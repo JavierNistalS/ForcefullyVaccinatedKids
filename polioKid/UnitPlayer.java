@@ -9,6 +9,7 @@ public class UnitPlayer {
 
 		UnitType t = uc.getType();
 		MyUnit u;
+		uc.println("hello world");
 
 		if (t == UnitType.BASE) u = new Base(uc);
 		else if (t == UnitType.WORKER) u = new Worker(uc);

@@ -61,7 +61,6 @@ public abstract class MyUnit {
         }
         return false;
     }
-
     void generalAttack(){
         int lessHpAggro = 100000000;
         int lessHpNonAggro = 100000000;
@@ -87,5 +86,4 @@ public abstract class MyUnit {
         if (best != null)
             uc.attack(best);
     }
-
 }

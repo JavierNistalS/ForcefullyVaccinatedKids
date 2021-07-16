@@ -16,23 +16,23 @@ public class Base extends MyUnit {
     }
 
     void playRound(){
-        int[] info = uc.readSmokeSignals();
-        if (info.length > 0){
-            enemyBaseCode = info[0];
-        }
+        baseLocation = uc.getLocation();
+        ReadSmokeSignals();
         generalAttack();
         if (explorerCount == 0){
-            if (spawnRandom(UnitType.EXPLORER)) explorerCount++;
+            if (spawnRandom(UnitType.EXPLORER))
+                explorerCount++;
         }
         else if (techIdx < techObjective.length){
             if (tryResearch(techObjective[techIdx]))
                 techIdx++;
         }
         else if (workerCount == 0){
-            if (spawnRandom(UnitType.WORKER)) workerCount++;
+            if (spawnRandom(UnitType.WORKER))
+                workerCount++;
         }
-        else if (enemyBaseCode >= 0){
-            trySmokeSignal(enemyBaseCode);
+        else if (enemyBaseLocation != null){
+            SendEnemyBaseSignal(enemyBaseLocation);
         }
     }
 
