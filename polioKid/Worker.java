@@ -4,13 +4,17 @@ import aic2021.user.*;
 
 public class Worker extends MyUnit {
 
-    Worker(UnitController uc){
+    Worker(UnitController uc)
+    {
         super(uc);
+        pathfinding = new Pathfinding(uc);
     }
 
     boolean hasBuiltBarracks = false;
+    Pathfinding pathfinding;
 
-    void playRound(){
+    void playRound()
+    {
         ReadSmokeSignals();
 
         if (uc.getInfo().getTorchRounds() < 100){
@@ -26,7 +30,7 @@ public class Worker extends MyUnit {
             if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(uc.getLocation()) >= 100) {
                 uc.println("moving to " + enemyBaseLocation);
                 uc.drawLineDebug(uc.getLocation(), enemyBaseLocation, 0, 0, 0);
-                move3(uc.getLocation().directionTo(enemyBaseLocation));
+                pathfinding.pathfindTo(enemyBaseLocation);
             }
         }
     }
