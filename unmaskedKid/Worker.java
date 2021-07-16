@@ -28,8 +28,13 @@ public class Worker extends MyUnit {
         }
     }
 
+    void MoveCloseToBase()
+    {
+
+    }
+
     boolean isValid(Location loc){
-        return (loc.x + loc.y)%2 == 0;
+        return (loc.x + loc.y) % 2 == 0;
     }
 
     boolean trySpawnInValid(UnitType type){
