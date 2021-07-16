@@ -6,6 +6,8 @@ public abstract class MyUnit {
 
     Direction[] dirs = Direction.values();
 
+    Location baseLocation;
+
     UnitController uc;
 
     MyUnit(UnitController uc){
@@ -36,7 +38,7 @@ public abstract class MyUnit {
         return false;
     }
 
-    boolean lightTorch(){
+    boolean tryLightTorch(){
         if (uc.canLightTorch()){
             uc.lightTorch();
             return true;
@@ -44,12 +46,18 @@ public abstract class MyUnit {
         return false;
     }
 
-    boolean randomThrow(){
-        Location[] locs = uc.getVisibleLocations(uc.getType().getTorchThrowRange(), false);
-        int index = (int)(uc.getRandomDouble()*locs.length);
-        if (uc.canThrowTorch(locs[index])){
-            uc.throwTorch(locs[index]);
+    boolean trySpawnUnit(UnitType type, Direction dir){
+        if (uc.canSpawn(type, dir)){
+            uc.spawn(type, dir);
             return true;
+        }
+        return false;
+    }
+
+    boolean trySpawnUnit(UnitType type){
+        for (Direction dir : dirs){
+            if (trySpawnUnit(type, dir))
+                return true;
         }
         return false;
     }
