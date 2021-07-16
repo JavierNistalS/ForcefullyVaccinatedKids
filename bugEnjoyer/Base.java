@@ -14,6 +14,7 @@ public class Base extends MyUnit {
     }
 
     void playRound() {
+        generalAttack();
         for (Technology T : Technology.values()){
             tryResearch(T);
         }
