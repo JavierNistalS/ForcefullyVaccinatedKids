@@ -1,4 +1,4 @@
-package rawTechRush;
+package gonorheaKid;
 
 import aic2021.user.UnitController;
 import aic2021.user.UnitType;
@@ -28,4 +28,5 @@ public class UnitPlayer {
 			uc.yield();
 		}
 	}
+
 }

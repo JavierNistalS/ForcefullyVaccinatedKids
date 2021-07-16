@@ -7,7 +7,7 @@ public class Base extends MyUnit {
     int lastWorker = -100;
     int techIdx = 0;
 
-    Technology[] techObjective = {Technology.COIN, Technology.ROCK_ART, Technology.BOXES, Technology.JOBS, Technology.EUGENICS, Technology.VOCABULARY, Technology.SCHOOLS, Technology.WHEEL};
+    Technology[] techObjective = {Technology.COIN, Technology.ROCK_ART, Technology.BOXES, Technology.JOBS, Technology.VOCABULARY, Technology.OIL, Technology.SCHOOLS, Technology.WHEEL};
 
     Base(UnitController uc){
         super(uc);
@@ -20,10 +20,10 @@ public class Base extends MyUnit {
         while(tryResearch(techObjective[techIdx]) && techIdx < techObjective.length)
             techIdx++;
 
-        if(techIdx >= 30 && lastWorker < 0)
+        if(techIdx >= 2 && lastWorker < 0)
         {
-            trySpawnUnit(UnitType.WORKER);
-            lastWorker = uc.getRound();
+            if(trySpawnUnit(UnitType.WORKER))
+                lastWorker = uc.getRound();
         }
     }
 
