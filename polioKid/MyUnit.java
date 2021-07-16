@@ -84,6 +84,10 @@ public abstract class MyUnit {
         return (tryMove(dir) || tryMove(dir.rotateLeft()) || tryMove(dir.rotateRight()));
     }
 
+    boolean move5(Direction dir){
+        return (tryMove(dir) || tryMove(dir.rotateLeft()) || tryMove(dir.rotateRight()) || tryMove(dir.rotateLeft().rotateLeft()) || tryMove(dir.rotateRight().rotateRight()));
+    }
+
     boolean tryAttack(Location loc){
         if (uc.canAttack(loc)){
             uc.attack(loc);

@@ -14,8 +14,7 @@ public class Base extends MyUnit {
     }
 
     void playRound() {
-        if(techIdx == techObjective.length)
-            uc.killSelf();
+        generalAttack();
 
         while(tryResearch(techObjective[techIdx]) && techIdx < techObjective.length)
             techIdx++;

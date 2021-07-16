@@ -24,6 +24,7 @@ public class Base extends MyUnit {
     }
 
     void playRound() {
+        generalAttack();
         if(uc.getTotalUnits() == uc.getMaxTotalUnits())
             researchGroup(unitCapTech);
         else if(researchGroup(tech[techIdx]))

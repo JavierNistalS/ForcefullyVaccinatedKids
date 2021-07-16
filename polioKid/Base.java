@@ -9,7 +9,7 @@ public class Base extends MyUnit {
     int techIdx = 0;
     int enemyBaseCode = -1;
 
-    Technology[] techObjective = {Technology.COIN, Technology.MILITARY_TRAINING, Technology.RAFTS};
+    Technology[] techObjective = {Technology.COIN, Technology.MILITARY_TRAINING};
 
     Base(UnitController uc){
         super(uc);
