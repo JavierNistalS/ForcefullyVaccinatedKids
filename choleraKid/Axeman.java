@@ -34,7 +34,7 @@ public class Axeman extends MyUnit {
                 if(enemyBaseLocation == null)
                     moveRandom();
                 else if(uc.getLocation().distanceSquared(enemyBaseLocation) > 32)
-                    pathfinding.wanderAround(enemyBaseLocation, 40);
+                    pathfinding.wanderAround(enemyBaseLocation, 18);
                 else
                     move5(enemyBaseLocation.directionTo(uc.getLocation()));
             }

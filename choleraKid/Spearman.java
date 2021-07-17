@@ -34,7 +34,7 @@ public class Spearman extends MyUnit {
                 if(enemyBaseLocation == null)
                     moveRandom();
                 else
-                    pathfinding.wanderAround(enemyBaseLocation, 40);
+                    pathfinding.wanderAround(enemyBaseLocation, 18);
             }
             else {
                 float bestScore = -10e20f;
