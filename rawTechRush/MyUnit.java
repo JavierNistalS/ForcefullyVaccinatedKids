@@ -5,6 +5,7 @@ import aic2021.user.*;
 public abstract class MyUnit {
 
     Direction[] dirs = Direction.values();
+    Direction[] diagDirs = {Direction.NORTHWEST, Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST};
 
     Location baseLocation;
 
@@ -26,18 +27,31 @@ public abstract class MyUnit {
         return false;
     }
 
-    boolean moveRandom(){
+    boolean moveRandom()
+    {
         int tries = 10;
         while (uc.canMove() && tries-- > 0){
             int random = (int)(uc.getRandomDouble()*8);
-            if (uc.canMove(dirs[random])){
+            if (uc.canMove(dirs[random]))
+            {
                 uc.move(dirs[random]);
                 return true;
             }
         }
         return false;
     }
-
+    boolean moveRandomDiagonal()
+    {
+        int tries = 10;
+        while (uc.canMove() && tries-- > 0){
+            int random = (int)(uc.getRandomDouble()*diagDirs.length);
+            if (uc.canMove(diagDirs[random])){
+                uc.move(diagDirs[random]);
+                return true;
+            }
+        }
+        return false;
+    }
     boolean tryLightTorch(){
         if (uc.canLightTorch()){
             uc.lightTorch();

@@ -6,10 +6,12 @@ public class Worker extends MyUnit {
 
     Worker(UnitController uc){
         super(uc);
+        pathfinding = new Pathfinding(uc);
     }
 
     boolean torchLighted = false;
     Location baseLocation;
+    Pathfinding pathfinding;
 
     int farmCount, quarryCount, sawmillCount;
     boolean orbitDirection = false;
@@ -22,37 +24,48 @@ public class Worker extends MyUnit {
             if(unit.getType() == UnitType.BASE)
                 baseLocation = unit.getLocation();
 
-        if(uc.canMove() && baseLocation != null)
-        {
-            Direction baseDir = uc.getLocation().directionTo(baseLocation);
-            Direction dir1 = orbitDirection ? baseDir.rotateLeft() : baseDir.rotateRight();
-            Direction dir2 = orbitDirection ? baseDir.rotateRight() : baseDir.rotateLeft();
+//        if(uc.canMove() && baseLocation != null)
+//        {
+//            Direction baseDir = uc.getLocation().directionTo(baseLocation);
+//            Direction dir1 = orbitDirection ? baseDir.rotateLeft() : baseDir.rotateRight();
+//            Direction dir2 = orbitDirection ? baseDir.rotateRight() : baseDir.rotateLeft();
+//
+//            if(uc.canMove(baseDir))
+//                uc.move(baseDir);
+//            else if(uc.canMove(dir1))
+//                uc.move(dir1);
+//            else if(uc.canMove(dir2))
+//            {
+//                uc.move(dir2);
+//                orbitDirection = !orbitDirection;
+//            }
+//            else
+//                moveRandom();
+//        }
 
-            if(uc.canMove(baseDir))
-                uc.move(baseDir);
-            else if(uc.canMove(dir1))
-                uc.move(dir1);
-            else if(uc.canMove(dir2))
-            {
-                uc.move(dir2);
-                orbitDirection = !orbitDirection;
+        if(uc.canMove()) {
+            if(baseLocation == null || uc.getLocation().distanceSquared(baseLocation) < 400) {
+                if (isValid(uc.getLocation()))
+                    moveRandomDiagonal();
+                if (uc.canMove())
+                    moveRandom();
             }
             else
-                moveRandom();
+                pathfinding.pathfindTo(baseLocation);
         }
 
-        moveRandom();
-        if(sawmillCount < 5 && trySpawnInValid(UnitType.SAWMILL))
+        if(sawmillCount < 6 && trySpawnInValid(UnitType.SAWMILL))
             sawmillCount++;
-        if(farmCount < 4 && trySpawnInValid(UnitType.FARM))
+        if(farmCount < 5 && trySpawnInValid(UnitType.FARM))
             farmCount++;
-        if(quarryCount < 4 && trySpawnInValid(UnitType.QUARRY))
+        if(quarryCount < 5 && trySpawnInValid(UnitType.QUARRY))
             quarryCount++;
     }
 
     boolean isValid(Location loc)
     {
-        return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());
+        return ((loc.x + loc.y) % 2) == 0;
+        //return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());
     }
 
     boolean trySpawnInValid(UnitType type)
