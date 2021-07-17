@@ -9,7 +9,7 @@ public class Spearman extends MyUnit {
         pathfinding = new Pathfinding(uc);
     }
     Pathfinding pathfinding;
-    int attackRound = 860;
+    int attackRound = 810;
 
     void playRound(){
         ReadSmokeSignals();
