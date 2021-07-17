@@ -24,27 +24,14 @@ public class Worker extends MyUnit {
             if(unit.getType() == UnitType.BASE)
                 baseLocation = unit.getLocation();
 
-//        if(uc.canMove() && baseLocation != null)
-//        {
-//            Direction baseDir = uc.getLocation().directionTo(baseLocation);
-//            Direction dir1 = orbitDirection ? baseDir.rotateLeft() : baseDir.rotateRight();
-//            Direction dir2 = orbitDirection ? baseDir.rotateRight() : baseDir.rotateLeft();
-//
-//            if(uc.canMove(baseDir))
-//                uc.move(baseDir);
-//            else if(uc.canMove(dir1))
-//                uc.move(dir1);
-//            else if(uc.canMove(dir2))
-//            {
-//                uc.move(dir2);
-//                orbitDirection = !orbitDirection;
-//            }
-//            else
-//                moveRandom();
-//        }
 
         if(uc.canMove()) {
-            if(baseLocation == null || uc.getLocation().distanceSquared(baseLocation) < 400) {
+
+            UnitInfo[] enemyUnits = uc.senseUnits(uc.getTeam().getOpponent());
+            if(enemyUnits.length > 0)
+                pathfinding.pathfindTo(baseLocation);
+
+            if(baseLocation == null || uc.getLocation().distanceSquared(baseLocation) < 64) {
                 if (isValid(uc.getLocation()))
                     moveRandomDiagonal();
                 if (uc.canMove())
@@ -54,11 +41,11 @@ public class Worker extends MyUnit {
                 pathfinding.pathfindTo(baseLocation);
         }
 
-        if(sawmillCount < 6 && trySpawnInValid(UnitType.SAWMILL))
+        if(sawmillCount < 4 && trySpawnInValid(UnitType.SAWMILL))
             sawmillCount++;
-        if(farmCount < 5 && trySpawnInValid(UnitType.FARM))
+        if(farmCount < 3 && trySpawnInValid(UnitType.FARM))
             farmCount++;
-        if(quarryCount < 5 && trySpawnInValid(UnitType.QUARRY))
+        if(quarryCount < 3 && trySpawnInValid(UnitType.QUARRY))
             quarryCount++;
     }
 
