@@ -1,4 +1,4 @@
-package gonorheaKid;
+package tuberculosisKid;
 
 import aic2021.user.UnitController;
 

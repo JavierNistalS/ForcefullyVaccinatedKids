@@ -1,10 +1,10 @@
-package gonorheaKid;
+package tuberculosisKid;
 
 import aic2021.user.UnitController;
 
-public class Wolf extends MyUnit {
+public class Sawmill extends MyUnit {
 
-    Wolf(UnitController uc){
+    Sawmill(UnitController uc){
         super(uc);
     }
 

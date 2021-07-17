@@ -1,4 +1,4 @@
-package gonorheaKid;
+package tuberculosisKid;
 
 import aic2021.user.*;
 
@@ -15,16 +15,10 @@ public class Worker extends MyUnit {
 
     void playRound()
     {
-
-
         ReadSmokeSignals();
-        //pathfinding.WanderAround(baseLocation, 3);
 
         if (!hasBuiltBarracks){
-            if (uc.getInfo().getTorchRounds() < 10 && trySpawnUnit(UnitType.BARRACKS)) {
-                hasBuiltBarracks = true;
-            }
-            if (enemyBaseLocation != null && trySpawnUnit(UnitType.BARRACKS)) {
+            if (trySpawnUnit(UnitType.BARRACKS)) {
                 hasBuiltBarracks = true;
             }
         }

@@ -1,15 +1,15 @@
-package gonorheaKid;
+package tuberculosisKid;
 
 import aic2021.user.*;
 
-public class Axeman extends MyUnit {
+public class Spearman extends MyUnit {
 
-    Axeman(UnitController uc){
+    Spearman(UnitController uc){
         super(uc);
         pathfinding = new Pathfinding(uc);
     }
     Pathfinding pathfinding;
-    int attackRound = 925;
+    int attackRound = 940;
 
     void playRound(){
         ReadSmokeSignals();
@@ -33,10 +33,8 @@ public class Axeman extends MyUnit {
             if(units.length == 0) {
                 if(enemyBaseLocation == null)
                     moveRandom();
-                else if(uc.getLocation().distanceSquared(enemyBaseLocation) > 32)
-                    pathfinding.pathfindTo(enemyBaseLocation);
                 else
-                    move5(enemyBaseLocation.directionTo(uc.getLocation()));
+                    pathfinding.pathfindTo(enemyBaseLocation);
             }
             else {
                 float bestScore = -10e20f;
@@ -54,9 +52,9 @@ public class Axeman extends MyUnit {
                     for(UnitInfo unit : units) {
                         Location unitLoc = unit.getLocation();
                         int dist = unitLoc.distanceSquared(loc);
-                        if((unit.getType() == UnitType.SPEARMAN && dist > 5 && dist <= 18) || (unit.getType() == UnitType.AXEMAN && dist <= 5))
-                            score = 100f / dist;
-                        else if(dist <= 5) {
+                        if(unit.getType() == UnitType.AXEMAN && dist <= 13)
+                            score = 10e8f / dist;
+                        else if(dist <= 18) {
                             canShootAny = true;
                             if(unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
                                 canShootAnyAggro = true;
@@ -69,16 +67,17 @@ public class Axeman extends MyUnit {
                         score += 10000;
                     else if(canShootAny)
                         score += 1000;
-
+                    else if(dir == Direction.NORTHEAST || dir == Direction.NORTHWEST || dir == Direction.SOUTHEAST || dir == Direction.SOUTHWEST)
+                        score -= 12000;
                     if(enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
                         score -= 10e10;
                     else
-                        score -= 0.01f * enemyBaseLocation.distanceSquared(loc);
+                        score -= 0.01 * enemyBaseLocation.distanceSquared(loc);
 
                     int light = uc.senseIllumination(loc);
                     score -= light;
                     if(light < 10)
-                        score += 700;
+                        score += 500;
 
                     if(score > bestScore) {
                         bestScore = score;
