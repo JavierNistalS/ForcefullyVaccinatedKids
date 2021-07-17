@@ -9,12 +9,13 @@ public class Barracks extends MyUnit {
         super(uc);
     }
 
+    int spearmanCount = 0;
+
     void playRound()
     {
-        if(uc.getRound() < 550)
-            spawnRandom(UnitType.SPEARMAN);
+        if(spearmanCount < 5 && spawnRandom(UnitType.SPEARMAN))
+            spearmanCount++;
         else
             spawnRandom(UnitType.AXEMAN);
     }
-
 }
