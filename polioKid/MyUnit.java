@@ -4,8 +4,8 @@ import aic2021.user.*;
 
 public abstract class MyUnit {
 
-    int HASH = 13377701;
-    int KEY = 17;
+    int HASH = 123201301;
+    int KEY = 15;
     int KEY_MOD = 1_0000_0000;
 
     Direction[] dirs = Direction.values();

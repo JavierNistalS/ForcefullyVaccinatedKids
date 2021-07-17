@@ -4,39 +4,34 @@ import aic2021.user.*;
 
 public class Worker extends MyUnit {
 
-    Worker(UnitController uc){
+    Worker(UnitController uc)
+    {
         super(uc);
+        pathfinding = new Pathfinding(uc);
     }
 
     boolean hasBuiltBarracks = false;
+    Pathfinding pathfinding;
 
-    void playRound(){
-        int[] info = uc.readSmokeSignals();
-        if (info.length > 0){
-            enemyBaseLocation = new Location(info[0]/100000, info[0]%100000);
-        }
-        if (uc.getInfo().getTorchRounds() < 100){
-            tryLightTorch();
-        }
+    void playRound()
+    {
+
+
+        ReadSmokeSignals();
+        //pathfinding.WanderAround(baseLocation, 3);
+
         if (!hasBuiltBarracks){
-            if (uc.getInfo().getTorchRounds() < 10){
-                if (trySpawnUnit(UnitType.BARRACKS))
-                    hasBuiltBarracks = true;
+            if (uc.getInfo().getTorchRounds() < 10 && trySpawnUnit(UnitType.BARRACKS)) {
+                hasBuiltBarracks = true;
             }
-            if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(uc.getLocation()) < 81){
-                if (trySpawnUnit(UnitType.BARRACKS))
-                    hasBuiltBarracks = true;
-            }
-            if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(uc.getLocation()) >= 81){
-                uc.println("moving to " + enemyBaseLocation);
-                uc.drawLineDebug(uc.getLocation(), enemyBaseLocation, 0, 0, 0);
-                move3(uc.getLocation().directionTo(enemyBaseLocation));
+            if (enemyBaseLocation != null && trySpawnUnit(UnitType.BARRACKS)) {
+                hasBuiltBarracks = true;
             }
         }
     }
 
     boolean isValid(Location loc){
-        return (loc.x + loc.y)%2 == 0;
+        return (loc.x + loc.y) % 2 == 0;
     }
 
     boolean trySpawnInValid(UnitType type){

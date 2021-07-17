@@ -13,7 +13,8 @@ public class Explorer extends MyUnit {
 
     boolean foundBase = false;
 
-    void playRound(){
+    void playRound()
+    {
         if (uc.getInfo().getTorchRounds() < 10)
             tryLightTorch();
         uc.println('a');
@@ -23,7 +24,7 @@ public class Explorer extends MyUnit {
                 enemyBaseLocation = u.getLocation();
         }
         if (!foundBase && enemyBaseLocation != null){
-            foundBase = trySmokeSignal(100000*enemyBaseLocation.x + enemyBaseLocation.y);
+            foundBase = SendEnemyBaseSignal(enemyBaseLocation);
         }
         randomExplore();
     }

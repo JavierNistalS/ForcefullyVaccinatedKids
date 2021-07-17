@@ -9,30 +9,31 @@ public class Base extends MyUnit {
     int techIdx = 0;
     int enemyBaseCode = -1;
 
-    Technology[] techObjective = {Technology.COIN, Technology.MILITARY_TRAINING, Technology.RAFTS};
+    Technology[] techObjective = {Technology.COIN, Technology.MILITARY_TRAINING};
 
     Base(UnitController uc){
         super(uc);
     }
 
     void playRound(){
-        int[] info = uc.readSmokeSignals();
-        if (info.length > 0){
-            enemyBaseCode = info[0];
-        }
+        baseLocation = uc.getLocation();
+        if(enemyBaseLocation == null || Math.abs(baseLocation.x - enemyBaseLocation.x) < 50 || Math.abs(baseLocation.y - enemyBaseLocation.y) < 50)
+            ReadSmokeSignals();
         generalAttack();
         if (explorerCount == 0){
-            if (spawnRandom(UnitType.EXPLORER)) explorerCount++;
+            if (spawnRandom(UnitType.EXPLORER))
+                explorerCount++;
         }
         else if (techIdx < techObjective.length){
             if (tryResearch(techObjective[techIdx]))
                 techIdx++;
         }
         else if (workerCount == 0){
-            if (spawnRandom(UnitType.WORKER)) workerCount++;
+            if (spawnRandom(UnitType.WORKER))
+                workerCount++;
         }
-        else if (enemyBaseCode >= 0){
-            trySmokeSignal(enemyBaseCode);
+        else if (enemyBaseLocation != null){
+            SendEnemyBaseSignal(enemyBaseLocation);
         }
     }
 

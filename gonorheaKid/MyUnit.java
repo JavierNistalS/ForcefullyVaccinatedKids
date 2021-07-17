@@ -4,6 +4,10 @@ import aic2021.user.*;
 
 public abstract class MyUnit {
 
+    int HASH = 13377701;
+    int KEY = 17;
+    int KEY_MOD = 1_0000_0000;
+
     Direction[] dirs = Direction.values();
 
     Location baseLocation, enemyBaseLocation;
@@ -14,8 +18,34 @@ public abstract class MyUnit {
         this.uc = uc;
     }
 
-
     abstract void playRound();
+
+    void ReadSmokeSignals()
+    {
+        if(uc.canReadSmokeSignals())
+        {
+            int[] smokes = uc.readSmokeSignals();
+            for(int smoke : smokes)
+            {
+                int info = smoke ^ HASH;
+                if((info / KEY_MOD) == KEY)
+                {
+                    uc.println("allied smoke: " + smoke);
+                    info %= KEY_MOD;
+                    enemyBaseLocation = new Location(info % 10000, info / 10000);
+                }
+                else
+                    uc.println("enemy smoke: " + smoke);
+            }
+        }
+    }
+
+    boolean SendEnemyBaseSignal(Location location)
+    {
+        int info = location.x + location.y * 10000;
+        info += KEY_MOD * KEY;
+        return trySmokeSignal(info ^ HASH);
+    }
 
     boolean spawnRandom(UnitType t){
         for (Direction dir : dirs){
@@ -83,6 +113,10 @@ public abstract class MyUnit {
 
     boolean move3(Direction dir){
         return (tryMove(dir) || tryMove(dir.rotateLeft()) || tryMove(dir.rotateRight()));
+    }
+
+    boolean move5(Direction dir){
+        return (tryMove(dir) || tryMove(dir.rotateLeft()) || tryMove(dir.rotateRight()) || tryMove(dir.rotateLeft().rotateLeft()) || tryMove(dir.rotateRight().rotateRight()));
     }
 
     boolean tryAttack(Location loc){
