@@ -15,7 +15,7 @@ public class Explorer extends MyUnit {
 
     Pathfinding pathfinding;
 
-    int CHUNK_SIZE = 6;
+    int CHUNK_SIZE = 5;
     boolean[][] exploredChunks = new boolean[(99 + CHUNK_SIZE) / CHUNK_SIZE][(99 + CHUNK_SIZE) / CHUNK_SIZE];
     UnitInfo[] enemyUnits;
 
