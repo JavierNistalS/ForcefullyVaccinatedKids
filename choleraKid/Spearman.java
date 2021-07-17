@@ -36,8 +36,12 @@ public class Spearman extends MyUnit {
                     aggroPresent = true;
             }
             if(!aggroPresent) {
-                if(enemyBaseLocation == null)
-                    moveRandom();
+                if(enemyBaseLocation == null) {
+                    if (enemyStructureLocation == null)
+                        moveRandom();
+                    else
+                        pathfinding.wanderAround(enemyStructureLocation, 10);
+                }
                 else
                     pathfinding.wanderAround(enemyBaseLocation, 18);
             }

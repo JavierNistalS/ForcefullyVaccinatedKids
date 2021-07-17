@@ -36,12 +36,14 @@ public class Axeman extends MyUnit {
                     aggroPresent = true;
             }
             if(!aggroPresent) {
-                if(enemyBaseLocation == null)
-                    moveRandom();
-                else if(uc.getLocation().distanceSquared(enemyBaseLocation) > 32)
-                    pathfinding.wanderAround(enemyBaseLocation, 18);
+                if(enemyBaseLocation == null) {
+                    if (enemyStructureLocation == null)
+                        moveRandom();
+                    else
+                        pathfinding.wanderAround(enemyStructureLocation, 10);
+                }
                 else
-                    move5(enemyBaseLocation.directionTo(uc.getLocation()));
+                    pathfinding.wanderAround(enemyBaseLocation, 18);
             }
             else {
                 float bestScore = -10e20f;

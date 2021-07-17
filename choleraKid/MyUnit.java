@@ -6,11 +6,12 @@ public abstract class MyUnit {
 
     int HASH = 13377701;
     int KEY = 17;
+    int KEY_STRUCTURE = 13;
     int KEY_MOD = 1_0000_0000;
 
     Direction[] dirs = Direction.values();
 
-    Location baseLocation, enemyBaseLocation;
+    Location baseLocation, enemyBaseLocation, enemyStructureLocation;
 
     UnitController uc;
 
@@ -30,9 +31,15 @@ public abstract class MyUnit {
                 int info = smoke ^ HASH;
                 if((info / KEY_MOD) == KEY)
                 {
-                    uc.println("allied smoke: " + smoke);
+                    uc.println("allied smoke [base]: " + smoke);
                     info %= KEY_MOD;
                     enemyBaseLocation = new Location(info % 10000, info / 10000);
+                }
+                else if((info / KEY_MOD) == KEY_STRUCTURE)
+                {
+                    uc.println("allied smoke [struct]: " + smoke);
+                    info %= KEY_MOD;
+                    enemyStructureLocation = new Location(info % 10000, info / 10000);
                 }
                 else
                     uc.println("enemy smoke: " + smoke);
@@ -44,6 +51,13 @@ public abstract class MyUnit {
     {
         int info = location.x + location.y * 10000;
         info += KEY_MOD * KEY;
+        return trySmokeSignal(info ^ HASH);
+    }
+
+    boolean SendEnemyStructureSignal(Location location)
+    {
+        int info = location.x + location.y * 10000;
+        info += KEY_MOD * KEY_STRUCTURE;
         return trySmokeSignal(info ^ HASH);
     }
 
