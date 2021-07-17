@@ -9,7 +9,7 @@ public class Axeman extends MyUnit {
         pathfinding = new Pathfinding(uc);
     }
     Pathfinding pathfinding;
-    int attackRound = 800;
+    int attackRound = 680;
 
     void playRound(){
         ReadSmokeSignals();
@@ -32,7 +32,7 @@ public class Axeman extends MyUnit {
             UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
             boolean aggroPresent = false;
             for (UnitInfo ui : units){
-                if (ui.getAttack() > 0 && ui.getType() != UnitType.BASE)
+                if (ui.getAttack() > 0 && !uc.isObstructed(ui.getLocation(), uc.getLocation()) && ui.getType() != UnitType.BASE)
                     aggroPresent = true;
             }
             if(!aggroPresent) {
@@ -59,15 +59,17 @@ public class Axeman extends MyUnit {
                     boolean canShootAny = false;
 
                     for(UnitInfo unit : units) {
-                        Location unitLoc = unit.getLocation();
-                        int dist = unitLoc.distanceSquared(loc);
-                        if((unit.getType() == UnitType.SPEARMAN && dist > 5 && dist <= 18) || (unit.getType() == UnitType.AXEMAN && dist <= 5))
-                            score = 100f / dist;
-                        else if(dist <= 5) {
-                            canShootAny = true;
-                            if(unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
-                                canShootAnyAggro = true;
-                                score -= dist * 10;
+                        if (!uc.isObstructed(unit.getLocation(), uc.getLocation())) {
+                            Location unitLoc = unit.getLocation();
+                            int dist = unitLoc.distanceSquared(loc);
+                            if ((unit.getType() == UnitType.SPEARMAN && dist > 5 && dist <= 18) || (unit.getType() == UnitType.AXEMAN && dist <= 5))
+                                score -= 100f / dist;
+                            else if (dist <= 5) {
+                                canShootAny = true;
+                                if (unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
+                                    canShootAnyAggro = true;
+                                    score -= dist * 10;
+                                }
                             }
                         }
                     }
