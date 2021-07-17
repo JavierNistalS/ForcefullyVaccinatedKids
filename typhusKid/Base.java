@@ -29,8 +29,6 @@ public class Base extends MyUnit {
         while(tryResearch(techObjective[techIdx]) && techIdx < techObjective.length)
             techIdx++;
 
-
-
         if(techIdx >= 2 && lastWorker < 0)
         {
             if (explorerCount == 0 && trySpawnUnit(UnitType.EXPLORER)){

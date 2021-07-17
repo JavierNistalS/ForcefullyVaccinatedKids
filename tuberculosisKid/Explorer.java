@@ -7,12 +7,16 @@ public class Explorer extends MyUnit {
     Explorer(UnitController uc){
         super(uc);
         pathfinding = new Pathfinding(uc);
+
+        for(int i = 0; i < 100 / CHUNK_SIZE; i++)
+            for(int j = 0; j < 100 / CHUNK_SIZE; j++)
+                exploredChunks[i][j] = false;
     }
 
     Pathfinding pathfinding;
 
     int CHUNK_SIZE = 6;
-    boolean[][] exploredChunks = new boolean[100 / CHUNK_SIZE][100 / CHUNK_SIZE];
+    boolean[][] exploredChunks = new boolean[(99 + CHUNK_SIZE) / CHUNK_SIZE][(99 + CHUNK_SIZE) / CHUNK_SIZE];
     UnitInfo[] enemyUnits;
 
     int targetChunkX, targetChunkY;
@@ -35,7 +39,7 @@ public class Explorer extends MyUnit {
         updateChunks();
 
         // find enemy base (TODO in micro)
-        if(baseLocation == null)
+        if(enemyBaseLocation == null)
             for (UnitInfo u : enemyUnits)
                 if (u.getType() == UnitType.BASE)
                     enemyBaseLocation = u.getLocation();
@@ -50,6 +54,8 @@ public class Explorer extends MyUnit {
              pathfinding.pathfindTo(new Location(
                  baseLocation.x - 50 + targetChunkX * CHUNK_SIZE,
                  baseLocation.y - 50 + targetChunkY * CHUNK_SIZE));
+         else
+             uc.println("target is invalid!");
 
         if (uc.getInfo().getTorchRounds() < 10)
             tryLightTorch();
@@ -61,19 +67,22 @@ public class Explorer extends MyUnit {
         // Discard current chunk
         Location loc = uc.getLocation();
         int cx = (loc.x - baseLocation.x + 50) / CHUNK_SIZE;
-        int cy = (loc.x - baseLocation.x + 50) / CHUNK_SIZE;
+        int cy = (loc.y - baseLocation.y + 50) / CHUNK_SIZE;
         exploredChunks[cx][cy] = true;
         uc.println("explored: [" + cx + ", " + cy + "]");
 
-        int SIZE = 100 / CHUNK_SIZE;
+        int SIZE = (99 + CHUNK_SIZE) / CHUNK_SIZE;
         int TEST_LEN = CHUNK_SIZE - 1;
 
         // discard Out-Of-Bounds Chunks
         if(uc.isOutOfMap(loc.add(0, TEST_LEN))) { // UP
-            uc.println("up OOB");
+            uc.println("up OOB start");
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy + 1; y < SIZE; y++)
+                {
+                    uc.println("up oob: [" + x + ", " + y + "]");
                     exploredChunks[x][y] = true;
+                }
         }
         if(uc.isOutOfMap(loc.add(0, -TEST_LEN))) { // DOWN
             uc.println("down OOB");
@@ -90,7 +99,7 @@ public class Explorer extends MyUnit {
         if(uc.isOutOfMap(loc.add(-TEST_LEN, 0))) { // LEFT
             uc.println("left OOB");
             for(int x = cx - 1; x >= 0; x--)
-                for(int y = cy - 1; y >= 0; y--)
+                for(int y = 0; y < SIZE; y++)
                     exploredChunks[x][y] = true;
         }
     }
@@ -99,15 +108,18 @@ public class Explorer extends MyUnit {
     {
         int SIZE = 100 / CHUNK_SIZE;
         int c = 0;
-        while((exploredChunks[targetChunkX][targetChunkY] && c < 20) || uc.getRound() >= targetRound + 100)
+        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound + 25)
         {
-            targetChunkX = (int)Math.floor(SIZE * uc.getRandomDouble());
-            targetChunkY = (int)Math.floor(SIZE * uc.getRandomDouble());
+            targetChunkX = (int)(SIZE * uc.getRandomDouble());
+            targetChunkY = (int)(SIZE * uc.getRandomDouble());
+            uc.println("rand: [" + targetChunkX + ", " + targetChunkY + "]");
             targetRound = uc.getRound();
             c++;
         }
-
-        return !exploredChunks[targetChunkX][targetChunkY];
+        uc.println("explored[" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
+        uc.println("c = " + c);
+        uc.println("targetRound = " + targetRound);
+        return true;
     }
 
     Direction randomDir = Direction.ZERO;

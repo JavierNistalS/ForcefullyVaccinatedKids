@@ -49,7 +49,7 @@ public class Worker extends MyUnit {
                 pathfinding.pathfindTo(baseLocation);
         }
 
-        if(sawmillCount < 4 && trySpawnInValid(UnitType.SAWMILL))
+        if(sawmillCount < 5 && trySpawnInValid(UnitType.SAWMILL))
             sawmillCount++;
         if(farmCount < 3 && trySpawnInValid(UnitType.FARM))
             farmCount++;
