@@ -9,7 +9,7 @@ public class Axeman extends MyUnit {
         pathfinding = new Pathfinding(uc);
     }
     Pathfinding pathfinding;
-    int attackRound = 925;
+    int attackRound = 850;
 
     void playRound(){
         ReadSmokeSignals();

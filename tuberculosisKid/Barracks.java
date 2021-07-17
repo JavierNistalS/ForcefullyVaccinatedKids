@@ -11,7 +11,7 @@ public class Barracks extends MyUnit {
 
     void playRound()
     {
-        if(uc.getRound() < 625)
+        if(uc.getRound() < 550)
             spawnRandom(UnitType.SPEARMAN);
         else
             spawnRandom(UnitType.AXEMAN);
