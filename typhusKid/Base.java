@@ -18,13 +18,14 @@ public class Base extends MyUnit {
         baseLocation = uc.getLocation();
         if(enemyBaseLocation == null || Math.abs(baseLocation.x - enemyBaseLocation.x) < 50 || Math.abs(baseLocation.y - enemyBaseLocation.y) < 50)
             ReadSmokeSignals();
-        if (enemyBaseLocation != null){
+        if (enemyBaseLocation != null)
             SendEnemyBaseSignal(enemyBaseLocation);
-        }
+        else if(enemyStructureLocation != null)
+            SendEnemyStructureSignal(enemyStructureLocation);
         generalAttack();
 
-        if(techIdx == techObjective.length)
-            uc.killSelf();
+        //if(techIdx == techObjective.length)
+        //    uc.killSelf();
 
         while(tryResearch(techObjective[techIdx]) && techIdx < techObjective.length)
             techIdx++;

@@ -10,11 +10,14 @@ public class Barracks extends MyUnit {
     }
 
     int unitCount = 0;
+    int delay = 0;
 
     void playRound(){
-        if (unitCount < 3 && trySpawnUnit(UnitType.SPEARMAN)){
+        if (unitCount < 3 && delay < 0 && trySpawnUnit(UnitType.SPEARMAN)){
             unitCount++;
+            delay = 12;
         }
+        delay--;
     }
 
 }

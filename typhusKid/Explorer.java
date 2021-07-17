@@ -22,6 +22,7 @@ public class Explorer extends MyUnit {
     int targetChunkX, targetChunkY;
     int targetRound = -100;
     boolean foundBase = false;
+    boolean foundBuilding = false;
 
     void playRound()
     {
@@ -39,13 +40,21 @@ public class Explorer extends MyUnit {
         updateChunks();
 
         // find enemy base (TODO in micro)
+        boolean anyAggro = false;
         if(enemyBaseLocation == null)
-            for (UnitInfo u : enemyUnits)
+            for (UnitInfo u : enemyUnits) {
                 if (u.getType() == UnitType.BASE)
                     enemyBaseLocation = u.getLocation();
+                else if(u.getType() == UnitType.FARM || u.getType() == UnitType.QUARRY || u.getType() == UnitType.QUARRY)
+                    enemyStructureLocation = u.getLocation();
+                else if(u.getType() == UnitType.WORKER || u.getType() == UnitType.AXEMAN || u.getType() == UnitType.SPEARMAN || u.getType() == UnitType.WOLF)
+                    anyAggro = true;
+            }
         if (!foundBase && enemyBaseLocation != null){
             foundBase = SendEnemyBaseSignal(enemyBaseLocation);
         }
+        else if(!foundBuilding && enemyStructureLocation != null && anyAggro)
+            foundBuilding = SendEnemyStructureSignal(enemyStructureLocation);
 
         //if(enemyUnits.length != 0) // micro
         //micro()

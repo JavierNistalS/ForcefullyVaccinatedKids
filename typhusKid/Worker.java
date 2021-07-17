@@ -27,10 +27,25 @@ public class Worker extends MyUnit {
             if(unit.getType() == UnitType.BASE)
                 baseLocation = unit.getLocation();
 
-        if (sawmillCount == 4 && farmCount == 3 && quarryCount == 3 && enemyBaseLocation != null && barrackCount == 0){
-            if (enemyBaseLocation.distanceSquared(uc.getLocation()) < 150 && trySpawnUnit(UnitType.BARRACKS))
+        if (sawmillCount >= 2 && farmCount >= 1 && quarryCount >= 1 && barrackCount <= 0 && (enemyBaseLocation != null || enemyStructureLocation != null)){
+            if (trySpawnUnit(UnitType.BARRACKS))
                 barrackCount++;
-            pathfinding.wanderAround(enemyBaseLocation, 64);
+        }
+        else
+        {
+            if(sawmillCount < 2 && trySpawnInValid(UnitType.SAWMILL))
+                sawmillCount++;
+            if(farmCount < 1 && trySpawnInValid(UnitType.FARM))
+                farmCount++;
+            if(quarryCount < 1 && trySpawnInValid(UnitType.QUARRY))
+                quarryCount++;
+
+            if(sawmillCount < 5 && uc.getResource(Resource.WOOD) > 300 && trySpawnInValid(UnitType.SAWMILL))
+                sawmillCount++;
+            if(farmCount < 4 && uc.getResource(Resource.FOOD) > 200 && trySpawnInValid(UnitType.FARM) )
+                farmCount++;
+            if(quarryCount < 5 && uc.getResource(Resource.STONE) > 200 && trySpawnInValid(UnitType.QUARRY) )
+                quarryCount++;
         }
 
         if(uc.canMove()) {
@@ -49,12 +64,7 @@ public class Worker extends MyUnit {
                 pathfinding.pathfindTo(baseLocation);
         }
 
-        if(sawmillCount < 5 && trySpawnInValid(UnitType.SAWMILL))
-            sawmillCount++;
-        if(farmCount < 3 && trySpawnInValid(UnitType.FARM))
-            farmCount++;
-        if(quarryCount < 3 && trySpawnInValid(UnitType.QUARRY))
-            quarryCount++;
+
     }
 
     boolean isValid(Location loc)

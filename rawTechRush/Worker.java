@@ -41,11 +41,11 @@ public class Worker extends MyUnit {
                 pathfinding.pathfindTo(baseLocation);
         }
 
-        if(sawmillCount < 4 && trySpawnInValid(UnitType.SAWMILL))
+        if((sawmillCount < 4 || (uc.getResource(Resource.STONE) > 1100 && uc.getResource(Resource.FOOD) > 1100)) && trySpawnInValid(UnitType.SAWMILL))
             sawmillCount++;
-        if(farmCount < 3 && trySpawnInValid(UnitType.FARM))
+        if((farmCount < 3 || (uc.getResource(Resource.STONE) > 1100 && uc.getResource(Resource.WOOD) > 1100)) && trySpawnInValid(UnitType.FARM))
             farmCount++;
-        if(quarryCount < 3 && trySpawnInValid(UnitType.QUARRY))
+        if((quarryCount < 3 || (uc.getResource(Resource.FOOD) > 1100 && uc.getResource(Resource.WOOD) > 1100)) && trySpawnInValid(UnitType.QUARRY))
             quarryCount++;
     }
 

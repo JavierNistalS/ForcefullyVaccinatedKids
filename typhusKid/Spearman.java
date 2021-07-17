@@ -23,6 +23,8 @@ public class Spearman extends MyUnit {
         if(uc.canMove()) {
             if(enemyBaseLocation != null)
                 uc.println("enemy base: " + enemyBaseLocation.toString());
+            else if(enemyStructureLocation != null)
+                uc.println("enemy struct: " + enemyStructureLocation.toString());
             else
                 uc.println("no c");
             UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
@@ -32,8 +34,12 @@ public class Spearman extends MyUnit {
                     aggroPresent = true;
             }
             if(!aggroPresent) {
-                if(enemyBaseLocation == null)
-                    moveRandom();
+                if(enemyBaseLocation == null) {
+                    if (enemyStructureLocation == null)
+                        moveRandom();
+                    else
+                        pathfinding.wanderAround(enemyStructureLocation, 16);
+                }
                 else
                     pathfinding.wanderAround(enemyBaseLocation, 18);
             }
