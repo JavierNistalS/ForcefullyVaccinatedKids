@@ -30,7 +30,12 @@ public class Spearman extends MyUnit {
             else
                 uc.println("no c");
             UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
-            if(units.length == 0) {
+            boolean aggroPresent = false;
+            for (UnitInfo ui : units){
+                if (ui.getAttack() > 0 && ui.getType() != UnitType.BASE)
+                    aggroPresent = true;
+            }
+            if(!aggroPresent) {
                 if(enemyBaseLocation == null)
                     moveRandom();
                 else
