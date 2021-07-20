@@ -87,23 +87,27 @@ public class Explorer extends MyUnit {
 
         // discard Out-Of-Bounds Chunks
         if(outOfBoundsUp && uc.isOutOfMap(loc.add(0, TEST_LEN))) { // UP
+            outOfBoundsUp = false;
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy + 1; y < SIZE; y++)
                     exploredChunks[x][y] = true;
         }
         if(outOfBoundsDown && uc.isOutOfMap(loc.add(0, -TEST_LEN))) { // DOWN
+            outOfBoundsDown = false;
             uc.println("down OOB");
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy - 1; y >= 0; y--)
                     exploredChunks[x][y] = true;
         }
         if(outOfBoundsRight && uc.isOutOfMap(loc.add(TEST_LEN, 0))) { // RIGHT
+            outOfBoundsRight = false;
             uc.println("right OOB");
             for(int x = cx + 1; x < SIZE; x++)
                 for(int y = 0; y < SIZE; y++)
                     exploredChunks[x][y] = true;
         }
         if(outOfBoundsLeft && uc.isOutOfMap(loc.add(-TEST_LEN, 0))) { // LEFT
+            outOfBoundsLeft = false;
             uc.println("left OOB");
             for(int x = cx - 1; x >= 0; x--)
                 for(int y = 0; y < SIZE; y++)

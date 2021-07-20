@@ -1,4 +1,5 @@
 package fullEconomy;
+
 import aic2021.user.*;
 
 public class Pathfinding {
@@ -6,13 +7,13 @@ public class Pathfinding {
     Location location;
     public Pathfinding(UnitController uc){
         this.uc = uc;
+        rotateRPath = uc.getRandomDouble() > 0.5;
     }
-    boolean rotateR = true;
     Location lastObj = new Location(-1, -1);
     boolean obstacle = false;
     Location lastObs;
     int minDistToObj = 1000000;
-    boolean rotateRPath = true;
+    boolean rotateRPath;
 
     public boolean pathfindTo(Location obj){
         if (!uc.canMove())
@@ -76,31 +77,74 @@ public class Pathfinding {
         minDistToObj = 1000000;
     }
 
-    public void WanderAround(Location center, int radius){
+    public boolean tryMoveSafe(Direction dir, Location danger, int radius){
+        return location.add(dir).distanceSquared(danger) > radius && tryMove(dir);
+    }
+
+    public boolean move3Safe(Direction dir, Location danger, int radius){
+        if (tryMoveSafe(dir, danger, radius))
+            return true;
+        if (tryMoveSafe(dir.rotateRight(), danger, radius))
+            return true;
+        if (tryMoveSafe(dir.rotateLeft(), danger, radius))
+            return true;
+        return false;
+    }
+
+    public boolean wanderAround(Location obj, int radius){
         if (!uc.canMove())
-            return;
+            return false;
         location = uc.getLocation();
-        //uc.println('a');
-        if (center.distanceSquared(location) > 2*radius)
-            pathfindTo(center);
-        //uc.println('b');
-        if (center.distanceSquared(location) < radius)
-            pathfindTo(location.add(location.x - center.x, location.y - center.y));
-        //uc.println('c');
-        if (!uc.canMove())
-            return;
-        Direction dir = location.directionTo(center);
-        dir = rotateR ? dir.rotateRight().rotateRight() : dir.rotateLeft().rotateLeft();
-        int k = 0;
-        while (!uc.canMove(dir) && k++ < 6){
-            dir = rotateR ? dir.rotateRight() : dir.rotateLeft();
+        //uc.println("position: " + position);
+        //uc.println("obj: " + obj);
+        //uc.println("lastobj: " + lastObj);
+        //uc.println("min dist to obj: "+minDistToObj);
+        if (!equals(lastObj,obj)){
+            resetPathfinding(obj);
         }
-        if (k < 6) {
-            if (k > 2)
-                rotateR = !rotateR;
-            uc.move(dir);
-            resetPathfinding(new Location(-1,-1));
+        if (!obstacle){
+            //uc.println("no obstacle?");
+            Direction dir = location.directionTo(obj);
+            if (move3Safe(dir, obj, radius))
+                return true;
+            obstacle = true;
+            //uc.println("new obstacle");
+            lastObs = location.add(dir);
         }
+        if (obstacle){
+            if (uc.isOutOfMap(lastObs)) {
+                resetPathfinding(obj);
+                rotateRPath = !rotateRPath;
+            }
+            //uc.println("obstacle: " + lastObs);
+            Direction dir = location.directionTo(lastObs);
+            //uc.println("Dir = " + dir);
+            if (tryMoveSafe(dir, obj, radius)){
+                obstacle = false;
+                //uc.println("obstacle disappeared");
+                return true;
+            }
+            for (int i = 1; i < 8; i++){
+                dir = rotateRPath ? dir.rotateRight() : dir.rotateLeft();
+                //uc.println("Dir = " + dir);
+                if (tryMoveSafe(dir, obj, radius)){
+                    //uc.println("moved " + dir);
+                    lastObs = location.add(rotateRPath ? dir.rotateLeft() : dir.rotateRight());
+                    int distToObj = location.distanceSquared(obj);
+                    //uc.println("dist to obj: " + distToObj);
+                    if (minDistToObj > distToObj){
+                        minDistToObj = distToObj;
+                        obstacle = false;
+                    }
+                    //uc.println("surrounding");
+                    return true;
+                }
+                //uc.println("cant move " + dir);
+            }
+            return false;
+        }
+        //uc.println("wtf pathfinding");
+        return false;
     }
 
     public boolean tryMove(Direction dir){
