@@ -9,12 +9,15 @@ public class Exploration
         this.uc = uc;
         this.baseLocation = baseLocation;
         this.CHUNK_SIZE = CHUNK_SIZE;
+        SIZE = (99 + 2 * CHUNK_SIZE) / CHUNK_SIZE; // ceil(100 / CHUNK_SIZE) + 1
+        exploredChunks = new boolean[SIZE][SIZE];
     }
 
     UnitController uc;
     Location baseLocation;
     int CHUNK_SIZE;
-    boolean[][] exploredChunks = new boolean[(99 + CHUNK_SIZE) / CHUNK_SIZE][(99 + CHUNK_SIZE) / CHUNK_SIZE];
+    int SIZE;
+    boolean[][] exploredChunks;
     UnitInfo[] enemyUnits;
 
     int targetChunkX, targetChunkY;
@@ -33,7 +36,7 @@ public class Exploration
         exploredChunks[cx][cy] = true;
         uc.println("explored: [" + cx + ", " + cy + "]");
 
-        int SIZE = (99 + CHUNK_SIZE) / CHUNK_SIZE;
+        int SIZE = (99 + 2 * CHUNK_SIZE) / CHUNK_SIZE;
         int TEST_LEN = CHUNK_SIZE - 1;
 
         // discard Out-Of-Bounds Chunks
@@ -64,7 +67,31 @@ public class Exploration
 
     boolean setExploreTarget()
     {
-        // TODO: adjacent exploration
+        if(exploredChunks[targetChunkX][targetChunkY])
+        {
+            // vv Cardinal directions are repeated so that they are more common
+            Direction[] dirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
+            for(int i = dirs.length - 1; i >= 1; i--) // SHUFFLE DIRS
+            {
+                int j = (int)(uc.getRandomDouble() * i + 1);
+                Direction temp = dirs[i];
+                dirs[i] = dirs[j];
+                dirs[j] = temp;
+            }
+
+            for(Direction dir : dirs)
+            {
+                int tx = targetChunkX + dir.dx;
+                int ty = targetChunkY + dir.dy;
+
+                if(!exploredChunks[tx][ty])
+                {
+                    targetChunkX = tx;
+                    targetChunkY = ty;
+                    return true;
+                }
+            }
+        }
 
         int SIZE = 100 / CHUNK_SIZE;
         int c = 0;
@@ -76,9 +103,6 @@ public class Exploration
             targetRound = uc.getRound();
             c++;
         }
-        uc.println("explored[" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
-        uc.println("c = " + c);
-        uc.println("targetRound = " + targetRound);
-        return true;
+        return !exploredChunks[targetChunkX][targetChunkY];
     }
 }
