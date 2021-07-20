@@ -9,13 +9,13 @@ public class Spearman extends MyUnit {
         pathfinding = new Pathfinding(uc);
     }
     Pathfinding pathfinding;
-    int attackRound = 690;
+    int attackRound = 720;
 
     void playRound(){
         ReadSmokeSignals();
         generalAttack();
 
-        if(uc.getRound() < attackRound)
+        if(uc.getRound() < attackRound || (uc.getRound() > attackRound + 100 && uc.getRound() < attackRound + 200))
             idleMicro();
         else
             pathfinding.pathfindTo(enemyBaseLocation);

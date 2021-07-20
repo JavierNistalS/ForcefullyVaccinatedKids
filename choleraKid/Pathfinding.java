@@ -7,13 +7,13 @@ public class Pathfinding {
     Location location;
     public Pathfinding(UnitController uc){
         this.uc = uc;
+        rotateRPath = uc.getRandomDouble() > 0.5;
     }
-    boolean rotateR = true;
     Location lastObj = new Location(-1, -1);
     boolean obstacle = false;
     Location lastObs;
     int minDistToObj = 1000000;
-    boolean rotateRPath = true;
+    boolean rotateRPath;
 
     public boolean pathfindTo(Location obj){
         if (!uc.canMove())
