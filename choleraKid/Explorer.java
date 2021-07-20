@@ -26,6 +26,8 @@ public class Explorer extends MyUnit {
 
     boolean outOfBoundsUp = true, outOfBoundsDown = true, outOfBoundsLeft = true, outOfBoundsRight = true;
 
+
+
     void playRound()
     {
         // try find allied base
