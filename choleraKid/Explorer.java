@@ -24,6 +24,8 @@ public class Explorer extends MyUnit {
     boolean foundBase = false;
     boolean foundBuilding = false;
 
+    boolean outOfBoundsUp = true, outOfBoundsDown = true, outOfBoundsLeft = true, outOfBoundsRight = true;
+
     void playRound()
     {
         // try find allied base
@@ -84,28 +86,24 @@ public class Explorer extends MyUnit {
         int TEST_LEN = CHUNK_SIZE - 1;
 
         // discard Out-Of-Bounds Chunks
-        if(uc.isOutOfMap(loc.add(0, TEST_LEN))) { // UP
-            uc.println("up OOB start");
+        if(outOfBoundsUp && uc.isOutOfMap(loc.add(0, TEST_LEN))) { // UP
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy + 1; y < SIZE; y++)
-                {
-                    uc.println("up oob: [" + x + ", " + y + "]");
                     exploredChunks[x][y] = true;
-                }
         }
-        if(uc.isOutOfMap(loc.add(0, -TEST_LEN))) { // DOWN
+        if(outOfBoundsDown && uc.isOutOfMap(loc.add(0, -TEST_LEN))) { // DOWN
             uc.println("down OOB");
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy - 1; y >= 0; y--)
                     exploredChunks[x][y] = true;
         }
-        if(uc.isOutOfMap(loc.add(TEST_LEN, 0))) { // RIGHT
+        if(outOfBoundsRight && uc.isOutOfMap(loc.add(TEST_LEN, 0))) { // RIGHT
             uc.println("right OOB");
             for(int x = cx + 1; x < SIZE; x++)
                 for(int y = 0; y < SIZE; y++)
                     exploredChunks[x][y] = true;
         }
-        if(uc.isOutOfMap(loc.add(-TEST_LEN, 0))) { // LEFT
+        if(outOfBoundsLeft && uc.isOutOfMap(loc.add(-TEST_LEN, 0))) { // LEFT
             uc.println("left OOB");
             for(int x = cx - 1; x >= 0; x--)
                 for(int y = 0; y < SIZE; y++)
@@ -133,7 +131,8 @@ public class Explorer extends MyUnit {
 
     Direction randomDir = Direction.ZERO;
 
-    void randomExplore(){
+    void randomExplore()
+    {
         uc.println(randomDir);
         if (!uc.canMove())
             return;
