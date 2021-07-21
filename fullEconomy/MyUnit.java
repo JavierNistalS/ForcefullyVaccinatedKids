@@ -100,4 +100,43 @@ public abstract class MyUnit {
         if (best != null)
             uc.attack(best);
     }
+
+    boolean tryThrowTorch(Location loc){
+        if (uc.canThrowTorch(loc)){
+            uc.throwTorch(loc);
+            return true;
+        }
+        return false;
+    }
+
+    boolean randomTorchThrow(){
+        int k = 10;
+        while (uc.getInfo().getTorchRounds() > 0 && k-- > 0){
+            Direction dir = dirs[(int)(uc.getRandomDouble()*9)];
+            Location loc = uc.getLocation().add(dir);
+            if (tryThrowTorch(loc))
+                return true;
+        }
+        return false;
+    }
+
+    void identifyBase(){
+        if (baseLocation == null){
+            UnitInfo[] units = uc.senseUnits(uc.getTeam());
+            for (UnitInfo ui : units){
+                if (ui.getType() == UnitType.BASE){
+                    baseLocation = ui.getLocation();
+                    break;
+                }
+            }
+        }
+    }
+
+    void sustainTorch(){
+        int torchLife = uc.getInfo().getTorchRounds();
+        if (torchLife < 10)
+            tryLightTorch();
+        if (torchLife < 4 && randomTorchThrow())
+            tryLightTorch();
+    }
 }
