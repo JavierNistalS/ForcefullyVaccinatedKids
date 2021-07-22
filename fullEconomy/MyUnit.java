@@ -7,7 +7,7 @@ public abstract class MyUnit {
     Direction[] dirs = Direction.values();
     Direction[] diagDirs = {Direction.NORTHWEST, Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST};
 
-    Location baseLocation;
+    Location baseLocation, enemyBaseLocation;
     UnitController uc;
 
     MyUnit(UnitController uc){
