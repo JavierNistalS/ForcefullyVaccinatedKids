@@ -40,19 +40,10 @@ public class Communications {
     }
     int decrypt(int smoke) {
         int msg = 0;
-        //uc.println("smoke: " + smoke);
         for (int i = 0; i < 32; i++) {
             long sy = SHUFFLE_NUMBER[i];
             msg |= ((((long)smoke & ((long)1 << (long)sy)) >> (long)sy) << (long)i);
-            //uc.println("--------------------------");
-            //uc.println("i: " + i + ", sy: " + sy);
-            //uc.println("(smoke & (1 << sy)): " + (smoke & (1 << sy)));
-            //uc.println("(smoke & (1 << sy)) >> sy): " + ((smoke & (1 << sy)) >> sy));
-            //uc.println("(smoke & (1 << sy)) >> sy) << i: " + (((smoke & (1 << sy)) >> sy) << i));
-            //uc.println("msg: " + msg);
         }
-        //uc.println("decrypt pre-xor: " + msg);
-
         return msg ^ XOR_NUMBER;
     }
 

@@ -25,8 +25,10 @@ public class Base extends MyUnit {
         generalAttack();
         readSmokeSignals();
 
-        if(uc.getRound() > 250)
-            uc.killSelf();
+        // TODO: stop economic growth at a reasonable level
+
+        //if(uc.getRound() > 500)
+        //    uc.killSelf();
 
         if(enemyBaseLocation != null && uc.senseUnits(uc.getOpponent()).length == 0)
             comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, enemyBaseLocation);
