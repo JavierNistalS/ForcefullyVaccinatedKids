@@ -8,22 +8,21 @@ public class Wolf extends MyUnit {
     Wolf(UnitController uc){
         super(uc);
         pathfinding = new Pathfinding(uc);
+        exploration = new Exploration(uc, 4, 75);
     }
 
     Exploration exploration;
     Pathfinding pathfinding;
 
-    void playRound(){
+    void playRound() {
         identifyBase();
-        if (exploration == null && baseLocation != null){
-            exploration = new Exploration(uc, baseLocation, 4, 75);
-        }
         generalAttack();
         exploration.updateChunks();
+
         if (uc.canMove() && !micro()) {
             Location toExplore = exploration.getLocation();
             if (toExplore == null){
-                exploration = new Exploration(uc, baseLocation, 4, 75);
+                exploration = new Exploration(uc, 4, 75);
                 toExplore = exploration.getLocation();
             }
             pathfinding.pathfindTo(toExplore);

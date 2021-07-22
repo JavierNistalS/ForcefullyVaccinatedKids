@@ -4,17 +4,17 @@ import aic2021.user.*;
 
 public class Exploration
 {
-    Exploration(UnitController uc, Location baseLocation, int CHUNK_SIZE, int RESET_TURNS)
+    Exploration(UnitController uc, int CHUNK_SIZE, int RESET_TURNS)
     {
         this.uc = uc;
-        this.baseLocation = baseLocation;
+        this.spawnLocation = uc.getLocation();
         this.CHUNK_SIZE = CHUNK_SIZE;
         this.RESET_TURNS = RESET_TURNS;
         SIZE = (99 + 2 * CHUNK_SIZE) / CHUNK_SIZE; // ceil(100 / CHUNK_SIZE) + 1
         exploredChunks = new boolean[SIZE][SIZE];
     }
     UnitController uc;
-    Location baseLocation;
+    Location spawnLocation;
     int CHUNK_SIZE;
     int SIZE;
     int RESET_TURNS;
@@ -32,8 +32,8 @@ public class Exploration
     {
         // Discard current chunk
         Location loc = uc.getLocation();
-        int cx = (loc.x - baseLocation.x + 50) / CHUNK_SIZE;
-        int cy = (loc.y - baseLocation.y + 50) / CHUNK_SIZE;
+        int cx = (loc.x - spawnLocation.x + 50) / CHUNK_SIZE;
+        int cy = (loc.y - spawnLocation.y + 50) / CHUNK_SIZE;
         exploredChunks[cx][cy] = true;
         uc.println("explored: [" + cx + ", " + cy + "]");
 
@@ -75,8 +75,8 @@ public class Exploration
     {
         if (setExploreTarget())
             return new Location(
-                baseLocation.x - 50 + targetChunkX * CHUNK_SIZE,
-                baseLocation.y - 50 + targetChunkY * CHUNK_SIZE);
+                spawnLocation.x - 50 + targetChunkX * CHUNK_SIZE,
+                spawnLocation.y - 50 + targetChunkY * CHUNK_SIZE);
         else
             return null;
     }
@@ -84,8 +84,8 @@ public class Exploration
     boolean setExploreTarget() {
         if(exploredChunks[targetChunkX][targetChunkY]) {
             Location loc = uc.getLocation();
-            int cx = (loc.x - baseLocation.x + 50) / CHUNK_SIZE;
-            int cy = (loc.y - baseLocation.y + 50) / CHUNK_SIZE;
+            int cx = (loc.x - spawnLocation.x + 50) / CHUNK_SIZE;
+            int cy = (loc.y - spawnLocation.y + 50) / CHUNK_SIZE;
 
             // vv Cardinal directions are repeated so that they are twice as common
             Direction[] randomDirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
@@ -116,11 +116,24 @@ public class Exploration
         {
             targetChunkX = (int)(SIZE * uc.getRandomDouble());
             targetChunkY = (int)(SIZE * uc.getRandomDouble());
-            uc.println("rand: [" + targetChunkX + ", " + targetChunkY + "]");
             targetRound = uc.getRound();
             c++;
         }
         uc.println("target (random): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
         return !exploredChunks[targetChunkX][targetChunkY];
+    }
+
+    void setRandomExploreTarget() {
+        int SIZE = 100 / CHUNK_SIZE;
+        int c = 0;
+        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound + RESET_TURNS)
+        {
+            targetChunkX = (int)(SIZE * uc.getRandomDouble());
+            targetChunkY = (int)(SIZE * uc.getRandomDouble());
+            targetRound = uc.getRound();
+            c++;
+        }
+        uc.println("randomTarget: [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
+
     }
 }

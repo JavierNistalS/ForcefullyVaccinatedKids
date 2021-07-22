@@ -7,7 +7,7 @@ public class Explorer extends MyUnit {
     Explorer(UnitController uc){
         super(uc);
         pathfinding = new Pathfinding(uc);
-        exploration = new Exploration(uc, uc.getLocation(), 5, 50);
+        exploration = new Exploration(uc, 5, 50);
         comms = new Communications(uc);
     }
 
@@ -19,9 +19,11 @@ public class Explorer extends MyUnit {
         sustainTorch();
         identifyBase();
         readSmokeSignals();
+        exploration.updateChunks();
+
         ResourceInfo[] resources = uc.senseResources();
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
-        pathfinding.pathfindTo(exploration.getLocation());
+
         for (UnitInfo ui : enemies){
             if (enemyBaseLocation == null && ui.getType() == UnitType.BASE){
                 if (comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, ui.getLocation())){
@@ -29,6 +31,8 @@ public class Explorer extends MyUnit {
                 }
             }
         }
+
+        pathfinding.pathfindTo(exploration.getLocation());
     }
 
     void readSmokeSignals() {

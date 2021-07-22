@@ -9,6 +9,7 @@ public class Worker extends MyUnit {
         buildBarracks = uc.getRound() > 400;
         pathfinding = new Pathfinding(uc);
         comms = new Communications(uc);
+        exploration = new Exploration(uc, 3, 75);
     }
 
     // adjustable constants
@@ -40,16 +41,19 @@ public class Worker extends MyUnit {
     ResourceInfo[] localResourceInfos;
     boolean[] resourceInfosOccupied;
     Location resourceMemory;
+    boolean anyEnemyAggroUnits = false;
 
     void playRound() {
-        sustainTorch();
+        //sustainTorch();
         updateInfo();
-        updateExploration();
         readSmokeSignals();
-
-        // TODO: add a resource timer so that workers don't get stuck on inaccessible resources
-
         generalAttack();
+
+        if(uc.canMove() && enemyBaseLocation != null && enemyBaseLocation.distanceSquared(uc.getLocation()) <= 32) {
+            Direction dir = enemyBaseLocation.directionTo(uc.getLocation());
+            pathfinding.pathfindTo(uc.getLocation().add(dir).add(dir).add(dir).add(dir).add(dir));
+            exploration.setRandomExploreTarget();
+        }
 
         if(!anyFood)
             huntDeer(closestDeer);
@@ -113,12 +117,15 @@ public class Worker extends MyUnit {
                 int msgType = comms.getType(msg);
                 if(msgType == comms.MSG_TYPE_ALLIED_SETTLEMENT)
                     addSettlementChecked(comms.intToLocation(comms.getInfo(msg)));
+                else if (msgType == comms.MSG_TYPE_ENEMY_BASE)
+                    enemyBaseLocation = comms.intToLocation(msg);
             }
         }
     }
 
     void updateInfo() {
         uc.println("updating info");
+        exploration.updateChunks();
 
         // carried resources & max resource capacity
         getResourcesCarried = uc.getResourcesCarried();
@@ -132,6 +139,7 @@ public class Worker extends MyUnit {
         units = uc.senseUnits();
         closestDeer = null;
         deerMinDist = 1000000;
+        anyEnemyAggroUnits = false;
     unitLoop:
         for (UnitInfo unit : units) {
             Location loc = unit.getLocation();
@@ -142,10 +150,17 @@ public class Worker extends MyUnit {
                 closestDeer = loc;
                 deerMinDist = dist;
             }
-            else if(type == UnitType.BASE && unit.getTeam() == uc.getTeam())
-                baseLocation = loc;
+            else if(type == UnitType.BASE){
+                 if(unit.getTeam() == uc.getTeam())
+                    baseLocation = loc;
+                 else // el worker ve la base enemiga (posible f)
+                    comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, loc);
+            }
             else if(type == UnitType.SETTLEMENT)
                 addSettlementChecked(loc);
+            else if(unit.getTeam() == uc.getOpponent())
+                anyEnemyAggroUnits |= (type == UnitType.AXEMAN || type == UnitType.SPEARMAN || type == UnitType.WORKER || type == UnitType.BASE);
+
         }
 
         // local resources
@@ -343,19 +358,6 @@ public class Worker extends MyUnit {
                 }
             }
         }
-    }
-
-    // also initializes it
-    void updateExploration(){
-        uc.println("updating exploration");
-        if(exploration == null) { // init. exploration & baseLocation
-            if(baseLocation != null) {
-                exploration = new Exploration(uc, baseLocation, 3, 75);
-                addSettlementUnchecked(baseLocation);
-            }
-        }
-        else
-            exploration.updateChunks();
     }
 
     void buildEconBuildings() {

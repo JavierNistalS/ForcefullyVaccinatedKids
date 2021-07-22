@@ -7,21 +7,29 @@ public class Base extends MyUnit {
 
     int lastWorker = -100;
     int workerCount = 0;
+    int explorerCount = 0;
 
     int techPhase = 0;
     Technology[] preJobTechs = {Technology.DOMESTICATION, Technology.MILITARY_TRAINING, Technology.BOXES, Technology.ROCK_ART};
     Technology[] endgameTechs = {Technology.TACTICS, Technology.EUGENICS, Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.WHEEL};
     int endgameTechIdx = 0;
 
+    Communications comms;
+
     Base(UnitController uc) {
         super(uc);
+        comms = new Communications(uc);
     }
 
     void playRound() {
         generalAttack();
+        readSmokeSignals();
 
-        //if(uc.getRound() > 600)
-        //    uc.killSelf();
+        if(uc.getRound() > 250)
+            uc.killSelf();
+
+        if(enemyBaseLocation != null && uc.senseUnits(uc.getOpponent()).length == 0)
+            comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, enemyBaseLocation);
 
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
@@ -62,6 +70,10 @@ public class Base extends MyUnit {
         //while(techIdx < techObjective.length && tryResearch(techObjective[techIdx]))
         //    techIdx++;
 
+        if(workerCount < 1) {
+            if(trySpawnUnit(UnitType.EXPLORER))
+                workerCount++;
+        }
         if(workerCount < 3) {
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
@@ -86,5 +98,22 @@ public class Base extends MyUnit {
         return food <= uc.getResource(Resource.FOOD)
             && wood <= uc.getResource(Resource.WOOD)
             && stone <= uc.getResource(Resource.STONE);
+    }
+
+    void readSmokeSignals() {
+        uc.println("reading smoke signals");
+        int[] smokeSignals = uc.readSmokeSignals();
+
+        for(int smokeSignal : smokeSignals) {
+            uc.println("smoke: " + smokeSignal);
+            int msg = comms.decrypt(smokeSignal);
+            uc.println("decrypted: " + msg);
+            if(comms.validate(msg)) {
+                int msgType = comms.getType(msg);
+                uc.println("smoke validated, type = " + msgType);
+                if (msgType == comms.MSG_TYPE_ENEMY_BASE)
+                    enemyBaseLocation = comms.intToLocation(msg);
+            }
+        }
     }
 }
