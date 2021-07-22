@@ -10,8 +10,8 @@ public class Base extends MyUnit {
 
     int techPhase = 0;
     Technology[] preJobTechs = {Technology.DOMESTICATION, Technology.MILITARY_TRAINING, Technology.BOXES, Technology.ROCK_ART};
-    Technology[] postJobTechs = {Technology.DOMESTICATION, Technology.TACTICS, Technology.EXPERTISE};
-    Technology[] endgameTechs = {Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.WHEEL};
+    Technology[] endgameTechs = {Technology.TACTICS, Technology.EUGENICS, Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.WHEEL};
+    int endgameTechIdx = 0;
 
     Base(UnitController uc) {
         super(uc);
@@ -20,16 +20,16 @@ public class Base extends MyUnit {
     void playRound() {
         generalAttack();
 
-        if(uc.getRound() > 600)
-            uc.killSelf();
+        //if(uc.getRound() > 600)
+        //    uc.killSelf();
 
-        if(techPhase == 0) {
+        if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
             if(hasTech(Technology.COIN) && hasTech(Technology.UTENSILS))
                 techPhase++;
         }
-        else if(techPhase == 1) {
+        else if(techPhase == 1) { // jobs
             int jobsWood = Technology.JOBS.getWoodCost();
             int jobsStone = Technology.JOBS.getStoneCost();
             int jobsFood = Technology.JOBS.getFoodCost();
@@ -46,14 +46,17 @@ public class Base extends MyUnit {
                 }
             }
         }
-        else if(techPhase == 2)
-        {
+        else if(techPhase == 2) { // jobs 2: electric boogaloo
             if(tryResearch(Technology.JOBS))
                 techPhase++;
         }
-        else if(techPhase == 3)
-        {
-
+        else if(techPhase == 3) { // post-jobs
+            if(tryResearch(Technology.DOMESTICATION))
+                techPhase++;
+        }
+        else { // endgame
+            while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
+                endgameTechIdx++;
         }
 
         //while(techIdx < techObjective.length && tryResearch(techObjective[techIdx]))

@@ -49,10 +49,10 @@ public class Worker extends MyUnit {
 
         // TODO: add a resource timer so that workers don't get stuck on inaccessible resources
 
+        generalAttack();
+
         if(!anyFood)
             huntDeer(closestDeer);
-        else
-            generalAttack();
 
         if (resourceMemory != null && uc.canSenseLocation(resourceMemory)){
             ResourceInfo[] rinfos = uc.senseResourceInfo(resourceMemory);
