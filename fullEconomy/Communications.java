@@ -46,6 +46,14 @@ public class Communications {
         return false;
     }
 
+    int getType(int x){
+        return ((x << VALIDATION_BITS) >> (VALIDATION_BITS + INFO_BITS));
+    }
+
+    int getInfo(int x){
+        return (x << (VALIDATION_BITS + TYPE_BITS)) >> (VALIDATION_BITS + TYPE_BITS);
+    }
+
     boolean signalLocation(int type, Location loc){
         return sendMessage(type, locationToInt(loc));
     }
