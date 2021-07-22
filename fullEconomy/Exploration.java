@@ -41,23 +41,28 @@ public class Exploration
 
         // discard Out-Of-Bounds Chunks
         if(outOfBoundsUp && uc.isOutOfMap(loc.add(0, TEST_LEN))) { // UP
+            outOfBoundsUp = false;
+            uc.println("up OOB");
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy + 1; y < SIZE; y++)
                     exploredChunks[x][y] = true;
         }
         if(outOfBoundsDown && uc.isOutOfMap(loc.add(0, -TEST_LEN))) { // DOWN
+            outOfBoundsDown = false;
             uc.println("down OOB");
             for(int x = 0; x < SIZE; x++)
                 for(int y = cy - 1; y >= 0; y--)
                     exploredChunks[x][y] = true;
         }
         if(outOfBoundsRight && uc.isOutOfMap(loc.add(TEST_LEN, 0))) { // RIGHT
+            outOfBoundsRight = false;
             uc.println("right OOB");
             for(int x = cx + 1; x < SIZE; x++)
                 for(int y = 0; y < SIZE; y++)
                     exploredChunks[x][y] = true;
         }
         if(outOfBoundsLeft && uc.isOutOfMap(loc.add(-TEST_LEN, 0))) { // LEFT
+            outOfBoundsLeft = false;
             uc.println("left OOB");
             for(int x = cx - 1; x >= 0; x--)
                 for(int y = 0; y < SIZE; y++)
@@ -65,29 +70,40 @@ public class Exploration
         }
     }
 
-    boolean setExploreTarget()
+    Location getLocation()
     {
-        if(exploredChunks[targetChunkX][targetChunkY])
-        {
-            // vv Cardinal directions are repeated so that they are more common
-            Direction[] dirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
-            for(int i = dirs.length - 1; i >= 1; i--) // SHUFFLE DIRS
-            {
+        if (setExploreTarget())
+            return new Location(
+                baseLocation.x - 50 + targetChunkX * CHUNK_SIZE,
+                baseLocation.y - 50 + targetChunkY * CHUNK_SIZE);
+        else
+            return null;
+    }
+
+    boolean setExploreTarget() {
+        if(exploredChunks[targetChunkX][targetChunkY]) {
+            Location loc = uc.getLocation();
+            int cx = (loc.x - baseLocation.x + 50) / CHUNK_SIZE;
+            int cy = (loc.y - baseLocation.y + 50) / CHUNK_SIZE;
+
+            // vv Cardinal directions are repeated so that they are twice as common
+            Direction[] randomDirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
+            for(int i = randomDirs.length - 1; i >= 1; i--) { // SHUFFLE DIRS
                 int j = (int)(uc.getRandomDouble() * i + 1);
-                Direction temp = dirs[i];
-                dirs[i] = dirs[j];
-                dirs[j] = temp;
+                Direction temp = randomDirs[i];
+                randomDirs[i] = randomDirs[j];
+                randomDirs[j] = temp;
             }
 
-            for(Direction dir : dirs)
-            {
-                int tx = targetChunkX + dir.dx;
-                int ty = targetChunkY + dir.dy;
+            for(Direction dir : randomDirs) {
+                int tx = cx + dir.dx;
+                int ty = cy + dir.dy;
 
                 if(!exploredChunks[tx][ty])
                 {
                     targetChunkX = tx;
                     targetChunkY = ty;
+                    uc.println("target (close): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY] + "{dir = " + dir.toString() + "}");
                     return true;
                 }
             }
@@ -103,6 +119,7 @@ public class Exploration
             targetRound = uc.getRound();
             c++;
         }
+        uc.println("target (random): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
         return !exploredChunks[targetChunkX][targetChunkY];
     }
 }

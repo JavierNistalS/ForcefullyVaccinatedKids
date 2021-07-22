@@ -8,7 +8,6 @@ public abstract class MyUnit {
     Direction[] diagDirs = {Direction.NORTHWEST, Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST};
 
     Location baseLocation;
-
     UnitController uc;
 
     MyUnit(UnitController uc){
@@ -75,7 +74,7 @@ public abstract class MyUnit {
         }
         return false;
     }
-    void generalAttack(){
+    boolean generalAttack(){
         int lessHpAggro = 100000000;
         int lessHpNonAggro = 100000000;
         Location best = null;
@@ -97,8 +96,11 @@ public abstract class MyUnit {
                 }
             }
         }
-        if (best != null)
+        if (best != null) {
             uc.attack(best);
+            return true;
+        }
+        return false;
     }
 
     boolean tryThrowTorch(Location loc){
@@ -112,7 +114,8 @@ public abstract class MyUnit {
     boolean randomTorchThrow(){
         int k = 10;
         while (uc.getInfo().getTorchRounds() > 0 && k-- > 0){
-            Direction dir = dirs[(int)(uc.getRandomDouble()*9)];
+            uc.println(dirs.length);
+            Direction dir = dirs[(int)(uc.getRandomDouble()*8)];
             Location loc = uc.getLocation().add(dir);
             if (tryThrowTorch(loc))
                 return true;
@@ -134,9 +137,7 @@ public abstract class MyUnit {
 
     void sustainTorch(){
         int torchLife = uc.getInfo().getTorchRounds();
-        if (torchLife < 10)
-            tryLightTorch();
-        if (torchLife < 4 && randomTorchThrow())
+        if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
             tryLightTorch();
     }
 }

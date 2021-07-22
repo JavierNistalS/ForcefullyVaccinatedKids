@@ -5,9 +5,10 @@ import aic2021.user.*;
 public class Base extends MyUnit {
 
     int lastWorker = -100;
+    int workerCount = 0;
     int techIdx = 0;
 
-    Technology[] techObjective = {Technology.COIN, Technology.ROCK_ART, Technology.BOXES, Technology.JOBS, Technology.VOCABULARY, Technology.OIL, Technology.SCHOOLS, Technology.WHEEL};
+    Technology[] techObjective = {Technology.BOXES, Technology.COIN, Technology.ROCK_ART, Technology.JOBS};
 
     Base(UnitController uc){
         super(uc);
@@ -16,16 +17,16 @@ public class Base extends MyUnit {
     void playRound() {
         generalAttack();
 
-        //if(techIdx == techObjective.length)
-        //    uc.killSelf();
+        if(uc.getRound() > 600)
+            uc.killSelf();
 
-        while(tryResearch(techObjective[techIdx]) && techIdx < techObjective.length)
+        while(techIdx < techObjective.length && tryResearch(techObjective[techIdx]))
             techIdx++;
 
-        if(techIdx >= 2 && lastWorker < 0)
+        if(workerCount < 5)
         {
             if(trySpawnUnit(UnitType.WORKER))
-                lastWorker = uc.getRound();
+                workerCount++;
         }
     }
 
