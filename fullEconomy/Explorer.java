@@ -16,11 +16,9 @@ public class Explorer extends MyUnit {
         sustainTorch();
         identifyBase();
         if (exploration == null && baseLocation != null){
-            exploration = new Exploration(uc, baseLocation, 5);
+            exploration = new Exploration(uc, baseLocation, 5, 50);
         }
         ResourceInfo[] resources = uc.senseResources();
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
     }
-
-
 }

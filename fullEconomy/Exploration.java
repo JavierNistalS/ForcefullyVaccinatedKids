@@ -4,19 +4,20 @@ import aic2021.user.*;
 
 public class Exploration
 {
-    Exploration(UnitController uc, Location baseLocation, int CHUNK_SIZE)
+    Exploration(UnitController uc, Location baseLocation, int CHUNK_SIZE, int RESET_TURNS)
     {
         this.uc = uc;
         this.baseLocation = baseLocation;
         this.CHUNK_SIZE = CHUNK_SIZE;
+        this.RESET_TURNS = RESET_TURNS;
         SIZE = (99 + 2 * CHUNK_SIZE) / CHUNK_SIZE; // ceil(100 / CHUNK_SIZE) + 1
         exploredChunks = new boolean[SIZE][SIZE];
     }
-
     UnitController uc;
     Location baseLocation;
     int CHUNK_SIZE;
     int SIZE;
+    int RESET_TURNS;
     boolean[][] exploredChunks;
     UnitInfo[] enemyUnits;
 
@@ -111,7 +112,7 @@ public class Exploration
 
         int SIZE = 100 / CHUNK_SIZE;
         int c = 0;
-        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound + 25)
+        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound + RESET_TURNS)
         {
             targetChunkX = (int)(SIZE * uc.getRandomDouble());
             targetChunkY = (int)(SIZE * uc.getRandomDouble());

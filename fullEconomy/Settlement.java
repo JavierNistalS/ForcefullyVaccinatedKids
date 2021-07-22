@@ -6,10 +6,13 @@ public class Settlement extends MyUnit {
 
     Settlement(UnitController uc){
         super(uc);
+        comms = new Communications(uc);
     }
 
-    void playRound(){
+    Communications comms;
 
+    void playRound() {
+        if(uc.canMakeSmokeSignal())
+            comms.signalLocation(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
     }
-
 }

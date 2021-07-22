@@ -23,8 +23,7 @@ public class Base extends MyUnit {
         while(techIdx < techObjective.length && tryResearch(techObjective[techIdx]))
             techIdx++;
 
-        if(workerCount < 5)
-        {
+        if(workerCount < 3) {
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
         }
