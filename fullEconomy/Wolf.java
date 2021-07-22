@@ -37,7 +37,7 @@ public class Wolf extends MyUnit {
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
         if (enemies.length == 0)
             return false;
-        int[] score = {0,0,0,0,0,0,0,0,0};
+        int[] score = {0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (Direction dir : dirs){
             if (uc.canMove(dir)){
                 Location loc = uc.getLocation().add(dir);

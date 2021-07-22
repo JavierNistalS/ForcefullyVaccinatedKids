@@ -136,6 +136,8 @@ public abstract class MyUnit {
     }
 
     void sustainTorch(){
+        uc.println("sustaining torch");
+
         int torchLife = uc.getInfo().getTorchRounds();
         if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
             tryLightTorch();

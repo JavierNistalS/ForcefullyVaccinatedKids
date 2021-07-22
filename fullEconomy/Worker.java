@@ -104,6 +104,7 @@ public class Worker extends MyUnit {
     }
 
     void readSmokeSignals() {
+        uc.println("reading smoke signals");
         int[] smokeSignals = uc.readSmokeSignals();
 
         for(int smokeSignal : smokeSignals) {
@@ -117,6 +118,8 @@ public class Worker extends MyUnit {
     }
 
     void updateInfo() {
+        uc.println("updating info");
+
         // carried resources & max resource capacity
         getResourcesCarried = uc.getResourcesCarried();
         int carriedRes = getResourcesCarried[0] + getResourcesCarried[1] + getResourcesCarried[2];
@@ -149,11 +152,13 @@ public class Worker extends MyUnit {
         localResourceInfos = uc.senseResourceInfo(uc.getLocation());
         localFood = 0;
         localResourceTotal = 0;
-        for(ResourceInfo resourceInfo : localResourceInfos) {
-            if(resourceInfo != null) {
-                localResourceTotal += resourceInfo.amount;
-                if(resourceInfo.resourceType == Resource.FOOD)
-                    localFood += resourceInfo.amount;
+        if(localResourceInfos != null) { // <- yes, this is necessary
+            for (ResourceInfo resourceInfo : localResourceInfos) {
+                if (resourceInfo != null) {
+                    localResourceTotal += resourceInfo.amount;
+                    if (resourceInfo.resourceType == Resource.FOOD)
+                        localFood += resourceInfo.amount;
+                }
             }
         }
 
@@ -342,6 +347,7 @@ public class Worker extends MyUnit {
 
     // also initializes it
     void updateExploration(){
+        uc.println("updating exploration");
         if(exploration == null) { // init. exploration & baseLocation
             if(baseLocation != null) {
                 exploration = new Exploration(uc, baseLocation, 3, 75);

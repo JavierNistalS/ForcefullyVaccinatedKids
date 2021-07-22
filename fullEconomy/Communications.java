@@ -17,6 +17,7 @@ public class Communications {
     final int MSG_TYPE_MISC = 3;
 
     final int MSG_MISC_STOP_BUILDING = 0;
+    final int MSG_MISC_RESOURCE_BUILDING_START_EXISTING = 1;
 
     public Communications(UnitController uc) {
         this.uc = uc;
