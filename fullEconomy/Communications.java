@@ -4,8 +4,8 @@ import aic2021.user.*;
 
 public class Communications {
 
-    final int[] SHUFFLE_NUMBER = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
-    final int XOR_NUMBER = 0;
+    final int[] SHUFFLE_NUMBER = {20, 23, 8, 15, 17, 6, 10, 3, 26, 28, 1, 7, 13, 19, 2, 4, 11, 22, 21, 31, 16, 24, 14, 30, 0, 12, 27, 29, 9, 25, 5, 18};
+    final int XOR_NUMBER = 1916125831;
     final int VALIDATION_BITS = 8; //Last round digits / 2
     final int TYPE_BITS = 2;
     final int INFO_BITS = 22;
