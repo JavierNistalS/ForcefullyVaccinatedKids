@@ -39,6 +39,7 @@ public class Worker extends MyUnit {
     ResourceInfo[] resourceInfos;
     ResourceInfo[] localResourceInfos;
     boolean[] resourceInfosOccupied;
+    Location resourceMemory;
 
     void playRound() {
         sustainTorch();
@@ -52,6 +53,17 @@ public class Worker extends MyUnit {
             huntDeer(closestDeer);
         else
             generalAttack();
+
+        if (resourceMemory != null && uc.canSenseLocation(resourceMemory)){
+            ResourceInfo[] rinfos = uc.senseResourceInfo(resourceMemory);
+            boolean something = false;
+            for (ResourceInfo ri : rinfos){
+                if (ri != null)
+                    something = true;
+            }
+            if (!something)
+                resourceMemory = null;
+        }
 
         if(localResourceTotal > 0 && !fullOfResources && (!anyFood || localFood > 0)) {
             uc.println("gathering resources");
@@ -68,12 +80,15 @@ public class Worker extends MyUnit {
                 else
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
             }
-            else if(totalRes == 0)
+            else if(totalRes == 0 && resourceMemory == null)
                 explore();
+            else if (totalRes == 0){
+                pathfinding.pathfindTo(resourceMemory);
+            }
             else { // some resources
                 uc.println("going to resources");
-
                 Location closestRes = findClosestResource(resourceInfos, resourceInfosOccupied);
+                resourceMemory = closestRes;
                 pathfinding.pathfindTo(closestRes);
                 uc.drawLineDebug(uc.getLocation(), closestRes, 255, 255, 0);
             }
