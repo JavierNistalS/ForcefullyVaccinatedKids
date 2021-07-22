@@ -12,7 +12,7 @@ public class Worker extends MyUnit {
     }
 
     // adjustable constants
-    int SETTLEMENT_DISTANCE = 25;
+    int SETTLEMENT_DISTANCE = 50;
 
     // refs
     Pathfinding pathfinding;
@@ -44,54 +44,48 @@ public class Worker extends MyUnit {
         sustainTorch();
         updateInfo();
         updateExploration();
+        readSmokeSignals();
 
-        if(!uc.hasResearched(Technology.JOBS, uc.getTeam())) { // NOT researched jobs
-            if(!anyFood)
-                huntDeer(closestDeer);
+        // TODO: add a resource timer so that workers don't get stuck on inaccessible resources
 
-            if(localResourceTotal > 0 && !fullOfResources) {
-                uc.println("gathering resources");
-                uc.gatherResources();
-                settlementTargetIdx = -1;
-                uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
+        if(!anyFood)
+            huntDeer(closestDeer);
+        else
+            generalAttack();
+
+        if(localResourceTotal > 0 && !fullOfResources && (!anyFood || localFood > 0)) {
+            uc.println("gathering resources");
+            uc.gatherResources();
+            settlementTargetIdx = -1;
+            uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
+        }
+        else if(uc.canMove()) {
+            if(fullOfResources) {
+                updateSettlementTarget();
+
+                if(uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE)
+                    spawnNewSettlement();
+                else
+                    pathfinding.pathfindTo(settlements[settlementTargetIdx]);
             }
-            else if(uc.canMove()) {
-                if(fullOfResources) {
-                    updateSettlementTarget();
+            else if(totalRes == 0)
+                explore();
+            else { // some resources
+                uc.println("going to resources");
 
-                    if(uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE)
-                        spawnNewSettlement();
-                    else
-                        pathfinding.pathfindTo(settlements[settlementTargetIdx]);
-                }
-                else if(totalRes == 0)
-                    explore();
-                else { // some resources
-                    uc.println("going to resources");
-
-                    Location closestRes = findClosestResource(resourceInfos, resourceInfosOccupied);
-                    pathfinding.pathfindTo(closestRes);
-                    uc.drawLineDebug(uc.getLocation(), closestRes, 255, 255, 0);
-                }
+                Location closestRes = findClosestResource(resourceInfos, resourceInfosOccupied);
+                pathfinding.pathfindTo(closestRes);
+                uc.drawLineDebug(uc.getLocation(), closestRes, 255, 255, 0);
             }
         }
-        else { // researched jobs
 
+        if(buildBarracks && uc.hasResearched(Technology.JOBS, uc.getTeam()) && trySpawnInValid(UnitType.BARRACKS))
+            buildBarracks = false;
 
-            if(uc.getLocation().distanceSquared(baseLocation) > 100)
-                pathfinding.pathfindTo(baseLocation);
-            else {
-                if(buildBarracks && trySpawnInValid(UnitType.BARRACKS))
-                    buildBarracks = false;
-
-                buildEconBuildings();
-            }
-
-        }
+        buildEconBuildings();
 
         if(tryDeposit())
             settlementTargetIdx = -1;
-
     }
 
     void readSmokeSignals() {

@@ -13,6 +13,6 @@ public class Settlement extends MyUnit {
 
     void playRound() {
         if(uc.canMakeSmokeSignal())
-            comms.signalLocation(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
+            comms.sendLocationMessage(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
     }
 }

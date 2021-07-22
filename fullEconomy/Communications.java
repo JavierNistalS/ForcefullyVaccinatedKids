@@ -14,12 +14,15 @@ public class Communications {
     final int MSG_TYPE_ENEMY_BASE = 0;
     final int MSG_TYPE_DEER = 1;
     final int MSG_TYPE_ALLIED_SETTLEMENT = 2;
+    final int MSG_TYPE_MISC = 3;
+
+    final int MSG_MISC_STOP_BUILDING = 0;
 
     public Communications(UnitController uc) {
         this.uc = uc;
     }
 
-    int encrypt(int x){
+    int encrypt(int x) {
         x ^= XOR_NUMBER;
         int y = 0;
         for (int i = 0; i < 32; i++){
@@ -27,8 +30,7 @@ public class Communications {
         }
         return y;
     }
-
-    int decrypt(int y){
+    int decrypt(int y) {
         int x = 0;
         for (int i = 0; i < 32; i++){
             int sy = SHUFFLE_NUMBER[i];
@@ -37,8 +39,8 @@ public class Communications {
         return x^XOR_NUMBER;
     }
 
-    boolean validate(int x){
-        return (x >> (TYPE_BITS + INFO_BITS)) == (uc.getRound() % (1 << (VALIDATION_BITS+1))) / 2;
+    boolean validate(int x) {
+        return (x >> (TYPE_BITS + INFO_BITS)) == (uc.getRound() % (1 << (VALIDATION_BITS + 1))) / 2;
     }
 
     boolean sendMessage(int type, int info){
@@ -50,24 +52,24 @@ public class Communications {
         }
         return false;
     }
-
-    int getType(int x){
-        return ((x << VALIDATION_BITS) >> (VALIDATION_BITS + INFO_BITS));
+    boolean sendMiscMessage(int info) {
+        return sendMessage(MSG_TYPE_MISC, info);
     }
-
-    int getInfo(int x){
-        return (x << (VALIDATION_BITS + TYPE_BITS)) >> (VALIDATION_BITS + TYPE_BITS);
-    }
-
-    boolean signalLocation(int type, Location loc){
+    boolean sendLocationMessage(int type, Location loc) {
         return sendMessage(type, locationToInt(loc));
     }
 
-    int locationToInt(Location loc){
-        return (loc.x << 11) + loc.y;
+    int getType(int x) {
+        return ((x << VALIDATION_BITS) >> (VALIDATION_BITS + INFO_BITS));
+    }
+    int getInfo(int x) {
+        return (x << (VALIDATION_BITS + TYPE_BITS)) >> (VALIDATION_BITS + TYPE_BITS);
     }
 
-    Location intToLocation(int x){
+    int locationToInt(Location loc) {
+        return (loc.x << 11) + loc.y;
+    }
+    Location intToLocation(int x) {
         return new Location((x << 10) >> 21, (x << 21) >> 21);
     }
 }
