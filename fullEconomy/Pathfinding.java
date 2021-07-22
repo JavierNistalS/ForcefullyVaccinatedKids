@@ -148,7 +148,7 @@ public class Pathfinding {
     }
 
     public boolean tryMove(Direction dir){
-        if (uc.canMove(dir)) {
+        if (canMove(dir)) {
             uc.move(dir);
             return true;
         }
@@ -165,5 +165,18 @@ public class Pathfinding {
     }
     public boolean equals(Location a, Location b){
         return a.x == b.x && a.y == b.y;
+    }
+
+    public boolean canMove(Direction dir){
+        if (uc.canMove()){
+            Location loc = uc.getLocation().add(dir);
+            if (uc.canSenseLocation(loc)){
+                return !uc.hasTrap(loc);
+            }
+            else{
+                return loc.x % 3 != 0 || loc.y % 3 != 0;
+            }
+        }
+        return false;
     }
 }

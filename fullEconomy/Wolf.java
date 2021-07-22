@@ -39,7 +39,7 @@ public class Wolf extends MyUnit {
             return false;
         int[] score = {0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (Direction dir : dirs){
-            if (uc.canMove(dir)){
+            if (pathfinding.canMove(dir)){
                 Location loc = uc.getLocation().add(dir);
                 int light = uc.senseIllumination(loc);
                 if (light >= 8){

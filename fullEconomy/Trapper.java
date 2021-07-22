@@ -2,35 +2,40 @@ package fullEconomy;
 
 import aic2021.user.*;
 
+
+
 public class Trapper extends MyUnit {
 
     Trapper(UnitController uc){
         super(uc);
+        exploration = new Exploration(uc, uc.getLocation(), 3, 75);
+        pathfinding = new Pathfinding(uc);
     }
+
+    Exploration exploration;
+    Pathfinding pathfinding;
 
     void playRound()
     {
-        UnitInfo[] units = uc.senseUnits(Team.NEUTRAL);
-
-        if(uc.canLightTorch())
-            uc.lightTorch();
-
-        if(uc.canMove())
-        {
-            if(units.length == 0)
-                moveRandom();
-            else {
-                Direction dir = uc.getLocation().directionTo(units[0].getLocation());
-                if(uc.canMove(dir))
-                    uc.move(dir);
-                else
-                    moveRandom();
-            }
+        identifyBase();
+        setTraps();
+        exploration.updateChunks();
+        Location target = exploration.getLocation();
+        if (target == null){
+            exploration = new Exploration(uc, uc.getLocation(), 3, 75);
+            target = exploration.getLocation();
         }
-
-        if(units.length > 0 && uc.canAttack() && units[0].getLocation().distanceSquared(uc.getLocation()) <= 2)
-            uc.attack(units[0].getLocation());
-
+        pathfinding.pathfindTo(target);
     }
 
+    void setTraps(){
+        if (uc.canAttack()){
+            for (Direction dir : dirs){
+                Location loc = uc.getLocation().add(dir);
+                if (uc.canAttack(loc) && loc.x%3 == 0 && loc.y%3 == 0){
+                    uc.attack(loc);
+                }
+            }
+        }
+    }
 }
