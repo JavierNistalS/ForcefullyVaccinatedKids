@@ -28,6 +28,23 @@ public class TheKGB {
         return trySmokeSignal(message);
     }
 
+    public boolean disruptEveryone(Location enemyBaseLocation) {
+        Location loc;
+        if (enemyBaseLocation != null)
+            loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
+        else
+            loc = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
+
+        uc.drawLineDebug(uc.getLocation(), loc, 120,0,0);
+        double random = uc.getRandomDouble();
+        if (random < 0.333)
+            return disruptCarbassots(loc);
+        else if (random < 0.666)
+            return disruptRosa(loc);
+        else
+            return disruptWololo(loc, uc.getRandomDouble() < 0.5);
+    }
+
     public boolean trySmokeSignal(int x){
         if (comms.validate(comms.decrypt(x)))
             return false;

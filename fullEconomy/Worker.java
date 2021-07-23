@@ -50,18 +50,14 @@ public class Worker extends MyUnit {
         generalAttack();
         exploration.updateChunks();
 
-        uc.println("a");
-
         if(uc.canMove() && enemyBaseLocation != null && enemyBaseLocation.distanceSquared(uc.getLocation()) <= 32) {
             Direction dir = enemyBaseLocation.directionTo(uc.getLocation());
             pathfinding.pathfindTo(uc.getLocation().add(dir).add(dir).add(dir).add(dir).add(dir));
             exploration.setRandomExploreTarget();
         }
-        uc.println("b");
 
         if(!anyFood)
             huntDeer(closestDeer);
-        uc.println("c");
 
         if (resourceMemory != null && uc.canSenseLocation(resourceMemory)){
             ResourceInfo[] rinfos = uc.senseResourceInfo(resourceMemory);
@@ -73,7 +69,6 @@ public class Worker extends MyUnit {
             if (!something)
                 resourceMemory = null;
         }
-        uc.println("d");
 
         if(localResourceTotal > 0 && !fullOfResources && (!anyFood || localFood > 0)) {
             uc.println("gathering resources");
@@ -103,7 +98,6 @@ public class Worker extends MyUnit {
                 uc.drawLineDebug(uc.getLocation(), closestRes, 255, 255, 0);
             }
         }
-        uc.println("e");
 
         if(buildBarracks && uc.hasResearched(Technology.JOBS, uc.getTeam()) && trySpawnInValid(UnitType.BARRACKS))
             buildBarracks = false;
@@ -112,8 +106,6 @@ public class Worker extends MyUnit {
 
         if(tryDeposit())
             settlementTargetIdx = -1;
-        uc.println("f");
-
     }
 
     void readSmokeSignals() {
