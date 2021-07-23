@@ -27,32 +27,6 @@ public abstract class MyUnit {
         }
         return false;
     }
-
-    boolean moveRandom()
-    {
-        int tries = 10;
-        while (uc.canMove() && tries-- > 0){
-            int random = (int)(uc.getRandomDouble()*8);
-            if (uc.canMove(dirs[random]))
-            {
-                uc.move(dirs[random]);
-                return true;
-            }
-        }
-        return false;
-    }
-    boolean moveRandomDiagonal()
-    {
-        int tries = 10;
-        while (uc.canMove() && tries-- > 0){
-            int random = (int)(uc.getRandomDouble()*diagDirs.length);
-            if (uc.canMove(diagDirs[random])){
-                uc.move(diagDirs[random]);
-                return true;
-            }
-        }
-        return false;
-    }
     boolean tryLightTorch(){
         if (uc.canLightTorch()){
             uc.lightTorch();

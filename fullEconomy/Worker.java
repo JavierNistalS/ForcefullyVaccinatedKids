@@ -58,7 +58,7 @@ public class Worker extends MyUnit {
         generalAttack();
         exploration.updateChunks();
 
-        if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation.distanceSquared(uc.getLocation()) <= 2) {
+        if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation != null && baseLocation.distanceSquared(uc.getLocation()) <= 2) {
             trySpawnInValid(UnitType.BARRACKS);
             pathfinding.tryMove(Direction.ZERO);
         }
@@ -151,8 +151,11 @@ public class Worker extends MyUnit {
                      baseLocation = loc;
                      addSettlementChecked(loc);
                  }
-                 else if(enemyBaseLocation == null) // el worker ve la base enemiga (posible f)
-                    comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, loc);
+                 else if(enemyBaseLocation == null) { // el worker ve la base enemiga (posible f)
+                     if (comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, loc)){
+                         enemyBaseLocation = loc;
+                     }
+                 }
             }
             else if(type == UnitType.SETTLEMENT)
                 addSettlementChecked(loc);
@@ -225,7 +228,7 @@ public class Worker extends MyUnit {
         uc.println("exploring...");
         Location exploreLoc = exploration.getLocation();
         if(exploreLoc == null) {
-            moveRandom();
+            exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.RESET_TURNS);
         }
         else {
             pathfinding.pathfindTo(exploreLoc);

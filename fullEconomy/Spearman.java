@@ -35,6 +35,8 @@ public class Spearman extends MyUnit {
             for (UnitInfo ui : units){
                 if (ui.getAttack() > 0 && ui.getType() != UnitType.BASE)
                     aggroPresent = true;
+                if (ui.getType() == UnitType.BASE)
+                    enemyBaseLocation = ui.getLocation();
             }
             if(!aggroPresent) {
                 if(enemyBaseLocation == null) {

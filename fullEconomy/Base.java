@@ -41,7 +41,6 @@ public class Base extends MyUnit {
         readSmokeSignals();
         research();
 
-
         totalResourcesSeen = 0;
         ResourceInfo[] resources = uc.senseResources();
         for(ResourceInfo resource : resources)
