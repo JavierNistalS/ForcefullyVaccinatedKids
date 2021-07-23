@@ -45,7 +45,7 @@ public class Spearman extends MyUnit {
                 Direction best = Direction.ZERO;
 
                 for(Direction dir : Direction.values()) {
-                    if(!uc.canMove(dir))
+                    if(!pathfinding.canMove(dir))
                         continue;
 
                     Location loc = uc.getLocation().add(dir);
