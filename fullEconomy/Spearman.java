@@ -57,7 +57,7 @@ public class Spearman extends MyUnit {
                         Location unitLoc = unit.getLocation();
                         int dist = unitLoc.distanceSquared(loc);
                         if(unit.getType() == UnitType.AXEMAN && dist <= 13)
-                            score = 10e8f / dist;
+                            score -= 10e8f / dist;
                         else if(dist <= 18) {
                             canShootAny = true;
                             if(unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
