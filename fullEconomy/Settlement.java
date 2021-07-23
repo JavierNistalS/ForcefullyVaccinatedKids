@@ -12,12 +12,14 @@ public class Settlement extends MyUnit {
 
     Communications comms;
     boolean genevaSuggestion = false;
+    boolean toldLocation = false;
     TheKGB kgb;
 
     void playRound() {
         readSmokeSignals();
-        if(uc.canMakeSmokeSignal())
-            comms.sendLocationMessage(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
+        if(uc.canMakeSmokeSignal() && !toldLocation) {
+            toldLocation = comms.sendLocationMessage(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
+        }
         if (genevaSuggestion && enemyBaseLocation != null){
             Location loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
             if (uc.getRound()%3 == 0)
