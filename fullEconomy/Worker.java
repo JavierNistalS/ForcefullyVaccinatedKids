@@ -58,12 +58,6 @@ public class Worker extends MyUnit {
         generalAttack();
         exploration.updateChunks();
 
-        if(uc.canMove() && enemyBaseLocation != null && enemyBaseLocation.distanceSquared(uc.getLocation()) <= 32) {
-            Direction dir = enemyBaseLocation.directionTo(uc.getLocation());
-            pathfinding.pathfindTo(uc.getLocation().add(dir).add(dir).add(dir).add(dir).add(dir));
-            exploration.setRandomExploreTarget();
-        }
-
         if(!anyFood)
             huntDeer(closestDeer);
 
