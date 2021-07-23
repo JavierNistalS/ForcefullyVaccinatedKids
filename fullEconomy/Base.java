@@ -35,6 +35,7 @@ public class Base extends MyUnit {
     boolean genevaSuggestion = false;
     int totalResourcesSeen;
     int lastEnemyBaseTransmission = -100;
+    boolean barracksWorker = false;
 
     void playRound() {
         generalAttack();
@@ -55,6 +56,10 @@ public class Base extends MyUnit {
 
         if (genevaSuggestion) {
             kgb.disruptEveryone(enemyBaseLocation);
+        }
+
+        if (hasTech(Technology.MILITARY_TRAINING) && !barracksWorker){
+            barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
         if(explorerCount < 1)

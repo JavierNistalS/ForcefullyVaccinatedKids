@@ -45,6 +45,13 @@ public abstract class MyUnit {
 
     boolean trySpawnUnit(UnitType type){
         for (Direction dir : dirs){
+            if (!uc.canSpawn(type, dir))
+                continue;
+            Location loc = uc.getLocation().add(dir);
+            if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
+                continue;
+            if (uc.canSenseLocation(loc) && uc.hasTrap(loc))
+                continue;
             if (trySpawnUnit(type, dir))
                 return true;
         }
