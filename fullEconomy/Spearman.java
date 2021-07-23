@@ -83,10 +83,11 @@ public class Spearman extends MyUnit {
                         score += 1000;
                     else if(dir == Direction.NORTHEAST || dir == Direction.NORTHWEST || dir == Direction.SOUTHEAST || dir == Direction.SOUTHWEST)
                         score -= 12000;
-                    if(enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
-                        score -= 10e10;
-                    else
+                    if(enemyBaseLocation != null){
+                        if(enemyBaseLocation.distanceSquared(loc) <= 18)
+                            score -= 10e10;
                         score -= 0.01 * enemyBaseLocation.distanceSquared(loc);
+                    }
 
                     int light = uc.senseIllumination(loc);
                     score -= light;
