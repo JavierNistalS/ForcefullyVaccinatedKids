@@ -7,7 +7,7 @@ public class Wolf extends MyUnit {
 
     Wolf(UnitController uc){
         super(uc);
-        pathfinding = new Pathfinding(uc);
+        pathfinding = new Pathfinding(uc, this);
         exploration = new Exploration(uc, 4, 75);
     }
 
@@ -54,6 +54,7 @@ public class Wolf extends MyUnit {
                     score[dir.ordinal()] -= (int)(10*Math.sqrt(loc.distanceSquared(ui.getLocation())));
                     if (ui.getType() == UnitType.BASE && loc.distanceSquared(ui.getLocation()) <= 40){
                         score[dir.ordinal()] -= 10000;
+                        enemyBaseLocation = ui.getLocation();
                     }
                     else if (ui.getType() == UnitType.WOLF){
                         int dist = loc.distanceSquared(ui.getLocation());

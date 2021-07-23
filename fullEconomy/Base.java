@@ -5,6 +5,10 @@ import aic2021.user.*;
 
 public class Base extends MyUnit {
 
+    final int FARM_MAX = 8;
+    final int SAWMILL_MAX = 7;
+    final int QUARRY_MAX = 7;
+
     Base(UnitController uc) {
         super(uc);
         comms = new Communications(uc);
@@ -30,6 +34,7 @@ public class Base extends MyUnit {
     int farmCount = 0, sawmillCount = 0, quarryCount = 0;
     boolean genevaSuggestion = false;
     int totalResourcesSeen;
+    int lastEnemyBaseTransmission = -100;
 
     void playRound() {
         generalAttack();
@@ -43,8 +48,16 @@ public class Base extends MyUnit {
         for(ResourceInfo resource : resources)
             totalResourcesSeen += resource.amount;
 
-        if(enemyBaseLocation != null && uc.senseUnits(uc.getOpponent()).length == 0)
-            comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, enemyBaseLocation);
+        manageMaxBuildings();
+
+        if(lastEnemyBaseTransmission < uc.getRound() - 60 && enemyBaseLocation != null && uc.senseUnits(uc.getOpponent()).length == 0) {
+            if (comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, enemyBaseLocation))
+                lastEnemyBaseTransmission = uc.getRound();
+        }
+
+        if (genevaSuggestion) {
+            kgb.disruptEveryone(enemyBaseLocation);
+        }
 
         if(explorerCount < 1)
             if(trySpawnUnit(UnitType.EXPLORER))
@@ -54,28 +67,59 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if(trapperCount < 2)
-            if(trySpawnUnit(UnitType.TRAPPER))
+        if(trapperCount < 2) {
+            if (trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
+        }
 
-        if (genevaSuggestion) {
-            Location loc;
-            if (enemyBaseLocation != null)
-                loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
-            else
-                loc = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
-            uc.drawLineDebug(uc.getLocation(), loc, 0,0,0);
-            double random = uc.getRandomDouble();
-            if (random < 0.2)
-                kgb.disruptCarbassots(loc);
-            else if (random < 0.4)
-                kgb.disruptRosa(loc);
-            else if (random < 0.6)
-                kgb.disruptWololo(loc, uc.getRandomDouble() < 0.5);
+    }
+
+    void manageMaxBuildings(){
+        uc.println("sawmillCount: " + sawmillCount);
+        uc.println("farmCount: " + farmCount);
+        uc.println("quarryCount: " + quarryCount);
+        if (buildWoodState && sawmillCount >= SAWMILL_MAX){
+            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_STOP_BUILDING_SAWMILLS)) {
+                buildWoodState = false;
+                uc.println("no build sawmills, *bonk");
+            }
+        }
+        if (!buildWoodState && sawmillCount < SAWMILL_MAX){
+            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_SAWMILLS)) {
+                buildWoodState = true;
+                uc.println("build sawmills");
+            }
+        }
+        if (buildFoodState && farmCount >= FARM_MAX){
+            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_STOP_BUILDING_FARMS)) {
+                buildFoodState = false;
+                uc.println("no build farms, *bonk");
+            }
+        }
+        if (!buildFoodState && farmCount < FARM_MAX){
+            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_FARMS)) {
+                buildFoodState = true;
+                uc.println("build farms");
+            }
+        }
+        if (buildStoneState && quarryCount >= QUARRY_MAX){
+            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_STOP_BUILDING_QUARRYS)) {
+                buildStoneState = false;
+                uc.println("no build quarries, *bonk");
+            }
+        }
+        if (!buildStoneState && quarryCount < QUARRY_MAX){
+            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_QUARRYS)) {
+                buildStoneState = true;
+                uc.println("build quarries");
+            }
         }
     }
 
     void research(){
+        if (uc.getResource(Resource.FOOD) > 2000){
+            tryResearch(Technology.DOMESTICATION);
+        }
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
@@ -154,6 +198,7 @@ public class Base extends MyUnit {
         int[] smokeSignals = uc.readSmokeSignals();
 
         for(int smokeSignal : smokeSignals) {
+            uc.println("reading " + smokeSignal);
             int msg = comms.decrypt(smokeSignal);
             if(comms.validate(msg)) {
                 int msgType = comms.getType(msg);

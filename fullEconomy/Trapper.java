@@ -9,7 +9,7 @@ public class Trapper extends MyUnit {
     Trapper(UnitController uc){
         super(uc);
         exploration = new Exploration(uc, 3, 75);
-        pathfinding = new Pathfinding(uc);
+        pathfinding = new Pathfinding(uc, this);
     }
 
     Exploration exploration;

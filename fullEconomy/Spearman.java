@@ -6,7 +6,7 @@ public class Spearman extends MyUnit {
 
     Spearman(UnitController uc){
         super(uc);
-        pathfinding = new Pathfinding(uc);
+        pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
     }
     Pathfinding pathfinding;

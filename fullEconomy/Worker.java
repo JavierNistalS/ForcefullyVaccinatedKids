@@ -7,7 +7,7 @@ public class Worker extends MyUnit {
     Worker(UnitController uc){
         super(uc);
         buildBarracks = uc.getRound() > 400;
-        pathfinding = new Pathfinding(uc);
+        pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
     }
@@ -43,10 +43,15 @@ public class Worker extends MyUnit {
     Location resourceMemory;
     boolean anyEnemyAggroUnits = false;
 
+    boolean canBuildFarm = true, canBuildSawmill = true, canBuildQuarry = true;
+    int farmUpdateRound = -10, sawmillUpdateRound = -10, quarryUpdateRound = -10;
     boolean canBuildSettlementForFood = true, canBuildSettlementForWood = true, canBuildSettlementForStone = true;
     int roundsSinceJobs = -1; // >= 0 means already researched
 
+    int timeAlive = 0;
+
     void playRound() {
+        timeAlive++;
         sustainTorch();
         updateInfo();
         readSmokeSignals();
@@ -66,10 +71,10 @@ public class Worker extends MyUnit {
             ResourceInfo[] ris = uc.senseResourceInfo(resourceMemory);
             boolean something = false;
             for (ResourceInfo ri : ris){
-                if (ri != null)
+                if (ri != null && uc.senseUnitAtLocation(ri.getLocation()) == null && (enemyBaseLocation == null || ri.getLocation().distanceSquared(enemyBaseLocation) > 18))
                     something = true;
             }
-            if (!something)
+            if (!something || (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(resourceMemory) <= 18))
                 resourceMemory = null;
         }
 
@@ -251,12 +256,30 @@ public class Worker extends MyUnit {
     }
 
     void readMiscMessage(int info) {
-        if(info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD)
+        if (info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD)
             canBuildSettlementForFood = false;
-        if(info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD)
+        if (info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD)
             canBuildSettlementForWood = false;
-        if(info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE)
+        if (info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE)
             canBuildSettlementForStone = false;
+        if (info == comms.MSG_START_BUILDING_SAWMILLS) {
+            canBuildSawmill = true;
+            sawmillUpdateRound = uc.getRound();
+        }
+        if (info == comms.MSG_STOP_BUILDING_SAWMILLS && sawmillUpdateRound < uc.getRound())
+            canBuildSawmill = false;
+        if (info == comms.MSG_START_BUILDING_FARMS) {
+            canBuildFarm = true;
+            farmUpdateRound = uc.getRound();
+        }
+        if (info == comms.MSG_STOP_BUILDING_FARMS && farmUpdateRound < uc.getRound())
+            canBuildFarm = false;
+        if (info == comms.MSG_START_BUILDING_QUARRYS) {
+            canBuildQuarry = true;
+            quarryUpdateRound = uc.getRound();
+        }
+        if (info == comms.MSG_STOP_BUILDING_QUARRYS && quarryUpdateRound < uc.getRound())
+            canBuildQuarry = false;
     }
 
     void spawnNewSettlement() {
@@ -385,11 +408,16 @@ public class Worker extends MyUnit {
     }
 
     void buildEconBuildings() {
-        if(trySpawnInValid(UnitType.SAWMILL))
+        if (timeAlive < 100)
+            return;
+        uc.println("canBuildSawmill: " + canBuildSawmill);
+        uc.println("canBuildFarm: " + canBuildFarm);
+        uc.println("canBuildQuarry: " + canBuildQuarry);
+        if(canBuildSawmill && trySpawnInValid(UnitType.SAWMILL))
             sawmillCount++;
-        if(trySpawnInValid(UnitType.QUARRY))
+        if(canBuildQuarry && trySpawnInValid(UnitType.QUARRY))
             quarryCount++;
-        if(trySpawnInValid(UnitType.FARM))
+        if(canBuildFarm && trySpawnInValid(UnitType.FARM))
             farmCount++;
     }
 }

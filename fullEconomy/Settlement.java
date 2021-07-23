@@ -16,9 +16,10 @@ public class Settlement extends MyUnit {
     int toldLocationCountdown = 0;
     int workerCount = 0;
     int totalResourcesSeen = 0;
+    int wolfCount = 0;
 
     void playRound() {
-        readSmokeSignalBuilding(comms);
+        readSmokeSignals();
 
         // spawning workers (& other units)
         totalResourcesSeen = 0;
@@ -38,6 +39,26 @@ public class Settlement extends MyUnit {
         else {
             kgb.disruptEveryone(enemyBaseLocation);
             toldLocationCountdown--;
+        }
+
+        if (wolfCount == 0){
+            if (trySpawnUnit(UnitType.WOLF))
+                wolfCount++;
+        }
+
+    }
+
+    void readSmokeSignals() {
+        uc.println("reading smoke signals");
+        int[] smokeSignals = uc.readSmokeSignals();
+
+        for(int smokeSignal : smokeSignals) {
+            int msg = comms.decrypt(smokeSignal);
+            if(comms.validate(msg)) {
+                int msgType = comms.getType(msg);
+                if (msgType == comms.MSG_TYPE_ENEMY_BASE)
+                    enemyBaseLocation = comms.intToLocation(msg);
+            }
         }
     }
 }

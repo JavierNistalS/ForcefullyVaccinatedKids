@@ -16,7 +16,7 @@ public class Barracks extends MyUnit {
     int totalEnemyAttack;
 
     void playRound() {
-        readSmokeSignalBuilding(comms);
+        readSmokeSignals();
 
         totalEnemyAttack = 0;
         UnitInfo[] enemyUnits = uc.senseUnits(uc.getOpponent());
@@ -25,6 +25,20 @@ public class Barracks extends MyUnit {
 
         if(genevaSuggestion) {
             kgb.disruptEveryone(enemyBaseLocation);
+        }
+    }
+
+    void readSmokeSignals() {
+        uc.println("reading smoke signals");
+        int[] smokeSignals = uc.readSmokeSignals();
+
+        for(int smokeSignal : smokeSignals) {
+            int msg = comms.decrypt(smokeSignal);
+            if(comms.validate(msg)) {
+                int msgType = comms.getType(msg);
+                if (msgType == comms.MSG_TYPE_ENEMY_BASE)
+                    enemyBaseLocation = comms.intToLocation(msg);
+            }
         }
     }
 }

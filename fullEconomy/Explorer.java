@@ -6,7 +6,7 @@ public class Explorer extends MyUnit {
 
     Explorer(UnitController uc){
         super(uc);
-        pathfinding = new Pathfinding(uc);
+        pathfinding = new Pathfinding(uc, this);
         exploration = new Exploration(uc, 5, 50);
         comms = new Communications(uc);
     }
@@ -32,7 +32,12 @@ public class Explorer extends MyUnit {
             }
         }
 
-        pathfinding.pathfindTo(exploration.getLocation());
+        Location toExplore = exploration.getLocation();
+        if (toExplore == null){
+            exploration = new Exploration(uc, 5, 50);
+            toExplore = exploration.getLocation();
+        }
+        pathfinding.pathfindTo(toExplore);
     }
 
     void readSmokeSignals() {

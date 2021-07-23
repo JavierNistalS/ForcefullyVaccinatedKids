@@ -5,15 +5,17 @@ import aic2021.user.*;
 public class Pathfinding {
     UnitController uc;
     Location location;
-    public Pathfinding(UnitController uc){
+    public Pathfinding(UnitController uc, MyUnit unit){
         this.uc = uc;
         rotateRPath = uc.getRandomDouble() > 0.5;
+        this.unit = unit;
     }
     Location lastObj = new Location(-1, -1);
     boolean obstacle = false;
     Location lastObs;
     int minDistToObj = 1000000;
     boolean rotateRPath;
+    MyUnit unit;
 
     public boolean pathfindTo(Location obj){
         if (!uc.canMove())
@@ -170,6 +172,9 @@ public class Pathfinding {
     public boolean canMove(Direction dir){
         if (uc.canMove(dir)){
             Location loc = uc.getLocation().add(dir);
+            if (unit.enemyBaseLocation != null && unit.enemyBaseLocation.distanceSquared(loc) <= 18){
+                return false;
+            }
             if (uc.canSenseLocation(loc)){
                 return !uc.hasTrap(loc);
             }

@@ -7,7 +7,7 @@ public abstract class MyUnit {
     Direction[] dirs = Direction.values();
     Direction[] diagDirs = {Direction.NORTHWEST, Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST};
 
-    Location baseLocation, enemyBaseLocation;
+    public Location baseLocation, enemyBaseLocation;
     UnitController uc;
 
     boolean genevaSuggestion = false;
@@ -143,20 +143,5 @@ public abstract class MyUnit {
         int torchLife = uc.getInfo().getTorchRounds();
         if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
             tryLightTorch();
-    }
-
-    void readSmokeSignalBuilding(Communications comms) {
-        uc.println("reading smoke signals");
-        int[] smokeSignals = uc.readSmokeSignals();
-
-        for(int smokeSignal : smokeSignals) {
-            int msg = comms.decrypt(smokeSignal);
-            if(comms.validate(msg)) {
-                int msgType = comms.getType(msg);
-                if (msgType == comms.MSG_TYPE_ENEMY_BASE){
-                    enemyBaseLocation = comms.intToLocation(msg);
-                }
-            }
-        }
     }
 }
