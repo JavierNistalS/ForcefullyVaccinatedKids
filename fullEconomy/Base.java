@@ -5,8 +5,8 @@ import aic2021.user.*;
 
 public class Base extends MyUnit {
 
-    final int FARM_MAX = 8;
-    final int SAWMILL_MAX = 7;
+    final int FARM_MAX = 7;
+    final int SAWMILL_MAX = 8;
     final int QUARRY_MAX = 7;
 
     Base(UnitController uc) {
@@ -41,7 +41,6 @@ public class Base extends MyUnit {
         readSmokeSignals();
         research();
 
-        // TODO: stop economic growth at a reasonable level
 
         totalResourcesSeen = 0;
         ResourceInfo[] resources = uc.senseResources();

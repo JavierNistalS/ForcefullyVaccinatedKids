@@ -28,7 +28,7 @@ public class Worker extends MyUnit {
     boolean buildBarracks = true;
 
     // updateInfo data
-    int maxResourceCapacity, carriedRes;
+    int maxResourceCapacity;
     boolean fullOfResources;
     int[] getResourcesCarried;
     int localFood, localResourceTotal, totalRes;
@@ -50,6 +50,7 @@ public class Worker extends MyUnit {
     int timeAlive = 0;
 
     void playRound() {
+        uc.println("buildBarracks: " + buildBarracks);
         timeAlive++;
         sustainTorch();
         updateInfo();
@@ -111,7 +112,7 @@ public class Worker extends MyUnit {
             }
         }
 
-        if(buildBarracks && 0.05 > uc.getRandomDouble())
+        if(timeAlive > 100 && buildBarracks && 0.05 > uc.getRandomDouble())
             trySpawnInValid(UnitType.BARRACKS);
 
         if (!anyEnemyAggroUnits)
@@ -305,6 +306,8 @@ public class Worker extends MyUnit {
     }
 
     boolean isValid(Location loc) {
+        if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
+            return false;
         if (((loc.x + loc.y) % 2) == 0 && !uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
             //uc.println("is preemptively valid");
 
@@ -409,7 +412,7 @@ public class Worker extends MyUnit {
     }
 
     void buildEconBuildings() {
-        if (timeAlive < 100)
+        if (timeAlive < 100 || uc.getRandomDouble() > 0.1)
             return;
         uc.println("canBuildSawmill: " + canBuildSawmill);
         uc.println("canBuildFarm: " + canBuildFarm);

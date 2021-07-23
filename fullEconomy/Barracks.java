@@ -11,7 +11,6 @@ public class Barracks extends MyUnit {
         super(uc);
         comms = new Communications(uc);
         kgb = new TheKGB(uc);
-        comms.sendMiscMessage(comms.MSG_BARRACKS_START);
     }
 
     Communications comms;
@@ -26,8 +25,12 @@ public class Barracks extends MyUnit {
     boolean canBuildQuarry = true;
     int quarryUpdateRound = -10;
 
+    int lastUpdate = -100;
+
     void playRound() {
         readSmokeSignals();
+        if (lastUpdate < uc.getRound() - 60 && comms.sendMiscMessage(comms.MSG_BARRACKS_START))
+            lastUpdate = uc.getRound();
 
         if (spawnedUnits < 2 && trySpawnUnit(UnitType.SPEARMAN))
             spawnedUnits++;
