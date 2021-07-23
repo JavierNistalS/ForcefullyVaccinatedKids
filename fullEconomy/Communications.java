@@ -14,9 +14,9 @@ public class Communications {
                 0, 12, 27, 29,
                 9, 25,  5, 18};
     final int XOR_NUMBER = 0;
-    final int VALIDATION_BITS = 8; //Last round digits / 2
-    final int TYPE_BITS = 2;
-    final int INFO_BITS = 22;
+    final int VALIDATION_BITS = 11; //Last round digits / 2
+    final int TYPE_BITS = 3;
+    final int INFO_BITS = 18;
     UnitController uc;
 
     final int MSG_TYPE_ENEMY_BASE = 0;
@@ -57,8 +57,6 @@ public class Communications {
 
     boolean sendMessage(int type, int info) {
         if (uc.canMakeSmokeSignal()){
-
-
             int msg = info + ((type + (uc.getRound() << TYPE_BITS)) << INFO_BITS);
             uc.println("decrypted: " + msg);
             msg = encrypt(msg);
@@ -85,9 +83,22 @@ public class Communications {
     }
 
     int locationToInt(Location loc) {
-        return (loc.x << 11) + loc.y;
+        return ((loc.x%128) << 7) + (loc.y%128);
     }
-    Location intToLocation(int x) {
-        return new Location((x << 10) >> 21, (x << 21) >> 21);
+    Location intToLocation(int msg) {
+        int x = ((msg << 18) >> 25);
+        int y = ((msg << 25) >> 25);
+        Location act = uc.getLocation();
+        x = act.x/128*128 + x;
+        y = act.y/128*128 + y;
+        while (x > act.x + 50)
+            x -= 128;
+        while (x < act.x - 50)
+            x += 128;
+        while (y > act.y + 50)
+            x -= 128;
+        while (y < act.y - 50)
+            y += 128;
+        return new Location(x, y);
     }
 }
