@@ -24,7 +24,28 @@ public class Communications {
     final int MSG_TYPE_ALLIED_SETTLEMENT = 2;
     final int MSG_TYPE_MISC = 3;
 
-    final int MSG_MISC_RESOURCE_BUILDING_START_EXISTING = 1;
+    // unit existance [0-99]
+    final int MSG_FARM_START = 0;
+    final int MSG_SAWMILL_START = 1;
+    final int MSG_QUARRY_START = 2;
+    final int MSG_FARM_END = 10;
+    final int MSG_SAWMILL_END = 11;
+    final int MSG_QUARRY_END = 12;
+    final int MSG_WORKER_END = 13;
+
+    // econonomy control [100-199]
+    final int MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD = 100;
+    final int MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD = 101;
+    final int MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE = 102;
+    final int MSG_STOP_BUILDING_FARMS = 110;
+    final int MSG_STOP_BUILDING_SAWMILLS = 111;
+    final int MSG_STOP_BUILDING_QUARRYS = 112;
+    final int MSG_STOP_BUILDING_RESOURCE_BUILDINGS = 113;
+    final int MSG_START_BUILDING_FARMS = 120;
+    final int MSG_START_BUILDING_SAWMILLS = 121;
+    final int MSG_START_BUILDING_QUARRYS = 122;
+    final int MSG_START_BUILDING_RESOURCE_BUILDINGS = 123;
+
 
     public Communications(UnitController uc) {
         this.uc = uc;

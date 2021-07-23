@@ -16,6 +16,11 @@ public class Base extends MyUnit {
 
     Communications comms;
 
+    boolean buildFoodState = true;
+    boolean buildWoodState = true;
+    boolean buildStoneState = true;
+    int farmCount, sawmillCount, quarryCount;
+
     Base(UnitController uc) {
         super(uc);
         comms = new Communications(uc);
@@ -26,6 +31,7 @@ public class Base extends MyUnit {
         readSmokeSignals();
 
         // TODO: stop economic growth at a reasonable level
+
 
         //if(uc.getRound() > 500)
         //    uc.killSelf();
@@ -65,8 +71,11 @@ public class Base extends MyUnit {
                 techPhase++;
         }
         else { // endgame
-            while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
-                endgameTechIdx++;
+            if(endgameTechIdx == endgameTechs.length - 1)
+                uc.killSelf();
+            else
+                while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
+                    endgameTechIdx++;
         }
 
         //while(techIdx < techObjective.length && tryResearch(techObjective[techIdx]))

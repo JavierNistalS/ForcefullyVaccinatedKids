@@ -164,7 +164,7 @@ public class Worker extends MyUnit {
                      baseLocation = loc;
                      addSettlementChecked(loc);
                  }
-                 else // el worker ve la base enemiga (posible f)
+                 else if(enemyBaseLocation == null) // el worker ve la base enemiga (posible f)
                     comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, loc);
             }
             else if(type == UnitType.SETTLEMENT)
