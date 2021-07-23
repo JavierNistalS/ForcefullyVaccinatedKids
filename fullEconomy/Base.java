@@ -50,7 +50,7 @@ public class Base extends MyUnit {
 
         manageMaxBuildings();
 
-        if(lastEnemyBaseTransmission < uc.getRound() - 60 && enemyBaseLocation != null && uc.senseUnits(uc.getOpponent()).length == 0) {
+        if(lastEnemyBaseTransmission < uc.getRound() - 40 && enemyBaseLocation != null) {
             if (comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, enemyBaseLocation))
                 lastEnemyBaseTransmission = uc.getRound();
         }
