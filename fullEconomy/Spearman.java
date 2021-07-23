@@ -8,13 +8,16 @@ public class Spearman extends MyUnit {
         super(uc);
         pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
+        exploration = new Exploration(uc, 6, 100);
     }
     Pathfinding pathfinding;
     Communications comms;
+    Exploration exploration;
 
     void playRound(){
         readSmokeSignals();
         generalAttack();
+        exploration.updateChunks();
 
         idleMicro();
 
@@ -35,7 +38,12 @@ public class Spearman extends MyUnit {
             }
             if(!aggroPresent) {
                 if(enemyBaseLocation == null) {
-                    moveRandom();
+                    Location obj = exploration.getLocation();
+                    if (obj == null){
+                        exploration = new Exploration(uc, 5, 100);
+                        obj = exploration.getLocation();
+                    }
+                    pathfinding.pathfindTo(obj);
                 }
                 else
                     pathfinding.wanderAround(enemyBaseLocation, 18);

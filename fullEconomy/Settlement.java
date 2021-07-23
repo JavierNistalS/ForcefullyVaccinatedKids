@@ -27,7 +27,7 @@ public class Settlement extends MyUnit {
         for(ResourceInfo resource : resources)
             totalResourcesSeen += resource.amount;
 
-        if(workerCount < (totalResourcesSeen / 350))
+        if(workerCount < (totalResourcesSeen / 350) && workerCount < 2)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 

@@ -58,6 +58,11 @@ public class Worker extends MyUnit {
         generalAttack();
         exploration.updateChunks();
 
+        if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation.distanceSquared(uc.getLocation()) <= 2) {
+            trySpawnInValid(UnitType.BARRACKS);
+            pathfinding.tryMove(Direction.ZERO);
+        }
+
         if(!anyFood)
             huntDeer(closestDeer);
 
@@ -79,7 +84,7 @@ public class Worker extends MyUnit {
             uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
         }
         else if(uc.canMove()) {
-            if(fullOfResources) {
+            if (fullOfResources) {
                 updateSettlementTarget();
 
                 boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
@@ -87,17 +92,15 @@ public class Worker extends MyUnit {
                 boolean buildSettlementForStone = uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
                 boolean buildSettlementForResources = totalRes > 200 || roundsSinceJobs > 75 || buildSettlementForFood || buildSettlementForWood || buildSettlementForStone;
 
-                if(buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE)
-                    spawnNewSettlement();
+                if (buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
+                    uc.println("no es relleno para no quitar el else");
                 else
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
-            }
-            else if(totalRes == 0 && resourceMemory == null)
+            } else if (totalRes == 0 && resourceMemory == null)
                 explore();
-            else if (totalRes == 0){
+            else if (totalRes == 0) {
                 pathfinding.pathfindTo(resourceMemory);
-            }
-            else { // some resources
+            } else { // some resources
                 uc.println("going to resources");
                 Location closestRes = findClosestResource(resourceInfos, resourceInfosOccupied);
                 resourceMemory = closestRes;
@@ -105,9 +108,6 @@ public class Worker extends MyUnit {
                 uc.drawLineDebug(uc.getLocation(), closestRes, 255, 255, 0);
             }
         }
-
-        if(timeAlive > 100 && buildBarracks && 0.05 > uc.getRandomDouble())
-            trySpawnInValid(UnitType.BARRACKS);
 
         if (!anyEnemyAggroUnits)
             buildEconBuildings();
@@ -158,6 +158,9 @@ public class Worker extends MyUnit {
                 addSettlementChecked(loc);
             else if(unit.getTeam() == uc.getOpponent())
                 anyEnemyAggroUnits |= type.attack > 0;
+            else if (type == UnitType.BARRACKS){
+                buildBarracks = false;
+            }
         }
 
         // local resources
@@ -278,13 +281,15 @@ public class Worker extends MyUnit {
             buildBarracks = false;
     }
 
-    void spawnNewSettlement() {
+    boolean spawnNewSettlement() {
         uc.println("spawning new settlement");
         Location newSettlementLoc = trySpawnInValidAndReturnLocation(UnitType.SETTLEMENT);
         if(newSettlementLoc != null) {
             uc.drawLineDebug(uc.getLocation(), newSettlementLoc, 0, 255, 255);
             addSettlementUnchecked(newSettlementLoc);
+            return true;
         }
+        return false;
     }
 
     boolean huntDeer(Location closestDeer) {
