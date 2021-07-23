@@ -32,7 +32,7 @@ public class Trapper extends MyUnit {
         if (uc.canAttack()) {
             for (Direction dir : dirs) {
                 Location loc = uc.getLocation().add(dir);
-                if (uc.canAttack(loc) && loc.x%3 == 0 && loc.y%3 == 0){
+                if (uc.canAttack(loc) && loc.x % 3 == 0 && loc.y % 3 == 0){
                     uc.attack(loc);
                 }
             }

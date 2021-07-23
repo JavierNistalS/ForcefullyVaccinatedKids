@@ -13,7 +13,7 @@ public class Worker extends MyUnit {
     }
 
     // adjustable constants
-    int SETTLEMENT_DISTANCE = 50;
+    int SETTLEMENT_DISTANCE = 121;
 
     // refs
     Pathfinding pathfinding;
@@ -43,6 +43,9 @@ public class Worker extends MyUnit {
     Location resourceMemory;
     boolean anyEnemyAggroUnits = false;
 
+    boolean canBuildSettlementForFood = true, canBuildSettlementForWood = true, canBuildSettlementForStone = true;
+    int roundsSinceJobs = -1; // >= 0 means already researched
+
     void playRound() {
         sustainTorch();
         updateInfo();
@@ -60,9 +63,9 @@ public class Worker extends MyUnit {
             huntDeer(closestDeer);
 
         if (resourceMemory != null && uc.canSenseLocation(resourceMemory)){
-            ResourceInfo[] rinfos = uc.senseResourceInfo(resourceMemory);
+            ResourceInfo[] ris = uc.senseResourceInfo(resourceMemory);
             boolean something = false;
-            for (ResourceInfo ri : rinfos){
+            for (ResourceInfo ri : ris){
                 if (ri != null)
                     something = true;
             }
@@ -80,7 +83,12 @@ public class Worker extends MyUnit {
             if(fullOfResources) {
                 updateSettlementTarget();
 
-                if(uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE)
+                boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
+                boolean buildSettlementForWood = uc.getResource(Resource.WOOD) >= maxResourceCapacity && canBuildSettlementForWood;
+                boolean buildSettlementForStone = uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
+                boolean buildSettlementForResources = totalRes > 200 || roundsSinceJobs > 75 || buildSettlementForFood || buildSettlementForWood || buildSettlementForStone;
+
+                if(buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE)
                     spawnNewSettlement();
                 else
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
@@ -108,25 +116,12 @@ public class Worker extends MyUnit {
             settlementTargetIdx = -1;
     }
 
-    void readSmokeSignals() {
-        uc.println("reading smoke signals");
-        int[] smokeSignals = uc.readSmokeSignals();
-
-        for(int smokeSignal : smokeSignals) {
-            int msg = comms.decrypt(smokeSignal);
-            if(comms.validate(msg)) {
-                int msgType = comms.getType(msg);
-                if(msgType == comms.MSG_TYPE_ALLIED_SETTLEMENT)
-                    addSettlementChecked(comms.intToLocation(comms.getInfo(msg)));
-                else if (msgType == comms.MSG_TYPE_ENEMY_BASE)
-                    enemyBaseLocation = comms.intToLocation(msg);
-            }
-        }
-    }
-
     void updateInfo() {
         uc.println("updating info");
         exploration.updateChunks();
+
+        if(uc.hasResearched(Technology.JOBS, uc.getTeam()))
+            roundsSinceJobs++;
 
         // carried resources & max resource capacity
         getResourcesCarried = uc.getResourcesCarried();
@@ -235,6 +230,33 @@ public class Worker extends MyUnit {
             uc.drawLineDebug(uc.getLocation(), exploreLoc, 0, 0, 255);
         }
 
+    }
+
+    void readSmokeSignals() {
+        uc.println("reading smoke signals");
+        int[] smokeSignals = uc.readSmokeSignals();
+
+        for(int smokeSignal : smokeSignals) {
+            int msg = comms.decrypt(smokeSignal);
+            if(comms.validate(msg)) {
+                int msgType = comms.getType(msg);
+                if(msgType == comms.MSG_TYPE_ALLIED_SETTLEMENT)
+                    addSettlementChecked(comms.intToLocation(comms.getInfo(msg)));
+                else if (msgType == comms.MSG_TYPE_ENEMY_BASE)
+                    enemyBaseLocation = comms.intToLocation(msg);
+                else if(msgType == comms.MSG_TYPE_MISC)
+                    readMiscMessage(comms.getInfo(msg));
+            }
+        }
+    }
+
+    void readMiscMessage(int info) {
+        if(info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD)
+            canBuildSettlementForFood = false;
+        if(info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD)
+            canBuildSettlementForWood = false;
+        if(info == comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE)
+            canBuildSettlementForStone = false;
     }
 
     void spawnNewSettlement() {
