@@ -168,7 +168,7 @@ public class Pathfinding {
     }
 
     public boolean canMove(Direction dir){
-        if (uc.canMove()){
+        if (uc.canMove(dir)){
             Location loc = uc.getLocation().add(dir);
             if (uc.canSenseLocation(loc)){
                 return !uc.hasTrap(loc);

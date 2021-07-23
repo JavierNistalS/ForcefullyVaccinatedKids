@@ -267,7 +267,6 @@ public class Worker extends MyUnit {
     }
 
     boolean isValid(Location loc) {
-        uc.println("is valid?: [" + loc.x + ", " + loc.y + "]");
         if (((loc.x + loc.y) % 2) == 0 && !uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
             //uc.println("is preemptively valid");
 

@@ -20,10 +20,13 @@ public class Base extends MyUnit {
     boolean buildWoodState = true;
     boolean buildStoneState = true;
     int farmCount, sawmillCount, quarryCount;
+    TheKGB kgb;
+    boolean genevaSuggestion = false;
 
     Base(UnitController uc) {
         super(uc);
         comms = new Communications(uc);
+        kgb = new TheKGB(uc);
     }
 
     void playRound() {
@@ -71,9 +74,9 @@ public class Base extends MyUnit {
                 techPhase++;
         }
         else { // endgame
-            if(endgameTechIdx == endgameTechs.length - 1)
+            /*if(endgameTechIdx == endgameTechs.length - 1 && uc.canResearchTechnology(Technology.WHEEL))
                 uc.killSelf();
-            else
+            else*/
                 while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                     endgameTechIdx++;
         }
@@ -88,6 +91,21 @@ public class Base extends MyUnit {
         if(workerCount < 3) {
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
+        }
+        if (genevaSuggestion){
+            Location loc;
+            if (enemyBaseLocation != null)
+                loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
+            else
+                loc = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
+            uc.drawLineDebug(uc.getLocation(), loc, 0,0,0);
+            double random = uc.getRandomDouble();
+            if (random < 0.2)
+                kgb.disruptCarbassots(loc);
+            else if (random < 0.4)
+                kgb.disruptRosa(loc);
+            else if (random < 0.6)
+                kgb.disruptWololo(loc, uc.getRandomDouble() < 0.5);
         }
     }
 

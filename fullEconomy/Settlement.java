@@ -20,8 +20,13 @@ public class Settlement extends MyUnit {
         if(uc.canMakeSmokeSignal() && !toldLocation) {
             toldLocation = comms.sendLocationMessage(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
         }
-        if (genevaSuggestion && enemyBaseLocation != null){
-            Location loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
+        if (genevaSuggestion){
+            Location loc;
+            if (enemyBaseLocation != null)
+                loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
+            else
+                loc = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
+            uc.drawLineDebug(uc.getLocation(), loc, 0,0,0);
             double random = uc.getRandomDouble();
             if (random < 0.2)
                 kgb.disruptCarbassots(loc);
