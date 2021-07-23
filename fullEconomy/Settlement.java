@@ -22,12 +22,16 @@ public class Settlement extends MyUnit {
         }
         if (genevaSuggestion && enemyBaseLocation != null){
             Location loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
-            if (uc.getRound()%3 == 0)
+            double random = uc.getRandomDouble();
+            if (random < 0.2)
                 kgb.disruptCarbassots(loc);
-            if (uc.getRound()%3 == 1)
+            else if (random < 0.4)
                 kgb.disruptRosa(loc);
-            if (uc.getRound()%3 == 2)
+            else if (random < 0.6)
                 kgb.disruptWololo(loc, uc.getRandomDouble() < 0.5);
+            else if (random < 0.8){
+                comms.sendLocationMessage(comms.MSG_TYPE_ALLIED_SETTLEMENT, uc.getLocation());
+            }
         }
     }
 
