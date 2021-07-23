@@ -21,7 +21,7 @@ public class Base extends MyUnit {
     int trapperCount = 0;
 
     int techPhase = 0;
-    Technology[] preJobTechs = {Technology.DOMESTICATION, Technology.MILITARY_TRAINING, Technology.BOXES, Technology.ROCK_ART};
+    Technology[] preJobTechs = {Technology.MILITARY_TRAINING};
     Technology[] endgameTechs = {Technology.TACTICS, Technology.EUGENICS, Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.WHEEL};
     int endgameTechIdx = 0;
 
@@ -123,7 +123,8 @@ public class Base extends MyUnit {
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
-            if(hasTech(Technology.COIN) && hasTech(Technology.UTENSILS))
+            tryResearch(Technology.MILITARY_TRAINING);
+            if(hasTech(Technology.COIN) && hasTech(Technology.UTENSILS) && hasTech(Technology.MILITARY_TRAINING))
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs

@@ -6,7 +6,6 @@ public class Worker extends MyUnit {
 
     Worker(UnitController uc){
         super(uc);
-        buildBarracks = uc.getRound() > 400;
         pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
@@ -26,7 +25,7 @@ public class Worker extends MyUnit {
     int settlementsLength = 0, settlementTargetIdx = -1;
     int farmCount, quarryCount, sawmillCount;
     int lastValid = 0;
-    boolean buildBarracks = false;
+    boolean buildBarracks = true;
 
     // updateInfo data
     int maxResourceCapacity, carriedRes;
@@ -112,10 +111,11 @@ public class Worker extends MyUnit {
             }
         }
 
-        if(buildBarracks && uc.hasResearched(Technology.JOBS, uc.getTeam()) && trySpawnInValid(UnitType.BARRACKS))
-            buildBarracks = false;
+        if(buildBarracks && 0.05 > uc.getRandomDouble())
+            trySpawnInValid(UnitType.BARRACKS);
 
-        buildEconBuildings();
+        if (!anyEnemyAggroUnits)
+            buildEconBuildings();
 
         if(tryDeposit())
             settlementTargetIdx = -1;
@@ -162,8 +162,7 @@ public class Worker extends MyUnit {
             else if(type == UnitType.SETTLEMENT)
                 addSettlementChecked(loc);
             else if(unit.getTeam() == uc.getOpponent())
-                anyEnemyAggroUnits |= (type == UnitType.AXEMAN || type == UnitType.SPEARMAN || type == UnitType.WORKER || type == UnitType.BASE);
-
+                anyEnemyAggroUnits |= type.attack > 0;
         }
 
         // local resources
@@ -280,6 +279,8 @@ public class Worker extends MyUnit {
         }
         if (info == comms.MSG_STOP_BUILDING_QUARRYS && quarryUpdateRound < uc.getRound())
             canBuildQuarry = false;
+        if (info == comms.MSG_BARRACKS_START)
+            buildBarracks = false;
     }
 
     void spawnNewSettlement() {

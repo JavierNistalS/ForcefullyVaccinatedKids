@@ -28,6 +28,7 @@ public class Communications {
     final int MSG_FARM_START = 0;
     final int MSG_SAWMILL_START = 1;
     final int MSG_QUARRY_START = 2;
+    final int MSG_BARRACKS_START = 3;
     final int MSG_FARM_END = 10;
     final int MSG_SAWMILL_END = 11;
     final int MSG_QUARRY_END = 12;
