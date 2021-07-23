@@ -1,6 +1,7 @@
 package fullEconomy;
 
 import aic2021.user.UnitController;
+import aic2021.user.UnitInfo;
 
 public class Farm extends MyUnit {
 
@@ -12,18 +13,27 @@ public class Farm extends MyUnit {
 
     Communications comms;
     TheKGB kgb;
-    boolean toldExistance;
+    boolean toldExistence = false;
+    boolean revokedExistence = false;
+    int totalEnemyAttack;
 
     void playRound(){
         readSmokeSignalBuilding(comms);
 
-        // TODO: check if you're gonna die (& send msg)
+        totalEnemyAttack = 0;
+        UnitInfo[] enemyUnits = uc.senseUnits(uc.getOpponent());
+        for(UnitInfo enemyUnit : enemyUnits)
+            totalEnemyAttack += enemyUnit.getAttack();
 
-        if(!toldExistance) {
+        if(!toldExistence) {
             if(comms.sendMiscMessage(comms.MSG_FARM_START))
-                toldExistance = true;
+                toldExistence = true;
         }
-        else if(genevaSuggestion){
+        else if(totalEnemyAttack > 0 && !revokedExistence) {
+            if(totalEnemyAttack > uc.getInfo().getHealth() && comms.sendMiscMessage(comms.MSG_FARM_END))
+                revokedExistence = true;
+        }
+        else if(genevaSuggestion) {
             kgb.disruptEveryone(enemyBaseLocation);
         }
     }
