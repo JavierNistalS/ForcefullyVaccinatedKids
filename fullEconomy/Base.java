@@ -8,6 +8,7 @@ public class Base extends MyUnit {
     final int FARM_MAX = 7;
     final int SAWMILL_MAX = 8;
     final int QUARRY_MAX = 7;
+    final int WORKER_MAX = 8;
 
     Base(UnitController uc) {
         super(uc);
@@ -44,8 +45,10 @@ public class Base extends MyUnit {
 
         totalResourcesSeen = 0;
         ResourceInfo[] resources = uc.senseResources();
-        for(ResourceInfo resource : resources)
-            totalResourcesSeen += resource.amount;
+        for(ResourceInfo resource : resources) {
+            if (uc.senseIllumination(resource.getLocation()) > 0)
+                totalResourcesSeen += resource.amount;
+        }
 
         manageMaxBuildings();
 
@@ -66,7 +69,7 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if(workerCount < 3 + totalResourcesSeen / 150)
+        if(workerCount < 3 + totalResourcesSeen / 150 && workerCount < WORKER_MAX)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
@@ -120,6 +123,9 @@ public class Base extends MyUnit {
     }
 
     void research(){
+        if (uc.getResource(Resource.WOOD) > 600){
+            tryResearch(Technology.RAFTS);
+        }
         if (uc.getResource(Resource.FOOD) > 2000){
             tryResearch(Technology.DOMESTICATION);
         }
