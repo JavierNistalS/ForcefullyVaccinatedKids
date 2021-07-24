@@ -20,6 +20,7 @@ public class Explorer extends MyUnit {
         identifyBase();
         readSmokeSignals();
         exploration.updateChunks();
+        pathfinding.updateEnemyUnits();
 
         ResourceInfo[] resources = uc.senseResources();
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());

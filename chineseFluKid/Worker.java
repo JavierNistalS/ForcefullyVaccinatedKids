@@ -6,7 +6,7 @@ public class Worker extends MyUnit {
 
     Worker(UnitController uc){
         super(uc);
-        pathfinding = new Pathfinding(uc, this);
+        pathfinding = new EvasivePathfinding(uc, this);
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
     }
@@ -15,7 +15,7 @@ public class Worker extends MyUnit {
     int SETTLEMENT_DISTANCE = 121;
 
     // refs
-    Pathfinding pathfinding;
+    EvasivePathfinding pathfinding;
     Exploration exploration;
     Communications comms;
 
@@ -61,6 +61,7 @@ public class Worker extends MyUnit {
         readSmokeSignals();
         generalAttack();
         exploration.updateChunks();
+        pathfinding.updateEnemyUnits();
 
         if (!requestedRafts && roundsChasingResource > 40){
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
