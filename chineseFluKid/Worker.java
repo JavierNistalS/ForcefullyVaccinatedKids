@@ -54,17 +54,11 @@ public class Worker extends MyUnit {
     int timeAlive = 0;
 
     void playRound() {
-        uc.println("buildBarracks: " + buildBarracks);
         timeAlive++;
-        uc.println("sustain torch");
         sustainTorch();
-        uc.println("update info");
         updateInfo();
-        uc.println("read smoke");
         readSmokeSignals();
-        uc.println("general attack");
         generalAttack();
-        uc.println("updateEnemyUnits");
         pathfinding.updateEnemyUnits();
 
         if (!requestedRafts && roundsChasingResource > 40) {

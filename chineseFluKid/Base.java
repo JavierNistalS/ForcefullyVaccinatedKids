@@ -14,6 +14,7 @@ public class Base extends MyUnit {
         super(uc);
         comms = new Communications(uc);
         kgb = new TheKGB(uc);
+        checkTrollMap();
     }
 
     int lastWorker = -100;
@@ -40,6 +41,7 @@ public class Base extends MyUnit {
     boolean barracksWorker = false;
     boolean raftsRequested = false;
     boolean reinforceRequested = false;
+    boolean[] canSpawn = {true, true, true, true, true, true, true, true, true};
 
     void playRound() {
         generalAttack();
@@ -262,5 +264,39 @@ public class Base extends MyUnit {
             quarryCount--;
         else if (info == comms.MSG_REQUEST_RAFTS)
             raftsRequested = true;
+    }
+
+    boolean trySpawnUnit(UnitType type, Direction dir){
+        uc.println("canSpawn[" + dir.toString() + "] = " + canSpawn[dir.ordinal()]);
+        if(canSpawn[dir.ordinal()])
+            return super.trySpawnUnit(type, dir);
+        return false;
+    }
+    void checkTrollMap() {
+        UnitInfo[] enemyUnits = uc.senseUnits(uc.getOpponent());
+
+        for(UnitInfo enemyUnit : enemyUnits) {
+            if(enemyUnit.getType() == UnitType.BASE) {
+                enemyBaseLocation = enemyUnit.getLocation();
+
+                if(enemyBaseLocation.distanceSquared(uc.getLocation()) <= 18) {
+                    uc.println("TROLL MAP DETECTED ON AMERICAN SOIL. LETHAL FORCE ENGAGED");
+
+                    for(Direction dir : dirs) {
+                        Location loc = uc.getLocation().add(dir);
+                        if(!uc.isOutOfMap(loc)) {
+                            if(!uc.isObstructed(loc, enemyBaseLocation)) {
+                                canSpawn[dir.ordinal()] = false;
+                                uc.println("canSpawn[" + dir.ordinal() + "] = false");
+                                uc.drawPointDebug(loc, 255, 0, 0);
+                            }
+                            else
+                                uc.drawPointDebug(loc, 0, 255, 0);
+                        }
+                    }
+                }
+                return;
+            }
+        }
     }
 }
