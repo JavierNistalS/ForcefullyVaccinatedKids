@@ -73,8 +73,19 @@ public class Worker extends MyUnit {
         }
 
         if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation != null && baseLocation.distanceSquared(uc.getLocation()) <= 2) {
-            trySpawnInValid(UnitType.BARRACKS);
-            pathfinding.tryMove(Direction.ZERO);
+            UnitInfo[] nextToBase = uc.senseUnits(4);
+            boolean iAmTheChosen = true;
+            for (UnitInfo ui : nextToBase){
+                if (ui.getType() == UnitType.WORKER && ui.getLocation().distanceSquared(baseLocation) <= 2){
+                    if (ui.getID() < uc.getInfo().getID())
+                        iAmTheChosen = false;
+                }
+            }
+            if (iAmTheChosen) {
+                trySpawnBarracks();
+                pathfinding.move3(uc.getLocation().directionTo(baseLocation));
+                pathfinding.tryMove(Direction.ZERO);
+            }
         }
 
         if(!anyFood)
@@ -445,6 +456,19 @@ public class Worker extends MyUnit {
                 if (dist < minDist) {
                     settlementTargetIdx = i;
                     minDist = dist;
+                }
+            }
+        }
+    }
+
+    void trySpawnBarracks(){
+        for (Direction dir : dirs){
+            if (uc.canSpawn(UnitType.BARRACKS, dir)){
+                Location loc = uc.getLocation().add(dir);
+                if (loc.distanceSquared(baseLocation) <= 2) {
+                    uc.spawn(UnitType.BARRACKS, dir);
+                    buildBarracks = false;
+                    break;
                 }
             }
         }
