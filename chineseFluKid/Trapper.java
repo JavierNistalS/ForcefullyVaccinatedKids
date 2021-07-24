@@ -35,6 +35,8 @@ public class Trapper extends MyUnit {
         if (uc.canAttack()) {
             for (Direction dir : dirs) {
                 Location loc = uc.getLocation().add(dir);
+                if (baseLocation != null && baseLocation.distanceSquared(loc) <= 2)
+                    continue;
                 boolean resourcePresent = false;
                 if (uc.canSenseLocation(loc)){
                     ResourceInfo[] resources = uc.senseResourceInfo(loc);
