@@ -4,6 +4,8 @@ import aic2021.user.*;
 
 public class Exploration
 {
+    // TODO: try to make specialized worker exploration
+
     Exploration(UnitController uc, int CHUNK_SIZE, int RESET_TURNS)
     {
         this.uc = uc;

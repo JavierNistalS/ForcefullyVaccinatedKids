@@ -125,4 +125,18 @@ public abstract class MyUnit {
         if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
             tryLightTorch();
     }
+
+    int totalResourcesAtLocation(Location loc) {
+        if(uc.canSenseLocation(loc) && uc.senseUnitAtLocation(loc) == null) {
+            ResourceInfo[] ris = uc.senseResourceInfo(loc);
+            int total = 0;
+
+            for(ResourceInfo ri : ris)
+                 if(ri != null)
+                     total += ri.amount;
+
+             return total;
+        }
+        return 0;
+    }
 }

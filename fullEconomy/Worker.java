@@ -82,6 +82,7 @@ public class Worker extends MyUnit {
             uc.gatherResources();
             settlementTargetIdx = -1;
             uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
+
         }
         else if(uc.canMove()) {
             if (fullOfResources) {

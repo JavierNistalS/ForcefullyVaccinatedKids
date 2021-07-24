@@ -91,10 +91,12 @@ public class Worker extends MyUnit {
             roundsChasingResource = 0;
             settlementTargetIdx = -1;
             uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
+            targetResource = null;
         }
         else if(uc.canMove()) {
             if (fullOfResources) {
                 roundsChasingResource = 0;
+                targetResource = null;
                 updateSettlementTarget();
 
                 boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
@@ -138,6 +140,9 @@ public class Worker extends MyUnit {
         if(uc.hasResearched(Technology.JOBS, uc.getTeam()))
             roundsSinceJobs++;
 
+        if(targetResource != null && totalResourcesAtLocation(targetResource) == 0)
+            targetResource = null;
+
         // carried resources & max resource capacity
         getResourcesCarried = uc.getResourcesCarried();
         int carriedRes = getResourcesCarried[0] + getResourcesCarried[1] + getResourcesCarried[2];
@@ -145,6 +150,7 @@ public class Worker extends MyUnit {
         fullOfResources = getResourcesCarried[0] >= maxResourceCapacity
                         || getResourcesCarried[1] >= maxResourceCapacity
                         || getResourcesCarried[2] >= maxResourceCapacity;
+
 
         // units
         units = uc.senseUnits();
