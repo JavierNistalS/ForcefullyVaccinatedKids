@@ -15,41 +15,32 @@ public class Spearman extends MyUnit {
     Communications comms;
     Exploration exploration;
     int minSpearmanID;
-    Direction baseCampingDirection = Direction.NORTH;
-    int roundsToBaseCampingDirectionChange = 0;
+
+    boolean rotateRight = true;
 
     void playRound() {
         identifyBase();
         readSmokeSignals();
         generalAttack();
+        updateMinSpearmanID();
         exploration.updateChunks();
 
-        idleMicro();
+        if (uc.getInfo().getID() == minSpearmanID)
+            camperMicro();
+        else
+            idleMicro();
 
         generalAttack();
     }
 
-    boolean updateMinSpearmanID() {
-        uc.println("updated min spearman id");
-        roundsToBaseCampingDirectionChange--;
-        if(roundsToBaseCampingDirectionChange < 0) {
-            roundsToBaseCampingDirectionChange = 4;
-            baseCampingDirection = dirs[(int)(uc.getRandomDouble() * 8)];
-        }
-
+    void updateMinSpearmanID() {
         if(minSpearmanID == uc.getInfo().getID()) {
             UnitInfo[] units = uc.senseUnits(uc.getTeam());
             for (UnitInfo unit : units) {
                 if (unit.getType() == UnitType.SPEARMAN)
                     minSpearmanID = Math.min(minSpearmanID, unit.getID());
             }
-
-            if (minSpearmanID == uc.getInfo().getID()) {
-                pathfinding.pathfindTo(baseLocation.add(baseCampingDirection));
-                return true;
-            }
         }
-        return false;
     }
 
     void idleMicro() {
@@ -67,18 +58,16 @@ public class Spearman extends MyUnit {
                     enemyBaseLocation = ui.getLocation();
             }
             if(!aggroPresent) {
-                if(!updateMinSpearmanID()) {
-                    if(enemyBaseLocation == null) {
-                        Location obj = exploration.getLocation();
-                        if (obj == null){
-                            exploration = new Exploration(uc, 5, 100);
-                            obj = exploration.getLocation();
-                        }
-                        pathfinding.pathfindTo(obj);
+                if(enemyBaseLocation == null) {
+                    Location obj = exploration.getLocation();
+                    if (obj == null){
+                        exploration = new Exploration(uc, 5, 100);
+                        obj = exploration.getLocation();
                     }
-                    else
-                        pathfinding.wanderAround(enemyBaseLocation, 50);
+                    pathfinding.pathfindTo(obj);
                 }
+                else
+                    pathfinding.wanderAround(enemyBaseLocation, 50);
             }
             else {
                 float bestScore = -10e20f;
@@ -134,6 +123,29 @@ public class Spearman extends MyUnit {
                 }
 
                 uc.move(best);
+            }
+        }
+    }
+
+    void camperMicro(){
+        if (uc.canMove()){
+            if (uc.getLocation().distanceSquared(baseLocation) > 2){
+                pathfinding.pathfindTo(baseLocation);
+            }
+            else{
+                Direction dir = baseLocation.directionTo(uc.getLocation());
+                int k = 4;
+                while (uc.canMove() && k-- > 0){
+                    if (pathfinding.canMove(dir) && uc.getLocation().add(dir).distanceSquared(baseLocation) <= 2){
+                        uc.move(dir);
+                    }
+                    else{
+                        dir = rotateRight ? dir.rotateRight() : dir.rotateLeft();
+                    }
+                }
+                if (uc.canMove())
+                    rotateRight = !rotateRight;
+
             }
         }
     }
