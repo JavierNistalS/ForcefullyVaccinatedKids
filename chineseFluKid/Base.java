@@ -191,10 +191,10 @@ public class Base extends MyUnit {
             if(tryResearch(Technology.JOBS))
                 techPhase++;
         }
-        /*else if(techPhase == 3) { // post-jobs
+        else if(techPhase == 3) { // post-jobs
             if(tryResearch(Technology.DOMESTICATION))
                 techPhase++;
-        }*/
+        }
         else { // endgame
             /*if(endgameTechIdx == endgameTechs.length - 1 && uc.canResearchTechnology(Technology.WHEEL))
                 uc.killSelf();

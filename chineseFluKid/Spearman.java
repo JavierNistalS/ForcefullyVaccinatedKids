@@ -98,7 +98,7 @@ public class Spearman extends MyUnit {
                         int dist = unitLoc.distanceSquared(loc);
                         if(unit.getType() == UnitType.AXEMAN && dist <= 13)
                             score -= 10e8f / dist;
-                        else if(dist <= 18) {
+                        else if(dist <= 18 && dist >= 9 && !uc.isObstructed(loc, unitLoc)) {
                             canShootAny = true;
                             if(unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
                                 canShootAnyAggro = true;
@@ -117,6 +117,9 @@ public class Spearman extends MyUnit {
                         if(enemyBaseLocation.distanceSquared(loc) <= 50)
                             score -= 10e10;
                         score -= 0.01 * enemyBaseLocation.distanceSquared(loc);
+                    }
+                    if (baseLocation != null && baseLocation.distanceSquared(loc) <= 2){
+                        score += 100;
                     }
 
                     int light = uc.senseIllumination(loc);
