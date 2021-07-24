@@ -15,6 +15,8 @@ public class Spearman extends MyUnit {
     Communications comms;
     Exploration exploration;
     int minSpearmanID;
+    Direction baseCampingDirection = Direction.NORTH;
+    int roundsToBaseCampingDirectionChange = 0;
 
     void playRound() {
         identifyBase();
@@ -29,6 +31,12 @@ public class Spearman extends MyUnit {
 
     boolean updateMinSpearmanID() {
         uc.println("updated min spearman id");
+        roundsToBaseCampingDirectionChange--;
+        if(roundsToBaseCampingDirectionChange < 0) {
+            roundsToBaseCampingDirectionChange = 4;
+            baseCampingDirection = dirs[(int)(uc.getRandomDouble() * 8)];
+        }
+
         if(minSpearmanID == uc.getInfo().getID()) {
             UnitInfo[] units = uc.senseUnits(uc.getTeam());
             for (UnitInfo unit : units) {
@@ -37,7 +45,7 @@ public class Spearman extends MyUnit {
             }
 
             if (minSpearmanID == uc.getInfo().getID()) {
-                pathfinding.pathfindTo(baseLocation);
+                pathfinding.pathfindTo(baseLocation.add(baseCampingDirection));
                 return true;
             }
         }
