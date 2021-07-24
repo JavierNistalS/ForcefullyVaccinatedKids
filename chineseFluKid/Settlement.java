@@ -61,7 +61,7 @@ public class Settlement extends MyUnit {
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
-        if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && uc.getResource(Resource.FOOD) > 900){
+        if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && uc.getResource(Resource.FOOD) > 940 && uc.getResource(Resource.WOOD) > 240 && uc.getResource(Resource.STONE) > 240){
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
