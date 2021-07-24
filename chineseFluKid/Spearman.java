@@ -133,6 +133,15 @@ public class Spearman extends MyUnit {
                 pathfinding.pathfindTo(baseLocation);
             }
             else{
+                boolean canAttack = false;
+                UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+                for (UnitInfo ui : enemies){
+                    Location loc = ui.getLocation();
+                    if (loc.distanceSquared(uc.getLocation()) <= 18 && !uc.isObstructed(loc, uc.getLocation()))
+                        canAttack = true;
+                }
+                if (canAttack)
+                    return;
                 Direction dir = baseLocation.directionTo(uc.getLocation());
                 int k = 4;
                 while (uc.canMove() && k-- > 0){
