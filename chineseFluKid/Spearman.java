@@ -9,12 +9,15 @@ public class Spearman extends MyUnit {
         pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
         exploration = new Exploration(uc, 6, 100);
+        minSpearmanID = uc.getInfo().getID();
     }
     Pathfinding pathfinding;
     Communications comms;
     Exploration exploration;
+    int minSpearmanID;
 
-    void playRound(){
+    void playRound() {
+        identifyBase();
         readSmokeSignals();
         generalAttack();
         exploration.updateChunks();
@@ -22,6 +25,23 @@ public class Spearman extends MyUnit {
         idleMicro();
 
         generalAttack();
+    }
+
+    boolean updateMinSpearmanID() {
+        uc.println("updated min spearman id");
+        if(minSpearmanID == uc.getInfo().getID()) {
+            UnitInfo[] units = uc.senseUnits(uc.getTeam());
+            for (UnitInfo unit : units) {
+                if (unit.getType() == UnitType.SPEARMAN)
+                    minSpearmanID = Math.min(minSpearmanID, unit.getID());
+            }
+
+            if (minSpearmanID == uc.getInfo().getID()) {
+                pathfinding.pathfindTo(baseLocation);
+                return true;
+            }
+        }
+        return false;
     }
 
     void idleMicro() {
@@ -39,16 +59,18 @@ public class Spearman extends MyUnit {
                     enemyBaseLocation = ui.getLocation();
             }
             if(!aggroPresent) {
-                if(enemyBaseLocation == null) {
-                    Location obj = exploration.getLocation();
-                    if (obj == null){
-                        exploration = new Exploration(uc, 5, 100);
-                        obj = exploration.getLocation();
+                if(!updateMinSpearmanID()) {
+                    if(enemyBaseLocation == null) {
+                        Location obj = exploration.getLocation();
+                        if (obj == null){
+                            exploration = new Exploration(uc, 5, 100);
+                            obj = exploration.getLocation();
+                        }
+                        pathfinding.pathfindTo(obj);
                     }
-                    pathfinding.pathfindTo(obj);
+                    else
+                        pathfinding.wanderAround(enemyBaseLocation, 50);
                 }
-                else
-                    pathfinding.wanderAround(enemyBaseLocation, 50);
             }
             else {
                 float bestScore = -10e20f;

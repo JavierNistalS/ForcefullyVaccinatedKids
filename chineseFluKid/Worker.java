@@ -67,7 +67,7 @@ public class Worker extends MyUnit {
         uc.println("updateEnemyUnits");
         pathfinding.updateEnemyUnits();
 
-        if (!requestedRafts && roundsChasingResource > 40){
+        if (!requestedRafts && roundsChasingResource > 40) {
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
             uc.println("requesting rafts");
         }
