@@ -54,6 +54,7 @@ public class Worker extends MyUnit {
     int timeAlive = 0;
 
     void playRound() {
+
         timeAlive++;
         sustainTorch();
         updateInfo();

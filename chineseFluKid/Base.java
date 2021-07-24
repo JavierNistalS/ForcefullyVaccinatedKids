@@ -279,7 +279,7 @@ public class Base extends MyUnit {
             if(enemyUnit.getType() == UnitType.BASE) {
                 enemyBaseLocation = enemyUnit.getLocation();
 
-                if(enemyBaseLocation.distanceSquared(uc.getLocation()) <= 18) {
+                if(enemyBaseLocation != null) {
                     uc.println("TROLL MAP DETECTED ON AMERICAN SOIL. LETHAL FORCE ENGAGED");
 
                     for(Direction dir : dirs) {
