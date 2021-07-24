@@ -6,13 +6,13 @@ public class Explorer extends MyUnit {
 
     Explorer(UnitController uc){
         super(uc);
-        pathfinding = new Pathfinding(uc, this);
+        pathfinding = new EvasivePathfinding(uc, this);
         exploration = new Exploration(uc, 5, 50);
         comms = new Communications(uc);
     }
 
     Exploration exploration;
-    Pathfinding pathfinding;
+    EvasivePathfinding pathfinding;
     Communications comms;
 
     void playRound(){
