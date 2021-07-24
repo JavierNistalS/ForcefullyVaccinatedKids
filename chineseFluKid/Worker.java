@@ -226,7 +226,7 @@ public class Worker extends MyUnit {
         int closestFoodDist = 10000000;
 
         for(int i = 0; i < resourceInfos.length; i++) {
-            if(!resourceInfosOccupied[i] && (enemyBaseLocation == null || enemyBaseLocation.distanceSquared(resourceInfos[i].getLocation()) > 18)) {
+            if(!resourceInfosOccupied[i] && !uc.hasTrap(resourceInfos[i].getLocation()) && (enemyBaseLocation == null || enemyBaseLocation.distanceSquared(resourceInfos[i].getLocation()) > 18)) {
                 Location loc = resourceInfos[i].location;
                 int dist = loc.distanceSquared(uc.getLocation());
                 if (dist < closestDist) {

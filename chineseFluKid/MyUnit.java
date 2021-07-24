@@ -127,7 +127,7 @@ public abstract class MyUnit {
     }
 
     int totalResourcesAtLocation(Location loc) {
-        if(uc.canSenseLocation(loc) && uc.senseUnitAtLocation(loc) == null) {
+        if(uc.canSenseLocation(loc) && uc.senseUnitAtLocation(loc) == null && !uc.hasTrap(loc)) {
             ResourceInfo[] ris = uc.senseResourceInfo(loc);
             int total = 0;
 
