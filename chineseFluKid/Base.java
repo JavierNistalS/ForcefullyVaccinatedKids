@@ -138,9 +138,9 @@ public class Base extends MyUnit {
         if ((uc.getResource(Resource.WOOD) > 1000 && uc.getResource(Resource.STONE) > 200) || raftsRequested){
             tryResearch(Technology.RAFTS);
         }
-        if (uc.getResource(Resource.FOOD) > 900){
+        /*if (uc.getResource(Resource.FOOD) > 900){
             tryResearch(Technology.DOMESTICATION);
-        }
+        }*/
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
@@ -191,10 +191,10 @@ public class Base extends MyUnit {
             if(tryResearch(Technology.JOBS))
                 techPhase++;
         }
-        else if(techPhase == 3) { // post-jobs
+        /*else if(techPhase == 3) { // post-jobs
             if(tryResearch(Technology.DOMESTICATION))
                 techPhase++;
-        }
+        }*/
         else { // endgame
             /*if(endgameTechIdx == endgameTechs.length - 1 && uc.canResearchTechnology(Technology.WHEEL))
                 uc.killSelf();
