@@ -39,6 +39,7 @@ public class Base extends MyUnit {
     int lastEnemyBaseTransmission = -100;
     boolean barracksWorker = false;
     boolean raftsRequested = false;
+    boolean reinforceRequested = false;
 
     void playRound() {
         generalAttack();
@@ -200,6 +201,18 @@ public class Base extends MyUnit {
             else*/
             while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                 endgameTechIdx++;
+        }
+    }
+
+    void checkForEnemyAttack(){
+        int axemanCount = 0;
+        UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+        for (UnitInfo ui : enemies){
+            if (ui.getType() == UnitType.AXEMAN)
+                axemanCount++;
+        }
+        if (axemanCount >= 4){
+            reinforceRequested = comms.sendMiscMessage(comms.MSG_REINFORCE_BASE);
         }
     }
 

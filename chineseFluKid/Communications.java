@@ -40,6 +40,10 @@ public class Communications {
     final int MSG_START_BUILDING_RESOURCE_BUILDINGS = 123;
     final int MSG_REQUEST_RAFTS = 124;
 
+    //Military
+    final int MSG_REINFORCE_BASE = 200;
+
+
 
     public Communications(UnitController uc) {
         this.uc = uc;
