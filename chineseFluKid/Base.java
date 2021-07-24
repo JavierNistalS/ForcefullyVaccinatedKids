@@ -44,9 +44,6 @@ public class Base extends MyUnit {
         readSmokeSignals();
         research();
 
-        if(uc.getRound() > 400)
-            uc.killSelf();
-
         totalResourcesSeen = 0;
         ResourceInfo[] resources = uc.senseResources();
         for(ResourceInfo resource : resources) {
