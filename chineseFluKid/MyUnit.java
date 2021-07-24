@@ -36,7 +36,8 @@ public abstract class MyUnit {
     }
 
     boolean trySpawnUnit(UnitType type, Direction dir){
-        if (uc.canSpawn(type, dir)){
+        Location loc = uc.getLocation().add(dir);
+        if (uc.canSpawn(type, dir) && (!uc.canSenseLocation(loc) || !uc.hasTrap(loc))){
             uc.spawn(type, dir);
             return true;
         }
