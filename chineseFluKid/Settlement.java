@@ -57,7 +57,11 @@ public class Settlement extends MyUnit {
             toldLocationCountdown--;
         }
 
-        if (wolfCount == 0 || uc.getResource(Resource.FOOD) > 4000){
+        if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600)){
+            if (trySpawnUnit(UnitType.WOLF))
+                wolfCount++;
+        }
+        if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && uc.getResource(Resource.FOOD) > 900){
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }

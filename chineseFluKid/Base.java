@@ -20,6 +20,7 @@ public class Base extends MyUnit {
     int workerCount = 0;
     int explorerCount = 0;
     int trapperCount = 0;
+    int wolfCount = 0;
 
     int techPhase = 0;
     Technology[] preJobTechs = {Technology.MILITARY_TRAINING};
@@ -79,6 +80,14 @@ public class Base extends MyUnit {
                 trapperCount++;
         }
 
+        if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600)){
+            if (trySpawnUnit(UnitType.WOLF))
+                wolfCount++;
+        }
+        if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && uc.getResource(Resource.FOOD) > 900){
+            if (trySpawnUnit(UnitType.WOLF))
+                wolfCount++;
+        }
     }
 
     void manageMaxBuildings(){
@@ -124,17 +133,20 @@ public class Base extends MyUnit {
     }
 
     void research(){
-        if (uc.getResource(Resource.WOOD) > 1000 || raftsRequested){
+        uc.println("rafts requested: " + raftsRequested);
+        if ((uc.getResource(Resource.WOOD) > 1000 && uc.getResource(Resource.STONE) > 200) || raftsRequested){
             tryResearch(Technology.RAFTS);
         }
-        if (uc.getResource(Resource.FOOD) > 2000){
+        if (uc.getResource(Resource.FOOD) > 900){
             tryResearch(Technology.DOMESTICATION);
         }
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
             tryResearch(Technology.MILITARY_TRAINING);
-            tryResearch(Technology.RAFTS);
+
+            if (raftsRequested)
+                tryResearch(Technology.RAFTS);
             if(hasTech(Technology.COIN) && hasTech(Technology.UTENSILS) && hasTech(Technology.MILITARY_TRAINING) && (!raftsRequested || hasTech(Technology.RAFTS)))
                 techPhase++;
         }

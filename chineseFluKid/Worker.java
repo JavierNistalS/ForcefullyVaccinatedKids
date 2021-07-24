@@ -56,15 +56,20 @@ public class Worker extends MyUnit {
     void playRound() {
         uc.println("buildBarracks: " + buildBarracks);
         timeAlive++;
+        uc.println("sustain torch");
         sustainTorch();
+        uc.println("update info");
         updateInfo();
+        uc.println("read smoke");
         readSmokeSignals();
+        uc.println("general attack");
         generalAttack();
-        exploration.updateChunks();
+        uc.println("updateEnemyUnits");
         pathfinding.updateEnemyUnits();
 
         if (!requestedRafts && roundsChasingResource > 40){
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
+            uc.println("requesting rafts");
         }
 
         if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation != null && baseLocation.distanceSquared(uc.getLocation()) <= 2) {
@@ -118,8 +123,12 @@ public class Worker extends MyUnit {
                 pathfinding.pathfindTo(resourceMemory);
             } else { // some resources
                 uc.println("going to resources");
+                uc.println("targetResource null ? " + (targetResource == null));
+                uc.println("resourceInfos null ? " + (resourceInfos == null));
+                uc.println("resourceInfosOccupied null ? " + (resourceInfosOccupied == null));
                 if (targetResource == null || roundsChasingResource % 20 == 15)
                     targetResource = findClosestResource(resourceInfos, resourceInfosOccupied);
+                uc.println("targetResource null ? " + (targetResource == null));
                 resourceMemory = targetResource;
                 pathfinding.pathfindTo(targetResource);
                 roundsChasingResource++;
@@ -158,6 +167,8 @@ public class Worker extends MyUnit {
         closestDeer = null;
         deerMinDist = 1000000;
         anyEnemyAggroUnits = false;
+
+        uc.println("unit loop");
     unitLoop:
         for (UnitInfo unit : units) {
             Location loc = unit.getLocation();
@@ -188,6 +199,7 @@ public class Worker extends MyUnit {
             }
         }
 
+        uc.println("local resources");
         // local resources
         localResourceInfos = uc.senseResourceInfo(uc.getLocation());
         localFood = 0;
@@ -202,21 +214,24 @@ public class Worker extends MyUnit {
             }
         }
 
+        uc.println("resources");
         // resourceInfosOccupied
         resourceInfos = uc.senseResources();
         resourceInfosOccupied = new boolean[resourceInfos.length];
         for(int i = 0; i < resourceInfos.length; i++)
             resourceInfosOccupied[i] = uc.senseUnitAtLocation(resourceInfos[i].location) != null;
 
+        uc.println("resource infos");
         // resourceInfos
         totalRes = 0;
         anyFood = false;
         for (int i = 0; i < resourceInfos.length; i++) {
-            if(!resourceInfosOccupied[i]) {
+            if(!resourceInfosOccupied[i] && (baseLocation == null || baseLocation.distanceSquared(resourceInfos[i].getLocation()) > 18) && !uc.hasTrap(resourceInfos[i].getLocation())) {
                 totalRes += resourceInfos[i].amount;
                 anyFood |= (resourceInfos[i].amount > 100 && resourceInfos[i].resourceType == Resource.FOOD);
             }
         }
+        uc.println("end resouces");
     }
 
     // prioritizes food
