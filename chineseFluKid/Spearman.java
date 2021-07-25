@@ -102,7 +102,7 @@ public class Spearman extends MyUnit {
                     else if(canShootAny)
                         score += 10000;
                     else if(dir == Direction.NORTHEAST || dir == Direction.NORTHWEST || dir == Direction.SOUTHEAST || dir == Direction.SOUTHWEST)
-                        score -= 22000;
+                        score -= 12000;
                     if(enemyBaseLocation != null){
                         if(enemyBaseLocation.distanceSquared(loc) <= 50)
                             score -= 10e10;
