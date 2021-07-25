@@ -152,7 +152,7 @@ public class Spearman extends MyUnit {
                         dir = rotateRight ? dir.rotateRight() : dir.rotateLeft();
                     }
                 }
-                if (uc.canMove())
+                if (pathfinding.canMove())
                     rotateRight = !rotateRight;
 
             }
