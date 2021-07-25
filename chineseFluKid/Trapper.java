@@ -24,7 +24,7 @@ public class Trapper extends MyUnit {
         pathfinding.updateEnemyUnits();
         exploration.updateChunks();
 
-        if (baseLocation == null) {
+        if (enemyBaseLocation == null) {
             Location target = exploration.getLocation();
             if (target == null) {
                 exploration = new Exploration(uc, 3, 75);
