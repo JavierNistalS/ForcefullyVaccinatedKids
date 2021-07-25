@@ -148,12 +148,44 @@ public abstract class MyUnit {
 
     void debugObstructed(){
         for (Location loc : uc.getVisibleLocations()){
-            if (uc.isObstructed(uc.getLocation(), loc)){
+            if (isObstructedNice(uc.getLocation(), loc)){
                 uc.drawPointDebug(loc, 0,0,0);
             }
             else{
                 uc.drawPointDebug(loc, 255, 255, 255);
             }
         }
+    }
+
+    boolean isObstructedNice(Location p0, Location p1) {
+        int dx = p1.x-p0.x, dy = p1.y-p0.y;
+        int nx = Math.abs(dx), ny = Math.abs(dy);
+        int sign_x = dx > 0? 1 : -1, sign_y = dy > 0? 1 : -1;
+
+        int px = p0.x, py = p0.y;
+
+        for (int ix = 0, iy = 0; ix < nx || iy < ny;) {
+            int decision = (1 + 2*ix) * ny - (1 + 2*iy) * nx;
+            if (decision == 0) {
+                // next step is diagonal
+                px += sign_x;
+                py += sign_y;
+                ix++;
+                iy++;
+            } else if (decision < 0) {
+                // next step is horizontal
+                px += sign_x;
+                ix++;
+            } else {
+                // next step is vertical
+                py += sign_y;
+                iy++;
+            }
+
+            Location loc = new Location(px, py);
+            if(uc.isOutOfMap(loc) || (uc.canSenseLocation(loc) && uc.hasMountain(loc)))
+                return true;
+        }
+        return false;
     }
 }
