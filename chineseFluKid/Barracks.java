@@ -32,7 +32,7 @@ public class Barracks extends MyUnit {
         if (lastUpdate < uc.getRound() - 60 && comms.sendMiscMessage(comms.MSG_BARRACKS_START))
             lastUpdate = uc.getRound();
 
-        if ((spawnedUnits < 4 || (reinforceRequested && spawnedUnits < 7)) && trySpawnSpearman())
+        if ((spawnedUnits < 8 || (reinforceRequested && spawnedUnits < 10)) && trySpawnSpearman())
             spawnedUnits++;
         if (spawnedUnits < 15 && !canBuildFarm && !canBuildQuarry && !canBuildSawmill && trySpawnSpearman()){
             spawnedUnits++;
