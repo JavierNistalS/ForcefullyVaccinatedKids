@@ -67,7 +67,7 @@ public class Spearman extends MyUnit {
                     pathfinding.pathfindTo(obj);
                 }
                 else
-                    pathfinding.wanderAround(enemyBaseLocation, 50);
+                    pathfinding.wanderAround(enemyBaseLocation, 18);
             }
             else {
                 float bestScore = -10e20f;
@@ -97,13 +97,13 @@ public class Spearman extends MyUnit {
                     }
 
                     if(canShootAnyAggro)
-                        score += 10000;
+                        score += 20000;
                     else if(canShootAny)
-                        score += 1000;
+                        score += 10000;
                     else if(dir == Direction.NORTHEAST || dir == Direction.NORTHWEST || dir == Direction.SOUTHEAST || dir == Direction.SOUTHWEST)
                         score -= 12000;
                     if(enemyBaseLocation != null){
-                        if(enemyBaseLocation.distanceSquared(loc) <= 50)
+                        if(enemyBaseLocation.distanceSquared(loc) <= 18)
                             score -= 10e10;
                         score -= 0.01 * enemyBaseLocation.distanceSquared(loc);
                     }
@@ -121,8 +121,8 @@ public class Spearman extends MyUnit {
                         best = dir;
                     }
                 }
-
-                uc.move(best);
+                if (best != Direction.ZERO)
+                    uc.move(best);
             }
         }
     }

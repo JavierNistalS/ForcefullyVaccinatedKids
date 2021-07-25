@@ -24,31 +24,40 @@ public class Trapper extends MyUnit {
         pathfinding.updateEnemyUnits();
         exploration.updateChunks();
 
-        Location target = exploration.getLocation();
-        if (target == null){
-            exploration = new Exploration(uc, 3, 75);
-            target = exploration.getLocation();
+        if (baseLocation == null) {
+            Location target = exploration.getLocation();
+            if (target == null) {
+                exploration = new Exploration(uc, 3, 75);
+                target = exploration.getLocation();
+            }
+            pathfinding.pathfindTo(target);
         }
-        pathfinding.pathfindTo(target);
+        else{
+            pathfinding.wanderAround(enemyBaseLocation, 18);
+        }
     }
 
     void setTraps() {
         if (uc.canAttack()) {
             for (Direction dir : dirs) {
                 Location loc = uc.getLocation().add(dir);
-                if (baseLocation != null && baseLocation.distanceSquared(loc) <= 2)
-                    continue;
-                boolean resourcePresent = false;
-                if (uc.canSenseLocation(loc)){
-                    ResourceInfo[] resources = uc.senseResourceInfo(loc);
-                    for (ResourceInfo ri : resources){
-                        if (ri != null)
-                            resourcePresent = true;
-                    }
+                if (uc.canAttack(loc)) {
+                    if (baseLocation != null && baseLocation.distanceSquared(loc) <= 2)
+                        continue;
+                    if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
+                        uc.attack(loc);
+                    boolean resourcePresent = false;
+                    if (uc.canSenseLocation(loc)) {
+                        ResourceInfo[] resources = uc.senseResourceInfo(loc);
+                        for (ResourceInfo ri : resources) {
+                            if (ri != null)
+                                resourcePresent = true;
+                        }
 
-                }
-                if (!resourcePresent && uc.canAttack(loc) && loc.x % 3 == 0 && loc.y % 3 == 0){
-                    uc.attack(loc);
+                    }
+                    if (!resourcePresent && loc.x % 3 == 0 && loc.y % 3 == 0) {
+                        uc.attack(loc);
+                    }
                 }
             }
         }
