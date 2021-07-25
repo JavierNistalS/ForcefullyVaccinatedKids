@@ -16,6 +16,8 @@ public class Explorer extends MyUnit {
     Communications comms;
 
     void playRound(){
+        /*if (uc.getRound() == 35)
+            debugObstructed();*/
         sustainTorch();
         identifyBase();
         readSmokeSignals();

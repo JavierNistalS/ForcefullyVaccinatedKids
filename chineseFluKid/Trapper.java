@@ -44,6 +44,8 @@ public class Trapper extends MyUnit {
                 if (uc.canAttack(loc)) {
                     if (baseLocation != null && baseLocation.distanceSquared(loc) <= 2)
                         continue;
+                    if (uc.canSenseLocation(loc) && uc.hasTrap(loc))
+                        continue;
                     if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
                         uc.attack(loc);
                     boolean resourcePresent = false;

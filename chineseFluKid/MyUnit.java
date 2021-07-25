@@ -145,4 +145,15 @@ public abstract class MyUnit {
         }
         return 0;
     }
+
+    void debugObstructed(){
+        for (Location loc : uc.getVisibleLocations()){
+            if (uc.isObstructed(uc.getLocation(), loc)){
+                uc.drawPointDebug(loc, 0,0,0);
+            }
+            else{
+                uc.drawPointDebug(loc, 255, 255, 255);
+            }
+        }
+    }
 }

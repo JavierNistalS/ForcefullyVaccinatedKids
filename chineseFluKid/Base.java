@@ -44,6 +44,8 @@ public class Base extends MyUnit {
     boolean[] canSpawn = {true, true, true, true, true, true, true, true, true};
 
     void playRound() {
+        /*if (uc.getRound() == 300)
+            debugObstructed();*/
         generalAttack();
         readSmokeSignals();
         research();
