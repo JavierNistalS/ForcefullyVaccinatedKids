@@ -196,10 +196,13 @@ public class Base extends MyUnit {
             if(tryResearch(Technology.JOBS))
                 techPhase++;
         }
-        else { // endgame
-            /*if(endgameTechIdx == endgameTechs.length - 1 && uc.canResearchTechnology(Technology.WHEEL))
-                uc.killSelf();
-            else*/
+        else {
+
+            techPhase++;
+
+            if(uc.getResource(Resource.FOOD) > 4500 && tryResearch(Technology.SCHOOLS))
+                endgameTechIdx = endgameTechs.length - 1;
+
             if(farmCount >= 2 && quarryCount >= 5 && sawmillCount >= 5 && tryResearch(Technology.DOMESTICATION))
                 techPhase++;
             while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
