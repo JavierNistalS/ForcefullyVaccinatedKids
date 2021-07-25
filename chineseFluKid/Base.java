@@ -86,7 +86,7 @@ public class Base extends MyUnit {
                 trapperCount++;
         }
 
-        if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600)){
+        if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600) && wolfCount < 10){
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
