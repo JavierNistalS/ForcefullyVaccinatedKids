@@ -9,18 +9,19 @@ public class Trapper extends MyUnit {
     Trapper(UnitController uc){
         super(uc);
         exploration = new Exploration(uc, 3, 75);
-        pathfinding = new Pathfinding(uc, this);
+        pathfinding = new EvasivePathfinding(uc, this);
         comms = new Communications(uc);
     }
 
     Exploration exploration;
-    Pathfinding pathfinding;
+    EvasivePathfinding pathfinding;
     Communications comms;
 
     void playRound() {
         identifyBase();
         setTraps();
         readSmokeSignals();
+        pathfinding.updateEnemyUnits();
         exploration.updateChunks();
 
         Location target = exploration.getLocation();
