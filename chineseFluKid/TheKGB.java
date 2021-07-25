@@ -18,7 +18,7 @@ public class TheKGB { // I only know that I know nothing, and so do you.
         //return trySmokeSignal(message);
 
         if(loc == null) {
-            return trySmokeSignal(433461225 );
+            return trySmokeSignal(139518736); // -- ~= [-30,-30]
         }
         else {
             Direction dir = uc.getLocation().directionTo(loc);
@@ -28,7 +28,7 @@ public class TheKGB { // I only know that I know nothing, and so do you.
             if(dir == Direction.EAST || dir == Direction.SOUTHEAST) // +-
                 return trySmokeSignal(431381955);
             if(dir == Direction.SOUTH || dir == Direction.SOUTHWEST) // --
-                return trySmokeSignal(433461225);
+                return trySmokeSignal(139518736);
             //if(dir == Direction.WEST || dir == Direction.NORTHWEST) // -+
                 return trySmokeSignal(433894293);
         }
