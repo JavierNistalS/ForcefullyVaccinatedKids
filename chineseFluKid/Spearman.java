@@ -47,10 +47,25 @@ public class Spearman extends MyUnit {
     }
 
     boolean willAttack(Direction dir, Location loc) {
-        if(uc.canAttack())
+        /*if(uc.canAttack()) {
+            if (uc.canAttack(loc.add(dir.opposite()))){
+                uc.drawLineDebug(uc.getLocation(), loc.add(dir.opposite()), 255, 0, 0);
+            }
+            else{
+                uc.drawLineDebug(uc.getLocation(), loc.add(dir.opposite()), 0, 0, 255);
+            }
             return uc.canAttack(loc.add(dir.opposite()));
-        else
-            return isObstructedNice(uc.getLocation(), loc);
+        }
+        else {*/
+            boolean ans = isObstructedNice(uc.getLocation().add(dir), loc);
+            if (ans){
+                uc.drawLineDebug(uc.getLocation().add(dir), loc, 0,0,0);
+            }
+            else{
+                uc.drawLineDebug(uc.getLocation().add(dir), loc, 255,255,255);
+            }
+            return ans;
+        //}
     }
 
     void idleMicro() {
@@ -87,22 +102,21 @@ public class Spearman extends MyUnit {
                     if(!pathfinding.canMove(dir) && dir != Direction.ZERO)
                         continue;
 
-                    //uc.println("evaluating " + dir);
+                    uc.println("evaluating " + dir);
                     Location loc = uc.getLocation().add(dir);
                     float score = 0;
                     boolean canShootAnyAggro = false;
                     boolean canShootAny = false;
 
                     for(UnitInfo unit : units) {
-                        //uc.println("aiming at " + unit.getType() + ' ' + unit.getID());
+                        uc.println("aiming at " + unit.getType() + ' ' + unit.getID());
                         Location unitLoc = unit.getLocation();
                         int dist = unitLoc.distanceSquared(loc);
-                        //uc.println("dist = " + dist);
-                        //uc.println("uc.isObstructed(loc, unitLoc) = " + willAttack(loc, unitLoc));
+                        uc.println("dist = " + dist);
                         if(unit.getType() == UnitType.AXEMAN && dist <= 13)
                             score -= 10e8f / dist;
-                        else if(!canShootAnyAggro && dist <= 18 && dist >= 9 && willAttack(dir, uc.getLocation())){ //!uc.isObstructed(loc, unitLoc)) { WTF
-                            //uc.println("can shoot at it");
+                        else if(!canShootAnyAggro && dist <= 18 && dist >= 9 && willAttack(dir, unitLoc)){ //!uc.isObstructed(loc, unitLoc)) { WTF
+                            uc.println("can shoot at it");
                             canShootAny = true;
                             if(unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
                                 canShootAnyAggro = true;
@@ -111,8 +125,8 @@ public class Spearman extends MyUnit {
                         }
                     }
 
-                    //uc.println("canShootAnyAggro: " + canShootAnyAggro);
-                    //uc.println("canShootAny: " + canShootAny);
+                    uc.println("canShootAnyAggro: " + canShootAnyAggro);
+                    uc.println("canShootAny: " + canShootAny);
                     if(canShootAnyAggro)
                         score += 20000;
                     else if(canShootAny)
