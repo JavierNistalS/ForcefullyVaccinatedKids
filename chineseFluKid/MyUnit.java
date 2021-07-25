@@ -112,6 +112,18 @@ public abstract class MyUnit {
         }
     }
 
+    void identifyEnemyBase(){
+        if (enemyBaseLocation != null){
+            UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
+            for (UnitInfo ui : units){
+                if (ui.getType() == UnitType.BASE){
+                    enemyBaseLocation = ui.getLocation();
+                    break;
+                }
+            }
+        }
+    }
+
     void sustainTorch(){
         uc.println("sustaining torch");
 

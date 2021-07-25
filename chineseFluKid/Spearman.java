@@ -20,6 +20,7 @@ public class Spearman extends MyUnit {
 
     void playRound() {
         identifyBase();
+        identifyEnemyBase();
         readSmokeSignals();
         generalAttack();
         updateMinSpearmanID();
@@ -152,7 +153,7 @@ public class Spearman extends MyUnit {
                         dir = rotateRight ? dir.rotateRight() : dir.rotateLeft();
                     }
                 }
-                if (pathfinding.canMove())
+                if (uc.canMove())
                     rotateRight = !rotateRight;
 
             }
