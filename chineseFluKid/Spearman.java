@@ -64,7 +64,7 @@ public class Spearman extends MyUnit {
             else{
                 uc.drawLineDebug(uc.getLocation().add(dir), loc, 255,255,255);
             }
-            return ans;
+            return !ans;
         //}
     }
 
