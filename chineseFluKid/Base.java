@@ -47,6 +47,7 @@ public class Base extends MyUnit {
         generalAttack();
         readSmokeSignals();
         research();
+        checkForEnemyAttack();
 
         totalResourcesSeen = 0;
         ResourceInfo[] resources = uc.senseResources();

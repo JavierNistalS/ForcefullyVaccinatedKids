@@ -37,7 +37,7 @@ public abstract class MyUnit {
 
     boolean trySpawnUnit(UnitType type, Direction dir){
         Location loc = uc.getLocation().add(dir);
-        if (uc.canSpawn(type, dir) && (!uc.canSenseLocation(loc) || !uc.hasTrap(loc))){
+        if (uc.canSpawn(type, dir) && (!uc.canSenseLocation(loc) || !uc.hasTrap(loc)) && (enemyBaseLocation == null || enemyBaseLocation.distanceSquared(loc) > 18 || uc.isObstructed(enemyBaseLocation, loc))){
             uc.spawn(type, dir);
             return true;
         }

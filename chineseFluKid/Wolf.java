@@ -71,9 +71,9 @@ public class Wolf extends MyUnit {
                 if(uc.getType() == UnitType.AXEMAN)
                     score += linDist10;
                 else if(uc.getType() == UnitType.SPEARMAN)
-                    score -= linDist10 * 2;
+                    score -= linDist10 * 10;
                 else
-                    score -= linDist10 / 2;
+                    score -= linDist10 * 6;
 
                 if(dist <= 2) {
                     canHitCount++;
@@ -86,9 +86,9 @@ public class Wolf extends MyUnit {
             }
 
             if(canHitSpearman)
-                score += 1000;
+                score += 10000;
             if(canHitCount > 0)
-                score += 500 - canHitCount;
+                score += 5000 - canHitCount;
 
             if(enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
                 score -= 100000;

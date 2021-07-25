@@ -460,8 +460,7 @@ public class Worker extends MyUnit {
         for (Direction dir : dirs){
             if (uc.canSpawn(UnitType.BARRACKS, dir)){
                 Location loc = uc.getLocation().add(dir);
-                if (loc.distanceSquared(baseLocation) <= 2) {
-                    uc.spawn(UnitType.BARRACKS, dir);
+                if (loc.distanceSquared(baseLocation) <= 2 && trySpawnUnit(UnitType.BARRACKS, dir)) {
                     buildBarracks = false;
                     break;
                 }
