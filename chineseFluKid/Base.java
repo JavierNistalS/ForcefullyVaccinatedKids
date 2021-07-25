@@ -267,7 +267,7 @@ public class Base extends MyUnit {
     }
 
     boolean trySpawnUnit(UnitType type, Direction dir){
-        uc.println("canSpawn[" + dir.toString() + "] = " + canSpawn[dir.ordinal()]);
+        //uc.println("canSpawn[" + dir.toString() + "] = " + canSpawn[dir.ordinal()]);
         if(canSpawn[dir.ordinal()])
             return super.trySpawnUnit(type, dir);
         return false;
@@ -285,9 +285,9 @@ public class Base extends MyUnit {
                     for(Direction dir : dirs) {
                         Location loc = uc.getLocation().add(dir);
                         if(!uc.isOutOfMap(loc)) {
-                            if(!uc.isObstructed(loc, enemyBaseLocation)) {
+                            if(enemyBaseLocation.distanceSquared(loc) <= 18 && !uc.isObstructed(loc, enemyBaseLocation)) {
                                 canSpawn[dir.ordinal()] = false;
-                                uc.println("canSpawn[" + dir.ordinal() + "] = false");
+                                uc.println("canSpawn[" + dir + "] = false");
                                 uc.drawPointDebug(loc, 255, 0, 0);
                             }
                             else
