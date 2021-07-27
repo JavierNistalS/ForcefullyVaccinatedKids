@@ -7,9 +7,10 @@ public class Communications {
     final int[] SHUFFLE_NUMBER = {2, 12, 25, 7, 3, 8, 23, 9, 24, 1, 16, 17, 26, 28, 29, 30, 0, 27, 18, 31, 15, 6, 14, 19, 21, 22, 5, 13, 11, 10, 20, 4};
     final int XOR_NUMBER = 2058629157;
 
-    final int VALIDATION_BITS = 11; //Last round digits / 2
+    final int ROUND_VALIDATION_BITS = 11; //Last round digits
+    final int OFFSET_VALIDATION_BITS = 4;
     final int TYPE_BITS = 3;
-    final int INFO_BITS = 18;
+    final int INFO_BITS = 14;
     UnitController uc;
 
     final int MSG_TYPE_ENEMY_BASE = 0;
@@ -51,6 +52,9 @@ public class Communications {
     }
 
     int encrypt(int msg) {
+        for (int i = 1; i < 32; i++){
+            msg ^= (msg & (1 << (i-1))) << 1;
+        }
         msg ^= XOR_NUMBER;
         long smoke = 0;
         for (int i = 0; i < 32; i++) {
@@ -64,20 +68,30 @@ public class Communications {
             long sy = SHUFFLE_NUMBER[i];
             msg |= ((((long)smoke & ((long)1 << (long)sy)) >> (long)sy) << (long)i);
         }
-        return msg ^ XOR_NUMBER;
+        msg ^= XOR_NUMBER;
+        for (int i = 31; i > 0; i--){
+            msg ^= (msg & (1 << (i-1))) << 1;
+        }
+        return msg;
     }
 
     boolean validate(int x) {
-        int mod = 1 << VALIDATION_BITS;
+        int mod = 1 << ROUND_VALIDATION_BITS;
         int currentRound = uc.getRound() % mod;
         int lastRound = (uc.getRound() - 1) % mod;
-        int msgRound = x >> (TYPE_BITS + INFO_BITS);
-        return msgRound == currentRound || msgRound == lastRound;
+        int msgRound = x >> (TYPE_BITS + INFO_BITS + OFFSET_VALIDATION_BITS);
+        int offsetMod = 1 << OFFSET_VALIDATION_BITS;
+        int offset = (uc.getLocation().x)/50%offsetMod;
+        int offsetM1 = (offset + offsetMod - 1)%offsetMod;
+        int offsetP1 = (offset + offsetMod + 1)%offsetMod;
+        int msgOffset = (x << ROUND_VALIDATION_BITS) >> (ROUND_VALIDATION_BITS + INFO_BITS + TYPE_BITS);
+        return (msgRound == currentRound || msgRound == lastRound) && (msgOffset == offset || msgOffset == offsetM1 || msgOffset == offsetP1);
     }
 
     boolean sendMessage(int type, int info) {
         if (uc.canMakeSmokeSignal()){
-            int msg = info + ((type + (uc.getRound() << TYPE_BITS)) << INFO_BITS);
+            int val = uc.getLocation().x/50%(1 << OFFSET_VALIDATION_BITS) + (uc.getRound() << OFFSET_VALIDATION_BITS);
+            int msg = info + ((type + (val << TYPE_BITS)) << INFO_BITS);
             uc.println("decrypted: " + msg);
             msg = encrypt(msg);
             uc.println("encrypted: " + msg);
@@ -96,10 +110,10 @@ public class Communications {
     }
 
     int getType(int x) {
-        return ((x << VALIDATION_BITS) >> (VALIDATION_BITS + INFO_BITS));
+        return ((x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS)) >> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + INFO_BITS));
     }
     int getInfo(int x) {
-        return (x << (VALIDATION_BITS + TYPE_BITS)) >> (VALIDATION_BITS + TYPE_BITS);
+        return (x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS)) >> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS);
     }
 
     int locationToInt(Location loc) {
