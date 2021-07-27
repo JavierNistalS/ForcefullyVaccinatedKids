@@ -3,7 +3,10 @@ package chineseFluKid;
 import aic2021.user.*;
 
 
-public class TheKGB { // I only know that I know nothing, and so do you.
+public class TheKGB {
+    // "All war is deception"
+    //   ― Sun tzu, The Art of War
+
     UnitController uc;
     Communications comms;
 
@@ -24,13 +27,13 @@ public class TheKGB { // I only know that I know nothing, and so do you.
             Direction dir = uc.getLocation().directionTo(loc);
 
             if(dir == Direction.NORTH || dir == Direction.NORTHEAST) // ++
-                return trySmokeSignal(431036316);
+                return trySmokeSignal(139787668);
             if(dir == Direction.EAST || dir == Direction.SOUTHEAST) // +-
-                return trySmokeSignal(431381955);
+                return trySmokeSignal(139518736);
             if(dir == Direction.SOUTH || dir == Direction.SOUTHWEST) // --
                 return trySmokeSignal(139518736);
             //if(dir == Direction.WEST || dir == Direction.NORTHWEST) // -+
-                return trySmokeSignal(433894293);
+                return trySmokeSignal(139518736);
         }
     }
 
@@ -49,6 +52,106 @@ public class TheKGB { // I only know that I know nothing, and so do you.
             return trySmokeSignal(11243);
         else
             return trySmokeSignal(11223);
+    }
+
+    public void disruptRelativeCoords(Location enemyBaseLocation, P<Direction, Integer>[] relativeDataFromEnemyPerspective) {
+        if(enemyBaseLocation == null) {
+            if(relativeDataFromEnemyPerspective.length > 0)
+                trySmokeSignal(relativeDataFromEnemyPerspective[0].y); // assumes at least 1 element
+        }
+        else {
+            int bestDist = 100000000;
+            int best = 0;
+
+            Direction dir = uc.getLocation().directionTo(enemyBaseLocation);
+
+            for(P<Direction, Integer> p : relativeDataFromEnemyPerspective) {
+                int dist = ((p.x.dx - dir.dx) * (p.x.dx - dir.dx)) + ((p.x.dy - dir.dy) * (p.x.dy - dir.dy));
+                if(dist < bestDist) {
+                    bestDist = dist;
+                    best = p.y;
+                }
+            }
+
+            if(bestDist != 100000000)
+                trySmokeSignal(best);
+        }
+
+    }
+    public void disruptAbsoluteCoords(Location enemyBaseLocation, P<Location, Integer>[] absoluteData) {
+        Location targetLoc = getTargetLoc(enemyBaseLocation);
+
+        if(targetLoc == null) {
+            int best = 0;
+            int bestDist = 0;
+            for(P<Location, Integer> p : absoluteData) {
+                int dist = uc.getLocation().distanceSquared(p.x);
+                if (dist > bestDist) {
+                    bestDist = dist;
+                    best = p.y;
+                }
+            }
+
+            if(bestDist != 0)
+                trySmokeSignal(best);
+        }
+        else {
+            int best = 0;
+            int bestDist = 100000000;
+
+            for(P<Location, Integer> p : absoluteData) {
+                int dist = targetLoc.distanceSquared(p.x);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = p.y;
+                }
+            }
+
+            if(bestDist != 100000000)
+                trySmokeSignal(best);
+        }
+    }
+
+    public Location getTargetLoc(Location enemyBaseLocation) {
+
+        int dx = 0, dy = 0;
+
+        if(enemyBaseLocation != null) {
+            Direction dir = uc.getLocation().directionTo(enemyBaseLocation);
+            dx = dir.dx;
+            dy = dir.dy;
+        }
+        else {
+            Location loc = uc.getLocation();
+
+            if(spotEndOfMapInDir(0, 1))
+                dy++;
+            if(spotEndOfMapInDir(0, -1))
+                dy--;
+            if(spotEndOfMapInDir(1, 1))
+                dx++;
+            if(spotEndOfMapInDir(-1, 1))
+                dx--;
+        }
+
+        if(dx == 0 && dy == 0)
+            return null;
+        else
+            return uc.getLocation().add(dx * 100, dy * 100);
+    }
+
+    public boolean spotEndOfMapInDir(int dx, int dy){
+        Location loc;
+        UnitType type = uc.getType();
+
+        if(type == UnitType.BASE)
+            loc = uc.getLocation().add(dx * 6, dy * 6);
+        else if(type == UnitType.SETTLEMENT || type == UnitType.BARRACKS)
+            loc = uc.getLocation().add(dx * 5, dy * 5);
+        else
+            loc = uc.getLocation().add(dx * 4, dy * 4);
+
+        return uc.isOutOfMap(loc);
     }
 
     public boolean disruptCarbassots(Location loc){
