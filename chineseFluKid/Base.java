@@ -244,6 +244,7 @@ public class Base extends MyUnit {
             uc.println("reading " + smokeSignal);
             int msg = comms.decrypt(smokeSignal);
             if(comms.validate(msg)) {
+                uc.println("validated");
                 int msgType = comms.getType(msg);
                 if (msgType == comms.MSG_TYPE_ENEMY_BASE)
                     enemyBaseLocation = comms.intToLocation(msg);
