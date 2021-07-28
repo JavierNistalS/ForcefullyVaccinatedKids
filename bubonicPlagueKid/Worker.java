@@ -10,10 +10,11 @@ public class Worker extends MyUnit {
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
         resourceGathering = new ResourceGathering(uc, this);
+        uc.println("im alive!");
     }
 
     // adjustable constants
-    int SETTLEMENT_DISTANCE = 121;
+    int SETTLEMENT_DISTANCE = 100;
 
     // refs
     EvasivePathfinding pathfinding;
@@ -54,6 +55,7 @@ public class Worker extends MyUnit {
     int roundsChasingResource = 0;
 
     int timeAlive = 0;
+    int lastUpdatedBuildingObstaclesRound = 9;
     boolean[][] buildingObstacles;
     boolean[] isValidBuildingDirection;
 
@@ -65,6 +67,7 @@ public class Worker extends MyUnit {
         generalAttack();
         resourceGathering.update();
         pathfinding.updateEnemyUnits();
+        uc.println("im alive!");
 
         if (!requestedRafts && roundsChasingResource > 40) {
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
@@ -86,6 +89,7 @@ public class Worker extends MyUnit {
                 pathfinding.tryMove(Direction.ZERO);
             }
         }
+        uc.println("im alive!");
 
         if(!anyFood)
             huntDeer(closestDeer);
@@ -257,7 +261,7 @@ public class Worker extends MyUnit {
                     }
                     else {
                         UnitInfo unit = uc.senseUnitAtLocation(loc);
-                        buildingObstacles[i + 2 - x][j + 2 - y] = unit == null || !unit.getType().isStructure();
+                        buildingObstacles[i + 2 - x][j + 2 - y] = unit != null && unit.getType().isStructure() && unit.getType() != UnitType.SETTLEMENT;
                     }
                 }
 
@@ -267,8 +271,10 @@ public class Worker extends MyUnit {
         }
 
         isValidBuildingDirection = new boolean[9];
-        for(Direction dir : dirs)
-            isValidBuildingDirection[dir.ordinal()] = updateIsValidBuildingDirection(uc.getLocation().add(dir));
+        for(Direction dir : dirs) {
+            if(isValidBuildingDirection[dir.ordinal()] = updateIsValidBuildingDirection(uc.getLocation().add(dir)))
+                return;
+        }
     }
 
     boolean updateIsValidBuildingDirection(Location loc) {
@@ -289,24 +295,31 @@ public class Worker extends MyUnit {
             Direction[] dirs = {Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST};
             boolean[] traversable = {false, false, false, false, false, false, false, false};
 
-            int bytecode = uc.getEnergyUsed();
-
             int x = uc.getLocation().x, y = uc.getLocation().y;
             for(int i = 0; i < 8; i++) {
                 traversable[i] = buildingObstacles[loc.x + dirs[i].dx - x + 2][loc.y + dirs[i].dy - y + 2];
             }
 
-            return (traversable[0] || !((traversable[6] || traversable[7]) && (traversable[1] || traversable[2])))
-                && (traversable[2] || !((traversable[0] || traversable[1]) && (traversable[3] || traversable[4])))
-                && (traversable[4] || !((traversable[2] || traversable[3]) && (traversable[5] || traversable[6])))
-                && (traversable[6] || !((traversable[4] || traversable[5]) && (traversable[7] || traversable[0])))
-                && (traversable[1] || !(traversable[0] && traversable[2]))
+            return (traversable[1] || !(traversable[0] && traversable[2]))
                 && (traversable[3] || !(traversable[2] && traversable[4]))
                 && (traversable[5] || !(traversable[4] && traversable[6]))
-                && (traversable[7] || !(traversable[6] && traversable[0]));
+                && (traversable[7] || !(traversable[6] && traversable[0]))
+                && (traversable[0] || !((traversable[6] || traversable[7]) && (traversable[1] || traversable[2])))
+                && (traversable[2] || !((traversable[0] || traversable[1]) && (traversable[3] || traversable[4])))
+                && (traversable[4] || !((traversable[2] || traversable[3]) && (traversable[5] || traversable[6])))
+                && (traversable[6] || !((traversable[4] || traversable[5]) && (traversable[7] || traversable[0])));
         }
         return false;
         //return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());
+    }
+
+    boolean isValidBuildingDirection(Direction dir){
+        if(lastUpdatedBuildingObstaclesRound < uc.getRound()) {
+            updateIsValidBuildingDirection();
+            lastUpdatedBuildingObstaclesRound = uc.getRound();
+        }
+
+        return isValidBuildingDirection[dir.ordinal()];
     }
 
     // prioritizes food
@@ -459,7 +472,7 @@ public class Worker extends MyUnit {
 
     boolean trySpawnInValid(UnitType type) {
         for (Direction dir : dirs) {
-            if (isValidBuildingDirection[dir.ordinal()] && uc.canSpawn(type, dir)) {
+            if (uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
                 uc.spawn(type, dir);
                 lastValid = uc.getRound();
                 return true;
@@ -469,7 +482,7 @@ public class Worker extends MyUnit {
     }
     Location trySpawnInValidAndReturnLocation(UnitType type) {
         for (Direction dir : dirs) {
-            if (isValidBuildingDirection[dir.ordinal()] && uc.canSpawn(type, dir)) {
+            if (uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
                 uc.spawn(type, dir);
                 lastValid = uc.getRound();
                 return uc.getLocation().add(dir);
