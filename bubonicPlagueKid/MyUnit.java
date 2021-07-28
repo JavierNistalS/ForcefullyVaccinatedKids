@@ -112,8 +112,8 @@ public abstract class MyUnit {
         }
     }
 
-    void identifyEnemyBase(){
-        if (enemyBaseLocation != null){
+    void identifyEnemyBase() {
+        if (enemyBaseLocation != null) {
             UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
             for (UnitInfo ui : units){
                 if (ui.getType() == UnitType.BASE){
@@ -124,12 +124,14 @@ public abstract class MyUnit {
         }
     }
 
-    void sustainTorch(){
+    boolean sustainTorch() {
         uc.println("sustaining torch");
 
         int torchLife = uc.getInfo().getTorchRounds();
         if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
             tryLightTorch();
+
+        return uc.getInfo().getTorchRounds() > 0;
     }
 
     int totalResourcesAtLocation(Location loc) {

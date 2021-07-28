@@ -88,7 +88,7 @@ public class ResourceGathering {
             fuckingWater = true;
         }
         if (turnsChasing > maxTurnsChasing){
-            blackList[targetResource.x][targetResource.y] = uc.getRound() + BLACK_LIST_DURATION;
+            blackList[targetResource.x - spawnLocation.x + 49][targetResource.y - spawnLocation.y + 49] = uc.getRound() + BLACK_LIST_DURATION;
             targetResource = null;
             targetResourceValue = 0;
             turnsChasing = 0;

@@ -10,7 +10,6 @@ public class Worker extends MyUnit {
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
         resourceGathering = new ResourceGathering(uc, this);
-        uc.println("im alive!");
     }
 
     // adjustable constants
@@ -47,8 +46,7 @@ public class Worker extends MyUnit {
     boolean canBuildSettlementForFood = true, canBuildSettlementForWood = true, canBuildSettlementForStone = true;
     int roundsSinceJobs = -1; // >= 0 means already researched
     boolean requestedRafts = false;
-
-    int roundsChasingResource = 0;
+    boolean torchLighted = false;
 
     int timeAlive = 0;
     int lastUpdatedBuildingObstaclesRound = 9;
@@ -57,7 +55,8 @@ public class Worker extends MyUnit {
 
     void playRound() {
         timeAlive++;
-        sustainTorch();
+        torchLighted = sustainTorch();
+
         updateInfo();
         readSmokeSignals();
         generalAttack();
@@ -86,10 +85,8 @@ public class Worker extends MyUnit {
         }
 
         if(uc.canMove()) {
-            uc.println("can move");
-            if (fullOfResources) {
-                uc.println("full of resources");
-                roundsChasingResource = 0;
+            if (fullOfResources || !torchLighted) {
+                resourceGathering.resetTurnCount();
                 updateSettlementTarget();
 
                 // TODO: use resourceGathering formula & SETTLEMENT_DISTANCE to determine settlement score
@@ -107,9 +104,10 @@ public class Worker extends MyUnit {
                 }
             }
             else {
-                uc.println("going to resources");
-                if(closestDeer != null && resourceGathering.effectiveValue(500, Resource.FOOD, closestDeer) > resourceGathering.targetResourceValue)
+                if(closestDeer != null && resourceGathering.effectiveValue(500, Resource.FOOD, closestDeer) > resourceGathering.targetResourceValue) {
                     huntDeer(closestDeer);
+                    resourceGathering.resetTurnCount();
+                }
                 else {
                     Location targetResource = resourceGathering.getLocation();
                     if(targetResource != null) {
