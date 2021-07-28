@@ -52,6 +52,7 @@ public class ResourceGathering {
             if (targetResourceValue == 0) {
                 targetResource = null;
                 turnsChasing = 0;
+                fuckingWater = false;
             }
         }
         uc.println("c");
