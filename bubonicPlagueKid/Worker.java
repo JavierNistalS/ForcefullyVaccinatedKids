@@ -34,16 +34,12 @@ public class Worker extends MyUnit {
     int maxResourceCapacity;
     boolean fullOfResources;
     int[] getResourcesCarried;
-    int localFood, localResourceTotal, totalRes;
-    boolean anyFood;
+    int totalRes;
     Location closestDeer;
     int deerMinDist;
     UnitInfo[] units;
     ResourceInfo[] resourceInfos;
-    ResourceInfo[] localResourceInfos;
     boolean[] resourceInfosOccupied;
-    Location resourceMemory;
-    Location targetResource;
     boolean anyEnemyAggroUnits = false;
 
     boolean canBuildFarm = true, canBuildSawmill = true, canBuildQuarry = true;
@@ -68,7 +64,7 @@ public class Worker extends MyUnit {
         resourceGathering.update();
         pathfinding.updateEnemyUnits();
 
-        if (!requestedRafts && roundsChasingResource > 40) {
+        if (!requestedRafts && resourceGathering.needRafts) {
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
             uc.println("requesting rafts");
         }
@@ -88,23 +84,15 @@ public class Worker extends MyUnit {
                 pathfinding.tryMove(Direction.ZERO);
             }
         }
-        uc.println("im alive!");
 
-        if(!anyFood)
-            huntDeer(closestDeer);
-
-        if(localResourceTotal > 0 && !fullOfResources && (!anyFood || localFood > 0)) {
-            uc.println("gathering resources");
-            roundsChasingResource = 0;
-            settlementTargetIdx = -1;
-            uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
-            targetResource = null;
-        }
-        else if(uc.canMove()) {
+        if(uc.canMove()) {
+            uc.println("can move");
             if (fullOfResources) {
+                uc.println("full of resources");
                 roundsChasingResource = 0;
-                targetResource = null;
                 updateSettlementTarget();
+
+                // TODO: use resourceGathering formula & SETTLEMENT_DISTANCE to determine settlement score
 
                 boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
                 boolean buildSettlementForWood = uc.getResource(Resource.WOOD) >= maxResourceCapacity && canBuildSettlementForWood;
@@ -117,16 +105,22 @@ public class Worker extends MyUnit {
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
                     uc.drawLineDebug(uc.getLocation(), settlements[settlementTargetIdx], 255, 128, 0);
                 }
-            } else {
-
-                Location targetResource = resourceGathering.getLocation();
-                if(targetResource != null) {
-                    pathfinding.pathfindTo(targetResource);
-                    resourceGathering.countTurn();
-                    uc.drawLineDebug(uc.getLocation(), targetResource, 255, 255, 0);
+            }
+            else {
+                uc.println("going to resources");
+                if(closestDeer != null && resourceGathering.effectiveValue(500, Resource.FOOD, closestDeer) > resourceGathering.targetResourceValue)
+                    huntDeer(closestDeer);
+                else {
+                    Location targetResource = resourceGathering.getLocation();
+                    if(targetResource != null) {
+                        uc.println("going to resource @ " + targetResource);
+                        pathfinding.pathfindTo(targetResource);
+                        resourceGathering.countTurn();
+                        uc.drawLineDebug(uc.getLocation(), targetResource, 255, 255, 0);
+                    }
+                    else
+                        explore();
                 }
-                else
-                    explore();
             }
         }
 
@@ -138,24 +132,18 @@ public class Worker extends MyUnit {
     }
 
     void updateInfo() {
-        uc.println("updating info");
         exploration.updateChunks();
         updateIsValidBuildingDirection();
 
         if(uc.hasResearched(Technology.JOBS, uc.getTeam()))
             roundsSinceJobs++;
 
-        if(targetResource != null && totalResourcesAtLocation(targetResource) == 0)
-            targetResource = null;
-
         // carried resources & max resource capacity
         getResourcesCarried = uc.getResourcesCarried();
-        int carriedRes = getResourcesCarried[0] + getResourcesCarried[1] + getResourcesCarried[2];
-        maxResourceCapacity = uc.hasResearched(Technology.BOXES, uc.getTeam()) ? GameConstants.MAX_RESOURCE_CAPACITY_BOXES : GameConstants.MAX_RESOURCE_CAPACITY;
-        fullOfResources = getResourcesCarried[0] >= maxResourceCapacity
+        maxResourceCapacity = (uc.hasResearched(Technology.BOXES, uc.getTeam()) ? GameConstants.MAX_RESOURCE_CAPACITY_BOXES : GameConstants.MAX_RESOURCE_CAPACITY) - 4;
+        fullOfResources =  getResourcesCarried[0] >= maxResourceCapacity
                         || getResourcesCarried[1] >= maxResourceCapacity
                         || getResourcesCarried[2] >= maxResourceCapacity;
-
 
         // units
         units = uc.senseUnits();
@@ -163,7 +151,6 @@ public class Worker extends MyUnit {
         deerMinDist = 1000000;
         anyEnemyAggroUnits = false;
 
-        uc.println("unit loop");
     unitLoop:
         for (UnitInfo unit : units) {
             Location loc = unit.getLocation();
@@ -194,39 +181,19 @@ public class Worker extends MyUnit {
             }
         }
 
-        uc.println("local resources");
-        // local resources
-        localResourceInfos = uc.senseResourceInfo(uc.getLocation());
-        localFood = 0;
-        localResourceTotal = 0;
-        if(localResourceInfos != null) { // <- yes, this is necessary
-            for (ResourceInfo resourceInfo : localResourceInfos) {
-                if (resourceInfo != null) {
-                    localResourceTotal += resourceInfo.amount;
-                    if (resourceInfo.resourceType == Resource.FOOD)
-                        localFood += resourceInfo.amount;
-                }
-            }
-        }
-
-        uc.println("resources");
         // resourceInfosOccupied
         resourceInfos = uc.senseResources();
         resourceInfosOccupied = new boolean[resourceInfos.length];
         for(int i = 0; i < resourceInfos.length; i++)
             resourceInfosOccupied[i] = uc.senseUnitAtLocation(resourceInfos[i].location) != null;
 
-        uc.println("resource infos");
         // resourceInfos
         totalRes = 0;
-        anyFood = false;
         for (int i = 0; i < resourceInfos.length; i++) {
             if(!resourceInfosOccupied[i] && (baseLocation == null || baseLocation.distanceSquared(resourceInfos[i].getLocation()) > 18) && !uc.hasTrap(resourceInfos[i].getLocation())) {
                 totalRes += resourceInfos[i].amount;
-                anyFood |= (resourceInfos[i].amount > 100 && resourceInfos[i].resourceType == Resource.FOOD);
             }
         }
-        uc.println("end resouces");
     }
 
     void updateIsValidBuildingDirection() {

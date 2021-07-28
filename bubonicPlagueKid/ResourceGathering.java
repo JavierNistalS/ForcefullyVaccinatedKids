@@ -32,14 +32,14 @@ public class ResourceGathering {
             uc.gatherResources();
 
         for (Resource r : Resource.values())
-            values[r.ordinal()] = 10000.0 / (1 + uc.getResource(r));
+            values[r.ordinal()] = 10000.0 / (uc.getResource(r) + 1); // RESOURCE CURVE
 
         if (uc.canSenseLocation(targetResource)) {
             ResourceInfo[] resourcesAtTarget = uc.senseResourceInfo(targetResource);
             targetResourceValue = 0;
             for (ResourceInfo ri : resourcesAtTarget){
                 if (ri != null){
-                    double value = value(ri);
+                    double value = effectiveValue(ri);
                     targetResourceValue = Math.max(targetResourceValue, value);
                 }
             }
@@ -67,7 +67,7 @@ public class ResourceGathering {
                 (unit.enemyBaseLocation == null || unit.enemyBaseLocation.distanceSquared(loc) > 18 ||
                     (uc.canSenseLocation(unit.enemyBaseLocation) && uc.isObstructed(unit.enemyBaseLocation, loc)))) {
 
-                double value = value(ri);
+                double value = effectiveValue(ri);
                 valueSum += value;
                 if (value > targetResourceValue) {
                     if(targetResource != null)
@@ -108,7 +108,19 @@ public class ResourceGathering {
         return targetResource;
     }
 
-    private double value(ResourceInfo ri){
-        return Math.max(ri.amount, 20)*values[ri.resourceType.ordinal()]/(Math.sqrt(uc.getLocation().distanceSquared(ri.getLocation()))+1);
+    private double effectiveValue(ResourceInfo ri) {
+        return effectiveValue(ri.amount, ri.resourceType, ri.location);
+    }
+
+    public double effectiveValue(int food, int wood, int stone, Location location) {
+        return effectiveValue(food, Resource.FOOD, location) + effectiveValue(wood, Resource.WOOD, location) + effectiveValue(stone, Resource.STONE, location);
+    }
+
+    public double effectiveValue(int amount, Resource resource, Location location) {
+        return effectiveValue(amount, resource, uc.getLocation().distanceSquared(location));
+    }
+
+    public double effectiveValue(int amount, Resource resource, int sqrDist) {
+        return Math.max(amount, 20)*values[resource.ordinal()]/(Math.sqrt(sqrDist) + 1);
     }
 }
