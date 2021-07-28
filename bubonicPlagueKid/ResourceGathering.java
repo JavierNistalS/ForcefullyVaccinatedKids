@@ -25,6 +25,7 @@ public class ResourceGathering {
     int maxTurnsChasing = 0;
     boolean fuckingWater = false;
     boolean needRafts = false;
+    double valueSum = 0;
 
     public void update(){
         uc.println("a");
@@ -53,13 +54,14 @@ public class ResourceGathering {
                 targetResource = null;
                 turnsChasing = 0;
                 fuckingWater = false;
+                resetTurnCount();
             }
         }
         uc.println("c");
 
         ResourceInfo[] resources = uc.senseResources();
         uc.println("c1");
-
+        valueSum = 0;
         for (ResourceInfo ri : resources) {
             uc.println("c_loop");
 
@@ -70,6 +72,7 @@ public class ResourceGathering {
                 uc.println("c_loop2");
 
                 double value = value(ri);
+                valueSum += value;
                 if (value > targetResourceValue) {
                     uc.println("c_loop3");
                     if(targetResource != null)
@@ -77,7 +80,7 @@ public class ResourceGathering {
                     targetResourceValue = value;
                     targetResource = loc;
                     turnsChasing = 0;
-                    maxTurnsChasing = (int) (Math.sqrt(uc.getLocation().distanceSquared(targetResource)) * MAX_TURNS_CHASING_MULT + 3);
+                    resetTurnCount();
                     fuckingWater = false;
                 }
             }
@@ -102,6 +105,11 @@ public class ResourceGathering {
                 fuckingWater = false;
             }
         }
+    }
+
+    public void resetTurnCount(){
+        turnsChasing = 0;
+        maxTurnsChasing = (int) (Math.sqrt(uc.getLocation().distanceSquared(targetResource)) * MAX_TURNS_CHASING_MULT + 3);
     }
 
     public Location getLocation(){
