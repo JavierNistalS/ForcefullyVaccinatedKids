@@ -9,6 +9,7 @@ public class Worker extends MyUnit {
         pathfinding = new EvasivePathfinding(uc, this);
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
+        resourceGathering = new ResourceGathering(uc, this);
     }
 
     // adjustable constants
@@ -18,6 +19,7 @@ public class Worker extends MyUnit {
     EvasivePathfinding pathfinding;
     Exploration exploration;
     Communications comms;
+    ResourceGathering resourceGathering;
 
     // data
     Location baseLocation;
@@ -61,6 +63,7 @@ public class Worker extends MyUnit {
         updateInfo();
         readSmokeSignals();
         generalAttack();
+        resourceGathering.update();
         pathfinding.updateEnemyUnits();
 
         if (!requestedRafts && roundsChasingResource > 40) {
