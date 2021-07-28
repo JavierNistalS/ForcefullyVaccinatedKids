@@ -52,6 +52,8 @@ public class Worker extends MyUnit {
     int roundsChasingResource = 0;
 
     int timeAlive = 0;
+    boolean[][] buildingObstacles;
+    boolean[] isValidBuildingDirection;
 
     void playRound() {
         timeAlive++;
@@ -151,6 +153,7 @@ public class Worker extends MyUnit {
     void updateInfo() {
         uc.println("updating info");
         exploration.updateChunks();
+        updateIsValidBuildingDirection();
 
         if(uc.hasResearched(Technology.JOBS, uc.getTeam()))
             roundsSinceJobs++;
@@ -237,6 +240,70 @@ public class Worker extends MyUnit {
             }
         }
         uc.println("end resouces");
+    }
+
+    void updateIsValidBuildingDirection() {
+        int x = uc.getLocation().x, y = uc.getLocation().y;
+        buildingObstacles = new boolean[5][5];
+        for(int i = x - 2; i <= x + 2; i++) {
+            for(int j = y - 2; j <= y + 2; j++) {
+                Location loc = uc.getLocation().add(i, j);
+                if(uc.canSenseLocation(loc)) {
+                    if(uc.hasMountain(loc) || (!uc.hasResearched(Technology.RAFTS, uc.getTeam()) && uc.hasWater(loc))) {
+                        buildingObstacles[i + 2 - x][j + 2 - y] = true;
+                    }
+                    else {
+                        UnitInfo unit = uc.senseUnitAtLocation(loc);
+                        buildingObstacles[i + 2 - x][j + 2 - y] = unit == null || !unit.getType().isStructure();
+                    }
+                }
+
+                if(buildingObstacles[i + 2 - x][j + 2 - y])
+                    uc.drawPointDebug(loc, 255, 0, 0);
+            }
+        }
+
+        isValidBuildingDirection = new boolean[9];
+        for(Direction dir : dirs)
+            isValidBuildingDirection[dir.ordinal()] = updateIsValidBuildingDirection(uc.getLocation().add(dir));
+    }
+
+    boolean updateIsValidBuildingDirection(Location loc) {
+        uc.println("isValid: [" + loc.x + ", " + loc.y + "]"); // TODO: make settlements "traversable", so that they don't get surrounded by buildings
+
+        if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
+            return false;
+        if (!uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
+            ResourceInfo[] res = uc.senseResourceInfo(loc);
+
+            for(ResourceInfo resInfo : res) {
+                if(resInfo != null && resInfo.amount > 0)
+                    return false;
+            }
+
+            //return (loc.x + loc.y) % 2 == 0;
+
+            Direction[] dirs = {Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST};
+            boolean[] traversable = {false, false, false, false, false, false, false, false};
+
+            int bytecode = uc.getEnergyUsed();
+
+            int x = uc.getLocation().x, y = uc.getLocation().y;
+            for(int i = 0; i < 8; i++) {
+                traversable[i] = buildingObstacles[loc.x + dirs[i].dx - x + 2][loc.y + dirs[i].dy - y + 2];
+            }
+
+            return (traversable[0] || !((traversable[6] || traversable[7]) && (traversable[1] || traversable[2])))
+                && (traversable[2] || !((traversable[0] || traversable[1]) && (traversable[3] || traversable[4])))
+                && (traversable[4] || !((traversable[2] || traversable[3]) && (traversable[5] || traversable[6])))
+                && (traversable[6] || !((traversable[4] || traversable[5]) && (traversable[7] || traversable[0])))
+                && (traversable[1] || !(traversable[0] && traversable[2]))
+                && (traversable[3] || !(traversable[2] && traversable[4]))
+                && (traversable[5] || !(traversable[4] && traversable[6]))
+                && (traversable[7] || !(traversable[6] && traversable[0]));
+        }
+        return false;
+        //return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());
     }
 
     // prioritizes food
@@ -349,58 +416,6 @@ public class Worker extends MyUnit {
         return false;
     }
 
-    boolean isValid(Location loc) {
-        uc.println("isValid: [" + loc.x + ", " + loc.y + "]"); // TODO: make settlements "traversable", so that they don't get surrounded by buildings
-
-        if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
-            return false;
-        if (!uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
-            ResourceInfo[] res = uc.senseResourceInfo(loc);
-
-            for(ResourceInfo resInfo : res) {
-                if(resInfo != null && resInfo.amount > 0)
-                    return false;
-            }
-
-            return (loc.x + loc.y) % 2 == 0;
-
-//            Direction[] dirs = {Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST};
-//            boolean[] traversable = {false, false, false, false, false, false, false, false};
-//
-//            int bytecode = uc.getEnergyUsed();
-//
-//            for(int i = 0; i < 8; i++) {
-//                Location l = loc.add(dirs[i]);
-//                if(!uc.canSenseLocation(l))
-//                    traversable[i] = !pathfinding.isTrapLocation(l);
-//                else if(!uc.hasMountain(l) && (uc.hasResearched(Technology.RAFTS, uc.getTeam()) || !uc.hasWater(l)))
-//                {
-//                    UnitInfo unit = uc.senseUnitAtLocation(l);
-//                    traversable[i] = unit == null || !unit.getType().isStructure();
-//                }
-//
-//                uc.println("iter #" + i + ": " + (uc.getEnergyUsed() - bytecode));
-//                bytecode = uc.getEnergyUsed();
-//            }
-//
-//            boolean result = (!traversable[0] || !((traversable[6] || traversable[7]) && (traversable[1] || traversable[2])))
-//                && (!traversable[2] || !((traversable[0] || traversable[1]) && (traversable[3] || traversable[4])))
-//                && (!traversable[4] || !((traversable[2] || traversable[3]) && (traversable[5] || traversable[6])))
-//                && (!traversable[6] || !((traversable[4] || traversable[5]) && (traversable[7] || traversable[0])))
-//                && (!traversable[1] || !(traversable[0] && traversable[2]))
-//                && (!traversable[3] || !(traversable[2] && traversable[4]))
-//                && (!traversable[5] || !(traversable[4] && traversable[6]))
-//                && (!traversable[7] || !(traversable[6] && traversable[0]));
-//
-//            uc.println("return: " + (uc.getEnergyUsed() - bytecode));
-//
-//            uc.drawPointDebug(loc, result ? 255 : 0, result ? 255 : 0, result ? 255 : 0);
-//            return result;
-        }
-        return false;
-        //return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());
-    }
-
     void addSettlementUnchecked(Location settlementLoc) {
         uc.println("Added settlements[" + settlementsLength + "]: [" + settlementLoc.x + ", " + settlementLoc.y + "]");
 
@@ -441,7 +456,8 @@ public class Worker extends MyUnit {
 
     boolean trySpawnInValid(UnitType type) {
         for (Direction dir : dirs) {
-            if (isValid(uc.getLocation().add(dir)) && trySpawnUnit(type, dir)) {
+            if (isValidBuildingDirection[dir.ordinal()] && uc.canSpawn(type, dir)) {
+                uc.spawn(type, dir);
                 lastValid = uc.getRound();
                 return true;
             }
@@ -450,7 +466,8 @@ public class Worker extends MyUnit {
     }
     Location trySpawnInValidAndReturnLocation(UnitType type) {
         for (Direction dir : dirs) {
-            if (isValid(uc.getLocation().add(dir)) && trySpawnUnit(type, dir)) {
+            if (isValidBuildingDirection[dir.ordinal()] && uc.canSpawn(type, dir)) {
+                uc.spawn(type, dir);
                 lastValid = uc.getRound();
                 return uc.getLocation().add(dir);
             }
