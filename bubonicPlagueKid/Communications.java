@@ -56,17 +56,17 @@ public class Communications {
             msg ^= (msg & (1 << (i-1))) << 1;
         }
         msg ^= XOR_NUMBER;
-        long smoke = 0;
+        int smoke = 0;
         for (int i = 0; i < 32; i++) {
-            smoke |= ((((long)msg & ((long)1 << (long)i)) >> (long)i) << (long)SHUFFLE_NUMBER[i]);
+            smoke |= (((msg & (1 << i)) >>> i) << SHUFFLE_NUMBER[i]);
         }
-        return (int)smoke;
+        return smoke;
     }
     int decrypt(int smoke) {
         int msg = 0;
         for (int i = 0; i < 32; i++) {
-            long sy = SHUFFLE_NUMBER[i];
-            msg |= ((((long)smoke & ((long)1 << (long)sy)) >> (long)sy) << (long)i);
+            int sy = SHUFFLE_NUMBER[i];
+            msg |= (((smoke & (1 << sy)) >>> sy) << i);
         }
         msg ^= XOR_NUMBER;
         for (int i = 31; i > 0; i--){
@@ -76,16 +76,21 @@ public class Communications {
     }
 
     boolean validate(int x) {
+        uc.println("validating " + x);
         int mod = 1 << ROUND_VALIDATION_BITS;
         int currentRound = uc.getRound() % mod;
         int lastRound = (uc.getRound() - 1) % mod;
-        int msgRound = x >> (TYPE_BITS + INFO_BITS + OFFSET_VALIDATION_BITS);
+        int msgRound = x >>> (TYPE_BITS + INFO_BITS + OFFSET_VALIDATION_BITS);
         int offsetMod = 1 << OFFSET_VALIDATION_BITS;
         int offset = (uc.getLocation().x)/50%offsetMod;
         int offsetM1 = (offset + offsetMod - 1)%offsetMod;
         int offsetP1 = (offset + offsetMod + 1)%offsetMod;
-        int msgOffset = (x << ROUND_VALIDATION_BITS) >> (ROUND_VALIDATION_BITS + INFO_BITS + TYPE_BITS);
-        return (msgRound == currentRound || msgRound == lastRound) && (msgOffset == offset || msgOffset == offsetM1 || msgOffset == offsetP1);
+        int msgOffset = (x << ROUND_VALIDATION_BITS) >>> (ROUND_VALIDATION_BITS + INFO_BITS + TYPE_BITS);
+        uc.println("round: " + msgRound);
+        uc.println("offset: " + msgOffset);
+        boolean ans = (msgRound == currentRound || msgRound == lastRound) && (msgOffset == offset || msgOffset == offsetM1 || msgOffset == offsetP1);
+        uc.println(ans);
+        return ans;
     }
 
     boolean sendMessage(int type, int info) {
@@ -110,18 +115,18 @@ public class Communications {
     }
 
     int getType(int x) {
-        return ((x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS)) >> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + INFO_BITS));
+        return ((x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS)) >>> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + INFO_BITS));
     }
     int getInfo(int x) {
-        return (x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS)) >> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS);
+        return (x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS)) >>> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS);
     }
 
     int locationToInt(Location loc) {
         return ((loc.x%128) << 7) + (loc.y%128);
     }
     Location intToLocation(int msg) {
-        int x = ((msg << 18) >> 25);
-        int y = ((msg << 25) >> 25);
+        int x = ((msg << 18) >>> 25);
+        int y = ((msg << 25) >>> 25);
         Location act = uc.getLocation();
         x = act.x/128*128 + x;
         y = act.y/128*128 + y;
