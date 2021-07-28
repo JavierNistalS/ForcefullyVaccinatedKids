@@ -15,6 +15,8 @@ public class Base extends MyUnit {
         comms = new Communications(uc);
         kgb = new TheKGB(uc);
         checkTrollMap();
+        landUF = new UnionFind(uc, true);
+        connectivityTEMP();
     }
 
     int lastWorker = -100;
@@ -30,6 +32,7 @@ public class Base extends MyUnit {
 
     Communications comms;
     TheKGB kgb;
+    UnionFind landUF;
 
     boolean buildFoodState = true;
     boolean buildWoodState = true;
@@ -93,6 +96,39 @@ public class Base extends MyUnit {
         if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && uc.getResource(Resource.FOOD) > 900 && wolfCount < 5){
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
+        }
+    }
+
+    void connectivityTEMP(){
+        uc.println("Started connectivity");
+        for (Location loc : uc.getVisibleLocations()){
+
+            if (!uc.isOutOfMap(loc) && !uc.hasMountain(loc) && !uc.hasWater(loc) && uc.getLocation().distanceSquared(loc) > 0){
+                landUF.add(loc);
+            }
+            else if (!uc.isOutOfMap(loc.add(loc.directionTo(uc.getLocation())))){
+                landUF.recognize(loc);
+            }
+
+        }
+        uc.println("Done");
+        Location north = uc.getLocation().add(Direction.NORTHWEST);
+        Location south = uc.getLocation().add(Direction.SOUTHWEST);
+        Location east = uc.getLocation().add(Direction.NORTHEAST);
+        Location west = uc.getLocation().add(Direction.SOUTHEAST);
+        for (Location loc : uc.getVisibleLocations()){
+            if (landUF.areConnected(north, loc)){
+                uc.drawPointDebug(loc, 0, 0, 255);
+            }
+            if (landUF.areConnected(south, loc)){
+                uc.drawPointDebug(loc, 0, 255, 0);
+            }
+            if (landUF.areConnected(east, loc)){
+                uc.drawPointDebug(loc, 255, 0, 0);
+            }
+            if (landUF.areConnected(west, loc)){
+                uc.drawPointDebug(loc, 255, 255, 255);
+            }
         }
     }
 
