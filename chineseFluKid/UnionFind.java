@@ -33,6 +33,9 @@ public class UnionFind {
     }
 
     private int find(int idx){
+        while (parent[idx] > 0){
+            parent[idx] = parent[parent[idx]];
+        }
         return (parent[idx] <= 0) ? idx : (parent[idx] = find(parent[idx]));
     }
 
@@ -40,7 +43,7 @@ public class UnionFind {
         A = find(A);
         B = find(B);
         if (A != B) {
-            //uc.drawLineDebug(idxToLoc(A), idxToLoc(B), 0,0,0);
+            uc.drawLineDebug(idxToLoc(A), idxToLoc(B), 0,0,0);
             size[A] += size[B];
             unknownConnections[A] += unknownConnections[B];
             parent[B] = A;
