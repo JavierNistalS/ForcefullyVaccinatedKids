@@ -43,7 +43,7 @@ public class ResourceGathering {
                     targetResourceValue = Math.max(targetResourceValue, value);
                 }
             }
-            if (uc.senseUnitAtLocation(targetResource) != null ||
+            if ((uc.senseUnitAtLocation(targetResource) != null && uc.getLocation().distanceSquared(targetResource) > 0) ||
                     (unit.enemyBaseLocation != null && unit.enemyBaseLocation.distanceSquared(targetResource) <= 18 &&
                             (!uc.canSenseLocation(unit.enemyBaseLocation) || !uc.isObstructed(unit.enemyBaseLocation, targetResource)))){
                 targetResourceValue = 0;
