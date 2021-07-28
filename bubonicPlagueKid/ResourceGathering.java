@@ -27,14 +27,12 @@ public class ResourceGathering {
     boolean needRafts = false;
 
     public void update(){
-        uc.println("a");
-
         if (uc.canGatherResources())
             uc.gatherResources();
+
         for (Resource r : Resource.values())
             values[r.ordinal()] = 10000.0 / (1 + uc.getResource(r));
 
-        uc.println("b");
         if (uc.canSenseLocation(targetResource)) {
             ResourceInfo[] resourcesAtTarget = uc.senseResourceInfo(targetResource);
             targetResourceValue = 0;
@@ -55,23 +53,17 @@ public class ResourceGathering {
                 fuckingWater = false;
             }
         }
-        uc.println("c");
 
         ResourceInfo[] resources = uc.senseResources();
-        uc.println("c1");
 
         for (ResourceInfo ri : resources) {
-            uc.println("c_loop");
-
             Location loc = ri.getLocation();
             if (blackList[loc.x - spawnLocation.x + 49][loc.y - spawnLocation.y + 49] < uc.getRound() && uc.senseUnitAtLocation(loc) == null &&
                 (unit.enemyBaseLocation == null || unit.enemyBaseLocation.distanceSquared(loc) > 18 ||
                     (uc.canSenseLocation(unit.enemyBaseLocation) && uc.isObstructed(unit.enemyBaseLocation, loc)))) {
-                uc.println("c_loop2");
 
                 double value = value(ri);
                 if (value > targetResourceValue) {
-                    uc.println("c_loop3");
                     if(targetResource != null)
                         blackList[targetResource.x - spawnLocation.x + 49][targetResource.y - spawnLocation.y + 49] = uc.getRound() + 10;
                     targetResourceValue = value;
@@ -81,10 +73,7 @@ public class ResourceGathering {
                     fuckingWater = false;
                 }
             }
-            uc.println("c_loop4");
         }
-        uc.println("d");
-
     }
 
     public void countTurn(){

@@ -67,7 +67,6 @@ public class Worker extends MyUnit {
         generalAttack();
         resourceGathering.update();
         pathfinding.updateEnemyUnits();
-        uc.println("im alive!");
 
         if (!requestedRafts && roundsChasingResource > 40) {
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
@@ -94,20 +93,8 @@ public class Worker extends MyUnit {
         if(!anyFood)
             huntDeer(closestDeer);
 
-        if (resourceMemory != null && uc.canSenseLocation(resourceMemory)){
-            ResourceInfo[] ris = uc.senseResourceInfo(resourceMemory);
-            boolean something = false;
-            for (ResourceInfo ri : ris){
-                if (ri != null && uc.senseUnitAtLocation(ri.getLocation()) == null && (enemyBaseLocation == null || ri.getLocation().distanceSquared(enemyBaseLocation) > 18))
-                    something = true;
-            }
-            if (!something || (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(resourceMemory) <= 18))
-                resourceMemory = null;
-        }
-
         if(localResourceTotal > 0 && !fullOfResources && (!anyFood || localFood > 0)) {
             uc.println("gathering resources");
-            uc.gatherResources();
             roundsChasingResource = 0;
             settlementTargetIdx = -1;
             uc.drawPointDebug(uc.getLocation(), 255, 255, 0);
@@ -126,27 +113,20 @@ public class Worker extends MyUnit {
 
                 if (buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
                     uc.println("no es relleno para no quitar el else");
-                else
+                else {
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
-            } else if (totalRes == 0 && resourceMemory == null) {
-                roundsChasingResource = 0;
-                explore();
-            }
-            else if (totalRes == 0) {
-                roundsChasingResource = 0;
-                pathfinding.pathfindTo(resourceMemory);
-            } else { // some resources
-                uc.println("going to resources");
-                uc.println("targetResource null ? " + (targetResource == null));
-                uc.println("resourceInfos null ? " + (resourceInfos == null));
-                uc.println("resourceInfosOccupied null ? " + (resourceInfosOccupied == null));
-                if (targetResource == null || roundsChasingResource % 20 == 15)
-                    targetResource = findClosestResource(resourceInfos, resourceInfosOccupied);
-                uc.println("targetResource null ? " + (targetResource == null));
-                resourceMemory = targetResource;
-                pathfinding.pathfindTo(targetResource);
-                roundsChasingResource++;
-                uc.drawLineDebug(uc.getLocation(), targetResource, 255, 255, 0);
+                    uc.drawLineDebug(uc.getLocation(), settlements[settlementTargetIdx], 255, 128, 0);
+                }
+            } else {
+
+                Location targetResource = resourceGathering.getLocation();
+                if(targetResource != null) {
+                    pathfinding.pathfindTo(targetResource);
+                    resourceGathering.countTurn();
+                    uc.drawLineDebug(uc.getLocation(), targetResource, 255, 255, 0);
+                }
+                else
+                    explore();
             }
         }
 
