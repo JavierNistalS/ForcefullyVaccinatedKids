@@ -54,7 +54,6 @@ public class Worker extends MyUnit {
     int timeAlive = 0;
 
     void playRound() {
-
         timeAlive++;
         sustainTorch();
         updateInfo();
@@ -351,20 +350,52 @@ public class Worker extends MyUnit {
     }
 
     boolean isValid(Location loc) {
+        uc.println("isValid: [" + loc.x + ", " + loc.y + "]"); // TODO: make settlements "traversable", so that they don't get surrounded by buildings
+
         if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
             return false;
-        if (((loc.x + loc.y) % 2) == 0 && !uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
-            //uc.println("is preemptively valid");
-
+        if (!uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
             ResourceInfo[] res = uc.senseResourceInfo(loc);
-            //uc.println("res.length: " + res.length);
 
             for(ResourceInfo resInfo : res) {
-                //uc.println("is valid? resInfo == null: " + resInfo == null);
                 if(resInfo != null && resInfo.amount > 0)
                     return false;
             }
-            return true;
+
+            return (loc.x + loc.y) % 2 == 0;
+
+//            Direction[] dirs = {Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST};
+//            boolean[] traversable = {false, false, false, false, false, false, false, false};
+//
+//            int bytecode = uc.getEnergyUsed();
+//
+//            for(int i = 0; i < 8; i++) {
+//                Location l = loc.add(dirs[i]);
+//                if(!uc.canSenseLocation(l))
+//                    traversable[i] = !pathfinding.isTrapLocation(l);
+//                else if(!uc.hasMountain(l) && (uc.hasResearched(Technology.RAFTS, uc.getTeam()) || !uc.hasWater(l)))
+//                {
+//                    UnitInfo unit = uc.senseUnitAtLocation(l);
+//                    traversable[i] = unit == null || !unit.getType().isStructure();
+//                }
+//
+//                uc.println("iter #" + i + ": " + (uc.getEnergyUsed() - bytecode));
+//                bytecode = uc.getEnergyUsed();
+//            }
+//
+//            boolean result = (!traversable[0] || !((traversable[6] || traversable[7]) && (traversable[1] || traversable[2])))
+//                && (!traversable[2] || !((traversable[0] || traversable[1]) && (traversable[3] || traversable[4])))
+//                && (!traversable[4] || !((traversable[2] || traversable[3]) && (traversable[5] || traversable[6])))
+//                && (!traversable[6] || !((traversable[4] || traversable[5]) && (traversable[7] || traversable[0])))
+//                && (!traversable[1] || !(traversable[0] && traversable[2]))
+//                && (!traversable[3] || !(traversable[2] && traversable[4]))
+//                && (!traversable[5] || !(traversable[4] && traversable[6]))
+//                && (!traversable[7] || !(traversable[6] && traversable[0]));
+//
+//            uc.println("return: " + (uc.getEnergyUsed() - bytecode));
+//
+//            uc.drawPointDebug(loc, result ? 255 : 0, result ? 255 : 0, result ? 255 : 0);
+//            return result;
         }
         return false;
         //return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());

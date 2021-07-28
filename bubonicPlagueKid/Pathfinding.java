@@ -179,9 +179,12 @@ public class Pathfinding {
                 return !uc.hasTrap(loc);
             }
             else{
-                return loc.x % 3 != 0 || loc.y % 3 != 0;
+                return !isTrapLocation(loc);
             }
         }
         return false;
+    }
+    public boolean isTrapLocation(Location loc){
+        return loc.x % 3 == 0 && loc.y % 3 == 0;
     }
 }

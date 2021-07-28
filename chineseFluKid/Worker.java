@@ -12,7 +12,7 @@ public class Worker extends MyUnit {
     }
 
     // adjustable constants
-    int SETTLEMENT_DISTANCE = 121;
+    int SETTLEMENT_DISTANCE = 101;
 
     // refs
     EvasivePathfinding pathfinding;
@@ -54,7 +54,6 @@ public class Worker extends MyUnit {
     int timeAlive = 0;
 
     void playRound() {
-
         timeAlive++;
         sustainTorch();
         updateInfo();
@@ -238,6 +237,10 @@ public class Worker extends MyUnit {
             }
         }
         uc.println("end resouces");
+    }
+
+    void buildCompact() {
+
     }
 
     // prioritizes food

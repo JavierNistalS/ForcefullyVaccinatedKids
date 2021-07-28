@@ -15,7 +15,7 @@ public class Base extends MyUnit {
         super(uc);
     }
 
-    void playRound(){
+    void playRound() {
 
         baseLocation = uc.getLocation();
         if(enemyBaseLocation == null || Math.abs(baseLocation.x - enemyBaseLocation.x) < 50 || Math.abs(baseLocation.y - enemyBaseLocation.y) < 50)
