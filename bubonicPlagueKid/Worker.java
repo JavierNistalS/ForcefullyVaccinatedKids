@@ -112,8 +112,10 @@ public class Worker extends MyUnit {
                     Location targetResource = resourceGathering.getLocation();
                     if(targetResource != null) {
                         uc.println("going to resource @ " + targetResource);
-                        pathfinding.pathfindTo(targetResource);
-                        resourceGathering.countTurn();
+                        if (uc.getLocation().distanceSquared(targetResource) > 0) {
+                            pathfinding.pathfindTo(targetResource);
+                            resourceGathering.countTurn();
+                        }
                         uc.drawLineDebug(uc.getLocation(), targetResource, 255, 255, 0);
                     }
                     else
