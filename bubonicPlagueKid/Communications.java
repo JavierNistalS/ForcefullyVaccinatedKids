@@ -130,14 +130,18 @@ public class Communications {
         Location act = uc.getLocation();
         x = act.x/128*128 + x;
         y = act.y/128*128 + y;
-        while (x > act.x + 50)
+        while (x > act.x + 50) {
             x -= 128;
-        while (x < act.x - 50)
+        }
+        while (x < act.x - 50) {
             x += 128;
-        while (y > act.y + 50)
-            x -= 128;
-        while (y < act.y - 50)
+        }
+        while (y > act.y + 50) {
+            y -= 128;
+        }
+        while (y < act.y - 50) {
             y += 128;
+        }
         return new Location(x, y);
     }
 }
