@@ -44,6 +44,7 @@ public class ResourceGathering {
                 }
             }
             if ((uc.senseUnitAtLocation(targetResource) != null && uc.getLocation().distanceSquared(targetResource) > 0) ||
+                    (uc.canSenseLocation(targetResource) && uc.hasTrap(targetResource)) ||
                     (unit.enemyBaseLocation != null && unit.enemyBaseLocation.distanceSquared(targetResource) <= 18 &&
                             (!uc.canSenseLocation(unit.enemyBaseLocation) || !uc.isObstructed(unit.enemyBaseLocation, targetResource)))){
                 targetResourceValue = 0;
@@ -64,14 +65,12 @@ public class ResourceGathering {
         for (ResourceInfo ri : resources) {
             Location loc = ri.getLocation();
             if (blackList[loc.x - spawnLocation.x + 49][loc.y - spawnLocation.y + 49] < uc.getRound() && uc.senseUnitAtLocation(loc) == null &&
-                (unit.enemyBaseLocation == null || unit.enemyBaseLocation.distanceSquared(loc) > 18 ||
+                !uc.hasTrap(loc) &&
+                    (unit.enemyBaseLocation == null || unit.enemyBaseLocation.distanceSquared(loc) > 18 ||
                     (uc.canSenseLocation(unit.enemyBaseLocation) && uc.isObstructed(unit.enemyBaseLocation, loc)))) {
-
                 double value = effectiveValue(ri);
                 valueSum += value;
                 if (value > targetResourceValue) {
-                    if(targetResource != null)
-                        blackList[targetResource.x - spawnLocation.x + 49][targetResource.y - spawnLocation.y + 49] = uc.getRound() + 10;
                     targetResourceValue = value;
                     targetResource = loc;
                     turnsChasing = 0;
