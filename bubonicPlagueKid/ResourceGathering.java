@@ -6,6 +6,7 @@ public class ResourceGathering {
 
     final int MAX_TURNS_CHASING_MULT = 10;
     final int BLACK_LIST_DURATION = 250;
+    final double MIN_TARGET_VALUE = 18.5f;
 
     public ResourceGathering(UnitController uc, MyUnit unit){
         this.uc = uc;
@@ -18,14 +19,14 @@ public class ResourceGathering {
     MyUnit unit;
     Location spawnLocation;
     Location targetResource = null;
-    double targetResourceValue = 0;
+    double targetResourceValue = MIN_TARGET_VALUE;
     int[][] blackList = new int[99][99];
     double[] values;
     int turnsChasing = 0;
     int maxTurnsChasing = 0;
     boolean fuckingWater = false;
     boolean needRafts = false;
-    double valueSum = 0;
+    double valueForSettlementConstruction = 0;
 
     public void update(){
         if (targetResource != null){
@@ -36,11 +37,11 @@ public class ResourceGathering {
             uc.gatherResources();
 
         for (Resource r : Resource.values())
-            values[r.ordinal()] = 10000.0 / (uc.getResource(r) + 1); // RESOURCE CURVE
+            values[r.ordinal()] = 10000.0 / (uc.getResource(r) + 100); // RESOURCE CURVE
 
         if (uc.canSenseLocation(targetResource)) {
             ResourceInfo[] resourcesAtTarget = uc.senseResourceInfo(targetResource);
-            targetResourceValue = 0;
+            targetResourceValue = MIN_TARGET_VALUE;
             for (ResourceInfo ri : resourcesAtTarget){
                 if (ri != null){
                     double value = effectiveValue(ri);
@@ -51,9 +52,9 @@ public class ResourceGathering {
                     (uc.canSenseLocation(targetResource) && uc.hasTrap(targetResource)) ||
                     (unit.enemyBaseLocation != null && unit.enemyBaseLocation.distanceSquared(targetResource) <= 18 &&
                             (!uc.canSenseLocation(unit.enemyBaseLocation) || !uc.isObstructed(unit.enemyBaseLocation, targetResource)))){
-                targetResourceValue = 0;
+                targetResourceValue = MIN_TARGET_VALUE;
             }
-            if (targetResourceValue == 0) {
+            if (targetResourceValue <= MIN_TARGET_VALUE) {
                 targetResource = null;
                 turnsChasing = 0;
                 fuckingWater = false;
@@ -64,7 +65,7 @@ public class ResourceGathering {
         ResourceInfo[] resources = uc.senseResources();
         
         uc.println("c1");
-        valueSum = 0;
+        valueForSettlementConstruction = 0;
 
         for (ResourceInfo ri : resources) {
             Location loc = ri.getLocation();
@@ -72,8 +73,10 @@ public class ResourceGathering {
                 !uc.hasTrap(loc) &&
                     (unit.enemyBaseLocation == null || unit.enemyBaseLocation.distanceSquared(loc) > 18 ||
                     (uc.canSenseLocation(unit.enemyBaseLocation) && uc.isObstructed(unit.enemyBaseLocation, loc)))) {
+
                 double value = effectiveValue(ri);
-                valueSum += value;
+                valueForSettlementConstruction += effectiveValueForSettlement(ri);
+
                 if (value > targetResourceValue) {
                     targetResourceValue = value;
                     targetResource = loc;
@@ -96,7 +99,7 @@ public class ResourceGathering {
             uc.drawPointDebug(targetResource,0,0,0);
             blackList[targetResource.x - spawnLocation.x + 49][targetResource.y - spawnLocation.y + 49] = uc.getRound() + BLACK_LIST_DURATION;
             targetResource = null;
-            targetResourceValue = 0;
+            targetResourceValue = MIN_TARGET_VALUE;
             turnsChasing = 0;
             if (fuckingWater){
                 uc.println("rafts would be cool");
@@ -130,5 +133,12 @@ public class ResourceGathering {
 
     public double effectiveValue(int amount, Resource resource, int sqrDist) {
         return Math.max(amount, 20)*values[resource.ordinal()]/(Math.sqrt(sqrDist) + 1);
+    }
+
+    private double effectiveValueForSettlement(ResourceInfo ri) {
+        return effectiveValue(ri.amount, ri.resourceType, uc.getLocation().distanceSquared(ri.location));
+    }
+    public double effectiveValueForSettlement(int amount, Resource resource, int sqrDist, int cap) {
+        return Math.sqrt(20*amount)*values[resource.ordinal()]/(Math.sqrt(sqrDist) + 1);
     }
 }

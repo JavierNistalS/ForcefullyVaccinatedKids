@@ -14,6 +14,7 @@ public class Worker extends MyUnit {
 
     // adjustable constants
     int SETTLEMENT_DISTANCE = 100;
+    int SETTLEMENT_BUILD_SCORE = 850;
 
     // refs
     EvasivePathfinding pathfinding;
@@ -97,9 +98,9 @@ public class Worker extends MyUnit {
                 boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
                 boolean buildSettlementForWood = uc.getResource(Resource.WOOD) >= maxResourceCapacity && canBuildSettlementForWood;
                 boolean buildSettlementForStone = uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
-                boolean buildSettlementForResources = totalRes > 200 || roundsSinceJobs > 75 || buildSettlementForFood || buildSettlementForWood || buildSettlementForStone;
+                boolean buildSettlementForResources = roundsSinceJobs > 75 || buildSettlementForFood || buildSettlementForWood || buildSettlementForStone;
 
-                if (buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
+                if (resourceGathering.valueForSettlementConstruction > SETTLEMENT_BUILD_SCORE && buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
                     uc.println("no es relleno para no quitar el else");
                 else {
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
