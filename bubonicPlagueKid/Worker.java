@@ -52,6 +52,8 @@ public class Worker extends MyUnit {
     int lastUpdatedBuildingObstaclesRound = 9;
     boolean[][] buildingObstacles;
     boolean[] isValidBuildingDirection;
+    boolean[] isUpdatedBuildingDirection;
+    Direction bannedBuildingDirection = Direction.ZERO;
 
     void playRound() {
         timeAlive++;
@@ -88,6 +90,7 @@ public class Worker extends MyUnit {
             if (fullOfResources || !torchLighted) {
                 resourceGathering.resetTurnCount();
                 updateSettlementTarget();
+                bannedBuildingDirection = Direction.ZERO;
 
                 // TODO: use resourceGathering formula & SETTLEMENT_DISTANCE to determine settlement score
 
@@ -100,22 +103,35 @@ public class Worker extends MyUnit {
                     uc.println("no es relleno para no quitar el else");
                 else {
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
+                    bannedBuildingDirection = uc.getLocation().directionTo(settlements[settlementTargetIdx]);
                     uc.drawLineDebug(uc.getLocation(), settlements[settlementTargetIdx], 255, 128, 0);
                 }
             }
             else {
                 if(closestDeer != null && resourceGathering.effectiveValue(500, Resource.FOOD, closestDeer) > resourceGathering.targetResourceValue) {
                     huntDeer(closestDeer);
+                    bannedBuildingDirection = uc.getLocation().directionTo(closestDeer);
                     resourceGathering.resetTurnCount();
                 }
                 else {
                     Location targetResource = resourceGathering.getLocation();
                     if(targetResource != null) {
                         uc.println("going to resource @ " + targetResource);
+
                         if (uc.getLocation().distanceSquared(targetResource) > 0) {
                             pathfinding.pathfindTo(targetResource);
                             resourceGathering.countTurn();
                         }
+
+
+                        if(targetResource.isEqual(uc.getLocation()))
+                            resourceGathering.resetTurnCount();
+                        else {
+                            pathfinding.pathfindTo(targetResource);
+                            resourceGathering.countTurn();
+                        }
+                        bannedBuildingDirection = uc.getLocation().directionTo(targetResource);
+
                         uc.drawLineDebug(uc.getLocation(), targetResource, 255, 255, 0);
                     }
                     else
@@ -133,7 +149,6 @@ public class Worker extends MyUnit {
 
     void updateInfo() {
         exploration.updateChunks();
-        updateIsValidBuildingDirection();
 
         if(uc.hasResearched(Technology.JOBS, uc.getTeam()))
             roundsSinceJobs++;
@@ -196,104 +211,71 @@ public class Worker extends MyUnit {
         }
     }
 
-    void updateIsValidBuildingDirection() {
-        int x = uc.getLocation().x, y = uc.getLocation().y;
-        buildingObstacles = new boolean[5][5];
-        for(int i = x - 2; i <= x + 2; i++) {
-            for(int j = y - 2; j <= y + 2; j++) {
-                Location loc = uc.getLocation().add(i, j);
-                if(uc.canSenseLocation(loc)) {
-                    if(uc.hasMountain(loc) || (!uc.hasResearched(Technology.RAFTS, uc.getTeam()) && uc.hasWater(loc))) {
-                        buildingObstacles[i + 2 - x][j + 2 - y] = true;
-                    }
-                    else {
-                        UnitInfo unit = uc.senseUnitAtLocation(loc);
-                        buildingObstacles[i + 2 - x][j + 2 - y] = unit != null && unit.getType().isStructure() && unit.getType() != UnitType.SETTLEMENT;
-                    }
-                }
-
-                if(buildingObstacles[i + 2 - x][j + 2 - y])
-                    uc.drawPointDebug(loc, 255, 0, 0);
-            }
-        }
-
-        isValidBuildingDirection = new boolean[9];
-        for(Direction dir : dirs) {
-            if(isValidBuildingDirection[dir.ordinal()] = updateIsValidBuildingDirection(uc.getLocation().add(dir)))
-                return;
-        }
-    }
-
-    boolean updateIsValidBuildingDirection(Location loc) {
-        uc.println("isValid: [" + loc.x + ", " + loc.y + "]"); // TODO: make settlements "traversable", so that they don't get surrounded by buildings
-
-        if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
-            return false;
-        if (!uc.isOutOfMap(loc) && uc.canSenseLocation(loc)) {
-            ResourceInfo[] res = uc.senseResourceInfo(loc);
-
-            for(ResourceInfo resInfo : res) {
-                if(resInfo != null && resInfo.amount > 0)
-                    return false;
-            }
-
-            //return (loc.x + loc.y) % 2 == 0;
-
-            Direction[] dirs = {Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST};
-            boolean[] traversable = {false, false, false, false, false, false, false, false};
+    void updateBuildingObstacles() {
+        if(uc.getRound() > lastUpdatedBuildingObstaclesRound) {
+            uc.println("updateBuildingObstacles");
 
             int x = uc.getLocation().x, y = uc.getLocation().y;
-            for(int i = 0; i < 8; i++) {
-                traversable[i] = buildingObstacles[loc.x + dirs[i].dx - x + 2][loc.y + dirs[i].dy - y + 2];
+            buildingObstacles = new boolean[5][5];
+
+            for(int i = 0; i < 5; i++) {
+                for(int j = 0; j < 5; j++) {
+                    Location loc = uc.getLocation().add(i - 2, j - 2);
+                    if(uc.isOutOfMap(loc))
+                        buildingObstacles[i][j] = true;
+                    else if(uc.canSenseLocation(loc)) {
+                        if(uc.hasMountain(loc) || (!uc.hasResearched(Technology.RAFTS, uc.getTeam()) && uc.hasWater(loc))) {
+                            buildingObstacles[i][j] = true;
+                        }
+                        else {
+                            UnitInfo unit = uc.senseUnitAtLocation(loc);
+                            buildingObstacles[i][j] = unit != null && unit.getType().isStructure() && unit.getType() != UnitType.SETTLEMENT;
+                        }
+                    }
+
+                    if(buildingObstacles[i][j])
+                        uc.drawPointDebug(loc, 255, 0, 0);
+                    else
+                        uc.drawPointDebug(loc, 0, 0, 0);
+                }
             }
 
-            return (traversable[1] || !(traversable[0] && traversable[2]))
-                && (traversable[3] || !(traversable[2] && traversable[4]))
-                && (traversable[5] || !(traversable[4] && traversable[6]))
-                && (traversable[7] || !(traversable[6] && traversable[0]))
-                && (traversable[0] || !((traversable[6] || traversable[7]) && (traversable[1] || traversable[2])))
-                && (traversable[2] || !((traversable[0] || traversable[1]) && (traversable[3] || traversable[4])))
-                && (traversable[4] || !((traversable[2] || traversable[3]) && (traversable[5] || traversable[6])))
-                && (traversable[6] || !((traversable[4] || traversable[5]) && (traversable[7] || traversable[0])));
-        }
-        return false;
-        //return baseLocation != null && loc.distanceSquared (baseLocation) > 1 || (uc.getRound() > 400 && lastValid + 3< uc.getRound());
-    }
-
-    boolean isValidBuildingDirection(Direction dir){
-        if(lastUpdatedBuildingObstaclesRound < uc.getRound()) {
-            updateIsValidBuildingDirection();
+            isValidBuildingDirection = new boolean[9];
+            isUpdatedBuildingDirection = new boolean[9];
             lastUpdatedBuildingObstaclesRound = uc.getRound();
         }
-
-        return isValidBuildingDirection[dir.ordinal()];
     }
 
-    // prioritizes food
-    Location findClosestResource(ResourceInfo[] resourceInfos, boolean[] resourceInfosOccupied) {
-        Location closest = null;
-        Location closestFood = null;
-        int closestDist = 1000000;
-        int closestFoodDist = 10000000;
+    void updateIsValidBuildingDirection(Direction dir) {
+        uc.println("updateIsValidBuildingDirection: " + dir);
+        isUpdatedBuildingDirection[dir.ordinal()] = true;
 
-        for(int i = 0; i < resourceInfos.length; i++) {
-            if(!resourceInfosOccupied[i] && !uc.hasTrap(resourceInfos[i].getLocation()) && (enemyBaseLocation == null || enemyBaseLocation.distanceSquared(resourceInfos[i].getLocation()) > 18)) {
-                Location loc = resourceInfos[i].location;
-                int dist = loc.distanceSquared(uc.getLocation());
-                if (dist < closestDist) {
-                    closest = loc;
-                    closestDist = dist;
-                }
-                if (resourceInfos[i].resourceType == Resource.FOOD && dist < closestFoodDist) {
-                    closestFood = loc;
-                    closestFoodDist = dist;
-                }
-            }
-        }
+        Direction[] dirs = {Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST};
 
-        if(closestFood != null)
-            return closestFood;
-        return closest;
+        int offsetX = dir.dx + 2;
+        int offsetY = dir.dy + 2;
+
+        boolean[] obstacle = new boolean[8];
+        for(int i = 0; i < 8; i++)
+            obstacle[i] = buildingObstacles[dirs[i].dx + offsetX][dirs[i].dy + offsetY];
+
+        isValidBuildingDirection[dir.ordinal()] =
+               (obstacle[1] || !(obstacle[0] && obstacle[2]))
+            && (obstacle[3] || !(obstacle[2] && obstacle[4]))
+            && (obstacle[5] || !(obstacle[4] && obstacle[6]))
+            && (obstacle[7] || !(obstacle[6] && obstacle[0]))
+            && (obstacle[0] || !((obstacle[6] || obstacle[7]) && (obstacle[1] || obstacle[2])))
+            && (obstacle[2] || !((obstacle[0] || obstacle[1]) && (obstacle[3] || obstacle[4])))
+            && (obstacle[4] || !((obstacle[2] || obstacle[3]) && (obstacle[5] || obstacle[6])))
+            && (obstacle[6] || !((obstacle[4] || obstacle[5]) && (obstacle[7] || obstacle[0])));
+    }
+
+    boolean isValidBuildingDirection(Direction dir) {
+        updateBuildingObstacles();
+        if(!isUpdatedBuildingDirection[dir.ordinal()])
+            updateIsValidBuildingDirection(dir);
+
+        return isValidBuildingDirection[dir.ordinal()];
     }
 
     void explore() {
@@ -301,9 +283,11 @@ public class Worker extends MyUnit {
         Location exploreLoc = exploration.getLocation();
         if(exploreLoc == null) {
             exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.RESET_TURNS);
+            bannedBuildingDirection = Direction.ZERO;
         }
         else {
             pathfinding.pathfindTo(exploreLoc);
+            bannedBuildingDirection = uc.getLocation().directionTo(exploreLoc);
             uc.drawLineDebug(uc.getLocation(), exploreLoc, 0, 0, 255);
         }
 
@@ -418,21 +402,28 @@ public class Worker extends MyUnit {
     }
 
     boolean trySpawnInValid(UnitType type) {
-        for (Direction dir : dirs) {
-            if (uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
-                uc.spawn(type, dir);
-                lastValid = uc.getRound();
-                return true;
-            }
-        }
-        return false;
+        return trySpawnInValidAndReturnLocation(type) != null;
     }
     Location trySpawnInValidAndReturnLocation(UnitType type) {
+
+    mainLoop:
         for (Direction dir : dirs) {
-            if (uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
-                uc.spawn(type, dir);
-                lastValid = uc.getRound();
-                return uc.getLocation().add(dir);
+            if(!dir.isEqual(bannedBuildingDirection)) {
+                Location loc = uc.getLocation().add(dir);
+
+                if ((enemyBaseLocation == null || enemyBaseLocation.distanceSquared(loc) > 18) && uc.canSpawn(type, dir) && !uc.hasTrap(loc)) {
+                    ResourceInfo[] locResources = uc.senseResourceInfo(loc);
+
+                    for(ResourceInfo resource : locResources)
+                        if(resource != null && resource.amount > 9)
+                            continue mainLoop;
+
+                    if(isValidBuildingDirection(dir)) {
+                        uc.spawn(type, dir);
+                        lastValid = uc.getRound();
+                        return loc;
+                    }
+                }
             }
         }
         return null;
