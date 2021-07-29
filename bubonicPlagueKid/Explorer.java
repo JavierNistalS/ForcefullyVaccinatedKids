@@ -14,10 +14,11 @@ public class Explorer extends MyUnit {
     Exploration exploration;
     EvasivePathfinding pathfinding;
     Communications comms;
+    boolean fuckingWater = false;
+    boolean tryingToRequestRafts = false;
+    boolean requestedRafts = false;
 
     void playRound(){
-        /*if (uc.getRound() == 35)
-            debugObstructed();*/
         sustainTorch();
         identifyBase();
         readSmokeSignals();
@@ -38,12 +39,25 @@ public class Explorer extends MyUnit {
             }
         }
 
+        if(tryingToRequestRafts) {
+            if(!requestedRafts)
+                requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
+        }
+        else if(exploration.willReset() && fuckingWater) {
+            tryingToRequestRafts = true;
+            uc.println("AQUATIC MAP DETECTED ON AMERICAN SOIL. LETHAL FORCE ENGAGED.");
+        }
+
         Location toExplore = exploration.getLocation();
         if (toExplore == null){
             exploration = new Exploration(uc, 5, 50);
             toExplore = exploration.getLocation();
         }
         pathfinding.pathfindTo(toExplore);
+
+        Location nextLoc = uc.getLocation().add(uc.getLocation().directionTo(toExplore));
+        if(uc.canSenseLocation(nextLoc))
+            fuckingWater |= uc.hasWater(nextLoc);
     }
 
     void readSmokeSignals() {

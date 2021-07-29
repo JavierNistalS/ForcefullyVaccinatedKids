@@ -138,4 +138,8 @@ public class Exploration
         uc.println("randomTarget: [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
 
     }
+
+    boolean willReset(){
+        return uc.getRound() >= targetRound + RESET_TURNS;
+    }
 }

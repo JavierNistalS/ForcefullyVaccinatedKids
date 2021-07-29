@@ -69,7 +69,7 @@ public class Base extends MyUnit {
             barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
-        if(explorerCount < 1)
+        if(explorerCount < 2)
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
