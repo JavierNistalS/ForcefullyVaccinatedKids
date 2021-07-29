@@ -406,19 +406,15 @@ public class Worker extends MyUnit {
         return trySpawnInValidAndReturnLocation(type) != null;
     }
     Location trySpawnInValidAndReturnLocation(UnitType type) {
-
     mainLoop:
         for (Direction dir : dirs) {
             if(!dir.isEqual(bannedBuildingDirection)) {
                 Location loc = uc.getLocation().add(dir);
-
-                if ((enemyBaseLocation == null || enemyBaseLocation.distanceSquared(loc) > 18) && uc.canSpawn(type, dir) && !uc.hasTrap(loc)) {
+                if ((enemyBaseLocation == null || enemyBaseLocation.distanceSquared(loc) > 18 || (uc.canSenseLocation(enemyBaseLocation) && uc.isObstructed(enemyBaseLocation, loc))) && uc.canSpawn(type, dir) && uc.canSenseLocation(loc) && !uc.hasTrap(loc)) {
                     ResourceInfo[] locResources = uc.senseResourceInfo(loc);
-
                     for(ResourceInfo resource : locResources)
                         if(resource != null && resource.amount > 9)
                             continue mainLoop;
-
                     if(isValidBuildingDirection(dir)) {
                         uc.spawn(type, dir);
                         lastValid = uc.getRound();
