@@ -31,11 +31,9 @@ public class Base extends MyUnit {
     Communications comms;
     TheKGB kgb;
 
-    boolean buildFoodState = true;
-    boolean buildWoodState = true;
-    boolean buildStoneState = true;
+    boolean buildFoodState = true, buildWoodState = true, buildStoneState = true;
+    boolean buildSettlementsForFood = true, buildSettlementsForWood = true, buildSettlementsForStone = true;
     int farmCount = 0, sawmillCount = 0, quarryCount = 0;
-    boolean genevaSuggestion = false;
     int totalResourcesSeen;
     int lastEnemyBaseTransmission = -100;
     boolean barracksWorker = false;
@@ -115,7 +113,14 @@ public class Base extends MyUnit {
                 buildFoodState = false;
                 uc.println("no build farms, *bonk");
             }
+            else
+                uc.println("CAN'T SEND BC COOLDOWN");
         }
+        else if(farmCount >= FARM_MAX)
+            uc.println("ALREADY SENT (buildFoodState = false)");
+        else
+            uc.println("NOT ENOUGH FARMS (farms = " + farmCount + ")");
+
         if (!buildFoodState && farmCount < FARM_MAX){
             if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_FARMS)) {
                 buildFoodState = true;
@@ -184,15 +189,16 @@ public class Base extends MyUnit {
             }
 
             if(bestMissingFood < 100 && buildFoodState)
-                buildFoodState = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD);
+                buildSettlementsForFood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD);
             else if(bestMissingWood < 100 && buildWoodState)
-                buildFoodState = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD);
+                buildSettlementsForWood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD);
             else if(bestMissingStone < 100 && buildStoneState)
-                buildFoodState = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE);
+                buildSettlementsForStone = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE);
         }
         else if(techPhase == 2) { // jobs 2: electric boogaloo
-            if(tryResearch(Technology.JOBS))
+            if(tryResearch(Technology.JOBS)) {
                 techPhase++;
+            }
         }
         else {
 
