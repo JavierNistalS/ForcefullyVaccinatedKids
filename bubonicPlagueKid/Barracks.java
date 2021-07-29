@@ -23,6 +23,7 @@ public class Barracks extends MyUnit {
     int quarryUpdateRound = -10;
 
     boolean reinforceRequested = false;
+    boolean raftsRequested = false;
 
     int lastUpdate = -100;
 
@@ -32,10 +33,12 @@ public class Barracks extends MyUnit {
         if (lastUpdate < uc.getRound() - 60 && comms.sendMiscMessage(comms.MSG_BARRACKS_START))
             lastUpdate = uc.getRound();
 
-        if ((spawnedUnits < 8 || (reinforceRequested && spawnedUnits < 15)) && trySpawnSpearman())
-            spawnedUnits++;
-        if (spawnedUnits < 15 && !canBuildFarm && !canBuildQuarry && !canBuildSawmill && trySpawnSpearman()){
-            spawnedUnits++;
+        if (!raftsRequested || uc.hasResearched(Technology.RAFTS, uc.getTeam())) {
+            if ((spawnedUnits < 8 || (reinforceRequested && spawnedUnits < 15)) && trySpawnSpearman())
+                spawnedUnits++;
+            if (spawnedUnits < 15 && !canBuildFarm && !canBuildQuarry && !canBuildSawmill && trySpawnSpearman()) {
+                spawnedUnits++;
+            }
         }
 
         if(genevaSuggestion) {
@@ -81,6 +84,8 @@ public class Barracks extends MyUnit {
         if (info == comms.MSG_REINFORCE_BASE){
             reinforceRequested = true;
         }
+        if (info == comms.MSG_REQUEST_RAFTS)
+            raftsRequested = true;
     }
 
     boolean trySpawnSpearman(){

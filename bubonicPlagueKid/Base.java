@@ -97,19 +97,19 @@ public class Base extends MyUnit {
         uc.println("farmCount: " + farmCount);
         uc.println("quarryCount: " + quarryCount);
         if (buildWoodState && sawmillCount >= SAWMILL_MAX){
-            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_STOP_BUILDING_SAWMILLS)) {
+            if (comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SAWMILLS)) {
                 buildWoodState = false;
                 uc.println("no build sawmills, *bonk");
             }
         }
         if (!buildWoodState && sawmillCount < SAWMILL_MAX){
-            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_SAWMILLS)) {
+            if (comms.sendMiscMessage(comms.MSG_START_BUILDING_SAWMILLS)) {
                 buildWoodState = true;
                 uc.println("build sawmills");
             }
         }
         if (buildFoodState && farmCount >= FARM_MAX){
-            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_STOP_BUILDING_FARMS)) {
+            if (comms.sendMiscMessage(comms.MSG_STOP_BUILDING_FARMS)) {
                 buildFoodState = false;
                 uc.println("no build farms, *bonk");
             }
@@ -122,19 +122,19 @@ public class Base extends MyUnit {
             uc.println("NOT ENOUGH FARMS (farms = " + farmCount + ")");
 
         if (!buildFoodState && farmCount < FARM_MAX){
-            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_FARMS)) {
+            if (comms.sendMiscMessage(comms.MSG_START_BUILDING_FARMS)) {
                 buildFoodState = true;
                 uc.println("build farms");
             }
         }
         if (buildStoneState && quarryCount >= QUARRY_MAX){
-            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_STOP_BUILDING_QUARRYS)) {
+            if (comms.sendMiscMessage(comms.MSG_STOP_BUILDING_QUARRYS)) {
                 buildStoneState = false;
                 uc.println("no build quarries, *bonk");
             }
         }
         if (!buildStoneState && quarryCount < QUARRY_MAX){
-            if (comms.sendMessage(comms.MSG_TYPE_MISC, comms.MSG_START_BUILDING_QUARRYS)) {
+            if (comms.sendMiscMessage(comms.MSG_START_BUILDING_QUARRYS)) {
                 buildStoneState = true;
                 uc.println("build quarries");
             }
@@ -152,7 +152,8 @@ public class Base extends MyUnit {
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
-            tryResearch(Technology.MILITARY_TRAINING);
+            if (!raftsRequested || hasTech(Technology.RAFTS))
+                tryResearch(Technology.MILITARY_TRAINING);
 
             if (raftsRequested)
                 tryResearch(Technology.RAFTS);

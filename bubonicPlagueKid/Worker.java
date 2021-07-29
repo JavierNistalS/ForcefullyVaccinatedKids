@@ -60,6 +60,7 @@ public class Worker extends MyUnit {
         timeAlive++;
         torchLighted = sustainTorch();
 
+        tryGather();
         updateInfo();
         readSmokeSignals();
         generalAttack();
@@ -144,8 +145,12 @@ public class Worker extends MyUnit {
         if (!anyEnemyAggroUnits)
             buildEconBuildings();
 
+        tryGather();
+
         if(tryDeposit())
             settlementTargetIdx = -1;
+
+        tryGather();
     }
 
     void updateInfo() {
@@ -479,5 +484,18 @@ public class Worker extends MyUnit {
             quarryCount++;
         if(canBuildFarm && trySpawnInValid(UnitType.FARM))
             farmCount++;
+    }
+
+    void tryGather(){
+        if (uc.canGatherResources()){
+            int total = 0;
+            ResourceInfo[] resources = uc.senseResourceInfo(uc.getLocation());
+            for (ResourceInfo ri : resources){
+                if (ri != null)
+                    total += ri.amount;
+            }
+            if (total > 0)
+                uc.gatherResources();
+        }
     }
 }

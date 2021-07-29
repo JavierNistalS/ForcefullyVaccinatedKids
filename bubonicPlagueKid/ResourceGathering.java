@@ -33,9 +33,6 @@ public class ResourceGathering {
             uc.drawPointDebug(targetResource, 0,255,255);
         }
 
-        if (uc.canGatherResources())
-            uc.gatherResources();
-
         for (Resource r : Resource.values())
             values[r.ordinal()] = 10000.0 / (uc.getResource(r) + 100); // RESOURCE CURVE
 

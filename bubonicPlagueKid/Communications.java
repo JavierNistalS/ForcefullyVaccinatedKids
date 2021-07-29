@@ -11,6 +11,7 @@ public class Communications {
     final int OFFSET_VALIDATION_BITS = 4;
     final int TYPE_BITS = 3;
     final int INFO_BITS = 14;
+    final int RANDOM_BITS = 4;
     UnitController uc;
 
     final int MSG_TYPE_ENEMY_BASE = 0;
@@ -108,7 +109,7 @@ public class Communications {
         return false;
     }
     boolean sendMiscMessage(int info) {
-        return sendMessage(MSG_TYPE_MISC, info);
+        return sendMessage(MSG_TYPE_MISC, info | ((uc.getInfo().getID()%(1<<RANDOM_BITS)) << (INFO_BITS - RANDOM_BITS)));
     }
     boolean sendLocationMessage(int type, Location loc) {
         return sendMessage(type, locationToInt(loc));
@@ -118,7 +119,10 @@ public class Communications {
         return ((x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS)) >>> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + INFO_BITS));
     }
     int getInfo(int x) {
-        return (x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS)) >>> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS);
+        if (getType(x) == MSG_TYPE_MISC)
+            return (x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS + RANDOM_BITS)) >>> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS + RANDOM_BITS);
+        else
+            return (x << (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS)) >>> (OFFSET_VALIDATION_BITS + ROUND_VALIDATION_BITS + TYPE_BITS);
     }
 
     int locationToInt(Location loc) {
