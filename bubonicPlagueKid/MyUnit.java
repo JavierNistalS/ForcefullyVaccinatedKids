@@ -59,17 +59,15 @@ public abstract class MyUnit {
         for (UnitInfo u : units){
             int hp = u.getHealth();
             if (u.getType().attack > 0){
-                if (lessHpAggro > hp){
+                if (lessHpAggro > hp && uc.canAttack(u.getLocation())){
                     lessHpAggro = hp;
-                    if (uc.canAttack(u.getLocation()))
-                        best = u.getLocation();
+                    best = u.getLocation();
                 }
             }
             else{
-                if (lessHpAggro == 100000000 && hp < lessHpNonAggro){
+                if (lessHpAggro == 100000000 && hp < lessHpNonAggro && uc.canAttack(u.getLocation())){
                     lessHpNonAggro = hp;
-                    if (uc.canAttack(u.getLocation()))
-                        best = u.getLocation();
+                    best = u.getLocation();
                 }
             }
         }
