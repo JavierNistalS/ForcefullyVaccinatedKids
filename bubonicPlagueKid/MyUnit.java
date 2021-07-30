@@ -160,27 +160,45 @@ public abstract class MyUnit {
     boolean isObstructedNice(Location p0, Location p1) {
         int dx = p1.x-p0.x, dy = p1.y-p0.y;
         int nx = Math.abs(dx), ny = Math.abs(dy);
-        int sign_x = dx > 0? 1 : -1, sign_y = dy > 0? 1 : -1;
+        int sign_x = dx > 0 ? 1 : -1, sign_y = dy > 0 ? 1 : -1;
 
         int px = p0.x, py = p0.y;
 
+        int decision = ny - nx; // (1 + 2*ix) * ny - (1 + 2*iy) * nx;
+        int nx2 = 2*nx, ny2 = 2*ny;
+
         for (int ix = 0, iy = 0; ix < nx || iy < ny;) {
-            int decision = (1 + 2*ix) * ny - (1 + 2*iy) * nx;
-            if (decision == 0) {
-                // next step is diagonal
-                px += sign_x;
-                py += sign_y;
-                ix++;
-                iy++;
-            } else if (decision < 0) {
-                // next step is horizontal
+
+            // int decision = (1 + 2*ix) * ny - (1 + 2*iy) * nx;
+
+            if(decision <= 0) {
                 px += sign_x;
                 ix++;
-            } else {
-                // next step is vertical
-                py += sign_y;
-                iy++;
+                decision += ny2;
+
             }
+
+            if(decision >= 0) {
+                py += sign_y;
+                iy++;
+                decision -= nx2;
+            }
+
+//            if (decision == 0) {
+//                // next step is diagonal
+//                px += sign_x;
+//                py += sign_y;
+//                ix++;
+//                iy++;
+//            } else if (decision < 0) {
+//                // next step is horizontal
+//                px += sign_x;
+//                ix++;
+//            } else {
+//                // next step is vertical
+//                py += sign_y;
+//                iy++;
+//            }
 
             Location loc = new Location(px, py);
             if(uc.isOutOfMap(loc) || (uc.canSenseLocation(loc) && uc.hasMountain(loc)))
