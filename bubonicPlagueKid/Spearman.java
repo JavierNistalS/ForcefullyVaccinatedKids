@@ -22,6 +22,7 @@ public class Spearman extends MyUnit {
 
     boolean rotateRight = true;
     boolean stayDefensive = false;
+    boolean reinforceRequested = false;
 
     void playRound() {
         /*if (uc.getRound() == 300)
@@ -83,7 +84,10 @@ public class Spearman extends MyUnit {
                     enemyBaseLocation = ui.getLocation();
             }
             if(!aggroPresent) {
-                if(enemyBaseLocation == null) {
+                if (reinforceRequested && baseLocation != null){
+                    pathfinding.pathfindTo(baseLocation);
+                }
+                else if(enemyBaseLocation == null) {
                     Location obj = exploration.getLocation();
                     if (obj == null){
                         exploration = new Exploration(uc, 5, 100);
@@ -202,7 +206,16 @@ public class Spearman extends MyUnit {
                 if (msgType == comms.MSG_TYPE_ENEMY_BASE){
                     enemyBaseLocation = comms.intToLocation(msg);
                 }
+                if (msgType == comms.MSG_TYPE_MISC){
+                    readMiscMessage(msgType);
+                }
             }
+        }
+    }
+
+    void readMiscMessage(int info) {
+        if (info == comms.MSG_REINFORCE_BASE){
+            reinforceRequested = true;
         }
     }
 
