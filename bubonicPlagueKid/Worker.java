@@ -6,7 +6,7 @@ public class Worker extends MyUnit {
 
     Worker(UnitController uc){
         super(uc);
-        pathfinding = new EvasivePathfinding(uc, this);
+        pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
         exploration = new Exploration(uc, 3, 75);
         resourceGathering = new ResourceGathering(uc, this);
@@ -17,7 +17,7 @@ public class Worker extends MyUnit {
     int SETTLEMENT_BUILD_SCORE = 850;
 
     // refs
-    EvasivePathfinding pathfinding;
+    Pathfinding pathfinding;
     Exploration exploration;
     Communications comms;
     ResourceGathering resourceGathering;
@@ -55,6 +55,7 @@ public class Worker extends MyUnit {
     boolean[] isValidBuildingDirection;
     boolean[] isUpdatedBuildingDirection;
     Direction bannedBuildingDirection = Direction.ZERO;
+    boolean enemyUnitsPresent = false;
 
     void playRound() {
         timeAlive++;
@@ -65,7 +66,6 @@ public class Worker extends MyUnit {
         readSmokeSignals();
         generalAttack();
         resourceGathering.update();
-        pathfinding.updateEnemyUnits();
 
         if (!requestedRafts && resourceGathering.needRafts) {
             requestedRafts = comms.sendMiscMessage(comms.MSG_REQUEST_RAFTS);
@@ -109,6 +109,9 @@ public class Worker extends MyUnit {
                     uc.drawLineDebug(uc.getLocation(), settlements[settlementTargetIdx], 255, 128, 0);
                 }
             }
+            else if (enemyUnitsPresent){
+                micro();
+            }
             else {
                 if(closestDeer != null && resourceGathering.effectiveValue(500, Resource.FOOD, closestDeer) > resourceGathering.targetResourceValue) {
                     huntDeer(closestDeer);
@@ -151,6 +154,7 @@ public class Worker extends MyUnit {
             settlementTargetIdx = -1;
 
         tryGather();
+        generalAttack();
     }
 
     void updateInfo() {
@@ -171,6 +175,7 @@ public class Worker extends MyUnit {
         closestDeer = null;
         deerMinDist = 1000000;
         anyEnemyAggroUnits = false;
+        enemyUnitsPresent = false;
 
     unitLoop:
         for (UnitInfo unit : units) {
@@ -193,10 +198,12 @@ public class Worker extends MyUnit {
                      }
                  }
             }
-            else if(type == UnitType.SETTLEMENT)
+            else if(type == UnitType.SETTLEMENT && unit.getTeam() == uc.getTeam())
                 addSettlementChecked(loc);
-            else if(unit.getTeam() == uc.getOpponent())
+            else if(unit.getTeam() == uc.getOpponent() && !uc.isObstructed(loc, uc.getLocation())) {
                 anyEnemyAggroUnits |= type.attack > 0;
+                enemyUnitsPresent = true;
+            }
             else if (type == UnitType.BARRACKS){
                 buildBarracks = false;
             }
@@ -500,5 +507,57 @@ public class Worker extends MyUnit {
             if (total > 0)
                 uc.gatherResources();
         }
+    }
+
+    void micro(){
+        uc.println("doing micro");
+        int bytecode = uc.getEnergyLeft();
+        if (uc.canMove()){
+            UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+            double bestScore = -1e9;
+            Direction bestDir = Direction.ZERO;
+            for (Direction dir : dirs){
+                if (pathfinding.canMove(dir)){
+                    Location loc = uc.getLocation().add(dir);
+                    double score = 0;
+                    boolean canHitAggro = false;
+                    boolean canHit = false;
+                    for (UnitInfo ui : enemies){
+                        boolean obstructed = uc.isObstructed(loc, ui.getLocation());
+                        int distSqr = loc.distanceSquared(ui.getLocation());
+                        UnitType type = ui.getType();
+                        if (type == UnitType.WOLF || type == UnitType.SPEARMAN || type == UnitType.AXEMAN){
+                            score += Math.sqrt(distSqr)*100;
+                        }
+                        else{
+                            score -= Math.sqrt(distSqr)*10;
+                        }
+                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange)
+                            score -= ui.getAttack()*100;
+                        if (distSqr <= 5 && !obstructed && uc.canAttack()) {
+                            canHit = true;
+                            if (ui.getAttack() > 0)
+                                canHitAggro = true;
+                        }
+                    }
+                    uc.println("canHit: " + canHit);
+                    uc.println("canHitAggro: " + canHitAggro);
+                    if (canHit)
+                        score += 200;
+                    if (canHitAggro)
+                        score += 1000;
+                    if (score > bestScore){
+                        bestScore = score;
+                        bestDir = dir;
+                    }
+                    uc.println(dir + " score: " + score);
+                }
+            }
+            if (bestDir != Direction.ZERO){
+                uc.move(bestDir);
+            }
+        }
+        int bytecodeUsed = bytecode - uc.getEnergyLeft();
+        uc.println("micro bytecode: " + (bytecodeUsed > 0 ? bytecodeUsed : 15000+bytecodeUsed));
     }
 }

@@ -185,6 +185,7 @@ public class Pathfinding {
         return false;
     }
     public boolean isTrapLocation(Location loc){
-        return loc.x % 3 == 0 && loc.y % 3 == 0;
+        return false;
+        //return loc.x % 3 == 0 && loc.y % 3 == 0;
     }
 }
