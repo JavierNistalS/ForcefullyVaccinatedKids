@@ -45,16 +45,24 @@ public class Explorer extends MyUnit {
             uc.println("AQUATIC MAP DETECTED ON AMERICAN SOIL. LETHAL FORCE ENGAGED.");
         }
 
-        Location toExplore = exploration.getLocation();
-        if (toExplore == null){
-            exploration = new Exploration(uc, 5, 50);
-            toExplore = exploration.getLocation();
-        }
-        pathfinding.pathfindTo(toExplore);
+        if(uc.canMove()){
+            Location toExplore = exploration.getLocation();
+            if (toExplore == null) {
+                exploration = new Exploration(uc, 5, 75);
+                toExplore = exploration.getLocation();
+            }
+            pathfinding.pathfindTo(toExplore);
+            uc.drawLineDebug(uc.getLocation(), toExplore, 0, 0, 255);
 
-        Location nextLoc = uc.getLocation().add(uc.getLocation().directionTo(toExplore));
-        if(uc.canSenseLocation(nextLoc))
-            fuckingWater |= uc.hasWater(nextLoc);
+            if(pathfinding.dodgedAnyEnemies)
+                fuckingWater = false;
+
+            Location nextLoc = uc.getLocation().add(uc.getLocation().directionTo(toExplore));
+            if(uc.canSenseLocation(nextLoc) && uc.hasWater(nextLoc)) {
+                fuckingWater = true;
+                uc.drawPointDebug(nextLoc, 0, 255, 255);
+            }
+        }
     }
 
     void readSmokeSignals() {

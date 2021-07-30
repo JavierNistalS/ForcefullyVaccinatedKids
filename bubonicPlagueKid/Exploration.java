@@ -106,6 +106,7 @@ public class Exploration
                 {
                     targetChunkX = tx;
                     targetChunkY = ty;
+                    targetRound = uc.getRound();
                     uc.println("target (close): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY] + "{dir = " + dir.toString() + "}");
                     return true;
                 }

@@ -10,9 +10,16 @@ public class EvasivePathfinding extends Pathfinding {
     }
 
     UnitInfo[] enemyUnits;
+    boolean dodgedAnyEnemies;
 
     public void updateEnemyUnits() {
+        dodgedAnyEnemies = false;
         enemyUnits = uc.senseUnits(uc.getOpponent());
+    }
+
+    public void resetPathfinding(Location newobj){
+        super.resetPathfinding(newobj);
+        dodgedAnyEnemies = false;
     }
 
     public boolean canMove(Direction dir) {
@@ -31,8 +38,10 @@ public class EvasivePathfinding extends Pathfinding {
                 }
 
                 int dist = enemyUnit.getLocation().distanceSquared(loc);
-                if(dist <= dangerRange && dist > minDangerRange && dist <= uc.getLocation().distanceSquared(enemyUnit.getLocation()))
+                if(dist <= dangerRange && dist > minDangerRange && dist <= uc.getLocation().distanceSquared(enemyUnit.getLocation())) {
+                    dodgedAnyEnemies = true;
                     return false;
+                }
             }
             return true;
         }
