@@ -30,8 +30,10 @@ public class EvasivePathfinding extends Pathfinding {
                 int dangerRange = 0;
                 int minDangerRange = 0;
 
-                if(enemyUnit.getType() == UnitType.AXEMAN || enemyUnit.getType() == UnitType.WORKER)
+                if(enemyUnit.getType() == UnitType.AXEMAN)
                     dangerRange = 13;
+                else if(enemyUnit.getType() == UnitType.WORKER)
+                    dangerRange = 20;
                 else if(enemyUnit.getType() == UnitType.SPEARMAN) {
                     dangerRange = 32;
                     minDangerRange = 5;
