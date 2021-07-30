@@ -17,6 +17,9 @@ public class Base extends MyUnit {
         checkTrollMap();
     }
 
+    Communications comms;
+    TheKGB kgb;
+
     int lastWorker = -100;
     int workerCount = 0;
     int explorerCount = 0;
@@ -28,9 +31,6 @@ public class Base extends MyUnit {
     Technology[] endgameTechs = {Technology.TACTICS, Technology.EUGENICS, Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.WHEEL};
     int endgameTechIdx = 0;
 
-    Communications comms;
-    TheKGB kgb;
-
     boolean buildFoodState = true, buildWoodState = true, buildStoneState = true;
     boolean buildSettlementsForFood = true, buildSettlementsForWood = true, buildSettlementsForStone = true;
     int farmCount = 0, sawmillCount = 0, quarryCount = 0;
@@ -40,6 +40,7 @@ public class Base extends MyUnit {
     boolean raftsRequested = false;
     boolean reinforceRequested = false;
     boolean[] canSpawn = {true, true, true, true, true, true, true, true, true};
+    UnitInfo[] enemies;
 
     void playRound() {
         generalAttack();
@@ -56,12 +57,12 @@ public class Base extends MyUnit {
 
         manageMaxBuildings();
 
-        if(lastEnemyBaseTransmission < uc.getRound() - 40 && enemyBaseLocation != null) {
+        if(uc.getRound() > 9 && lastEnemyBaseTransmission < uc.getRound() - 40 && enemyBaseLocation != null) {
             if (comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, enemyBaseLocation))
                 lastEnemyBaseTransmission = uc.getRound();
         }
 
-        if (genevaSuggestion) {
+        if (uc.getRound() > 30 && genevaSuggestion && enemies.length < 3) {
             kgb.disruptEveryone(enemyBaseLocation);
         }
 
@@ -69,11 +70,11 @@ public class Base extends MyUnit {
             barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
-        if(explorerCount < 2)
+        if(explorerCount < (enemyBaseLocation == null ? 2 : 1))
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if(workerCount < 3 + totalResourcesSeen / 150 && workerCount < WORKER_MAX)
+        if(workerCount < 3 + totalResourcesSeen / 200 && workerCount < WORKER_MAX)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
@@ -217,7 +218,7 @@ public class Base extends MyUnit {
 
     void checkForEnemyAttack(){
         int axemanCount = 0;
-        UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+        enemies = uc.senseUnits(uc.getTeam().getOpponent());
         for (UnitInfo ui : enemies){
             if (ui.getType() == UnitType.AXEMAN)
                 axemanCount++;
