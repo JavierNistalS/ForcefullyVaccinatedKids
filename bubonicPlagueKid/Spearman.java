@@ -10,6 +10,10 @@ public class Spearman extends MyUnit {
         comms = new Communications(uc);
         exploration = new Exploration(uc, 6, 100);
         minSpearmanID = uc.getInfo().getID();
+        UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+        if (enemies.length >= 2){
+            stayDefensive = true;
+        }
     }
     Pathfinding pathfinding;
     Communications comms;
@@ -17,6 +21,7 @@ public class Spearman extends MyUnit {
     int minSpearmanID;
 
     boolean rotateRight = true;
+    boolean stayDefensive = false;
 
     void playRound() {
         /*if (uc.getRound() == 300)
@@ -28,7 +33,7 @@ public class Spearman extends MyUnit {
         updateMinSpearmanID();
         exploration.updateChunks();
 
-        if (uc.getInfo().getID() == minSpearmanID)
+        if (uc.getInfo().getID() == minSpearmanID || stayDefensive)
             camperMicro();
         else
             idleMicro();
