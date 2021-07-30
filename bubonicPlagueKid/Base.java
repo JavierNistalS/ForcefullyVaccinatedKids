@@ -81,7 +81,6 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if(trapperCount < 2) {
         if(trapperCount < 0) {
             if (trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
