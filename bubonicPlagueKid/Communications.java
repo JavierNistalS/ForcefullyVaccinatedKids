@@ -5,7 +5,8 @@ import aic2021.user.*;
 public class Communications {
 
     final int[] SHUFFLE_NUMBER = {2, 12, 25, 7, 3, 8, 23, 9, 24, 1, 16, 17, 26, 28, 29, 30, 0, 27, 18, 31, 15, 6, 14, 19, 21, 22, 5, 13, 11, 10, 20, 4};
-    final int XOR_NUMBER = 2058629157;
+    final int XOR_NUMBER = -1178629157;
+    final int ADD_NUMBER = 1002162947;
 
     final int ROUND_VALIDATION_BITS = 11; //Last round digits
     final int OFFSET_VALIDATION_BITS = 4;
@@ -53,44 +54,52 @@ public class Communications {
     }
 
     int encrypt(int msg) {
-        for (int i = 1; i < 32; i++){
+        /*for (int i = 1; i < 32; i++){
             msg ^= (msg & (1 << (i-1))) << 1;
-        }
+        }*/
+        msg += ADD_NUMBER;
         msg ^= XOR_NUMBER;
-        int smoke = 0;
-        for (int i = 0; i < 32; i++) {
+        int smoke = msg;
+        /*for (int i = 0; i < 32; i++) {
             smoke |= (((msg & (1 << i)) >>> i) << SHUFFLE_NUMBER[i]);
-        }
+        }*/
         return smoke;
     }
     int decrypt(int smoke) {
-        int msg = 0;
-        for (int i = 0; i < 32; i++) {
+        int bytecode = uc.getEnergyLeft();
+        int msg = smoke;
+        /*for (int i = 0; i < 32; i++) {
             int sy = SHUFFLE_NUMBER[i];
             msg |= (((smoke & (1 << sy)) >>> sy) << i);
-        }
+        }*/
+
         msg ^= XOR_NUMBER;
-        for (int i = 31; i > 0; i--){
-            msg ^= (msg & (1 << (i-1))) << 1;
-        }
+        msg -= ADD_NUMBER;
+        /*for (int i = 31; i > 0; i--){
+            msg ^= (msg << 1) & (1 << i);
+        }*/
+        uc.println("decrypt cost: " + (bytecode - uc.getEnergyLeft()));
         return msg;
     }
 
     boolean validate(int x) {
         uc.println("validating " + x);
+        int bytecode = uc.getEnergyLeft();
         int mod = 1 << ROUND_VALIDATION_BITS;
         int currentRound = uc.getRound() % mod;
         int lastRound = (uc.getRound() - 1) % mod;
         int msgRound = x >>> (TYPE_BITS + INFO_BITS + OFFSET_VALIDATION_BITS);
+        if (currentRound != msgRound && lastRound != msgRound) {
+            uc.println("validate cost: " + (bytecode - uc.getEnergyLeft()));
+            return false;
+        }
         int offsetMod = 1 << OFFSET_VALIDATION_BITS;
         int offset = (uc.getLocation().x)/50%offsetMod;
         int offsetM1 = (offset + offsetMod - 1)%offsetMod;
         int offsetP1 = (offset + offsetMod + 1)%offsetMod;
         int msgOffset = (x << ROUND_VALIDATION_BITS) >>> (ROUND_VALIDATION_BITS + INFO_BITS + TYPE_BITS);
-        uc.println("round: " + msgRound);
-        uc.println("offset: " + msgOffset);
-        boolean ans = (msgRound == currentRound || msgRound == lastRound) && (msgOffset == offset || msgOffset == offsetM1 || msgOffset == offsetP1);
-        uc.println(ans);
+        boolean ans = (msgOffset == offset || msgOffset == offsetM1 || msgOffset == offsetP1);
+        uc.println("validate cost: " + (bytecode - uc.getEnergyLeft()));
         return ans;
     }
 

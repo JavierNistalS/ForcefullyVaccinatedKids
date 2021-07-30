@@ -304,6 +304,7 @@ public class Worker extends MyUnit {
         int[] smokeSignals = uc.readSmokeSignals();
 
         for(int smokeSignal : smokeSignals) {
+            int bytecode = uc.getEnergyLeft();
             int msg = comms.decrypt(smokeSignal);
             if(comms.validate(msg)) {
                 int msgType = comms.getType(msg);
@@ -314,6 +315,8 @@ public class Worker extends MyUnit {
                 else if(msgType == comms.MSG_TYPE_MISC)
                     readMiscMessage(comms.getInfo(msg));
             }
+            int bytecodeLeft = uc.getEnergyLeft();
+            uc.println("bytecode spent in comms: " + (bytecode - bytecodeLeft));
         }
     }
 
