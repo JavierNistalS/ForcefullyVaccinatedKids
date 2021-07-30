@@ -55,7 +55,7 @@ public class Explorer extends MyUnit {
             uc.drawLineDebug(uc.getLocation(), toExplore, 0, 0, 255);
 
             if(pathfinding.dodgedAnyEnemies)
-                fuckingWater = false;
+                exploration.targetRound = uc.getRound();
 
             Location nextLoc = uc.getLocation().add(uc.getLocation().directionTo(toExplore));
             if(uc.canSenseLocation(nextLoc) && uc.hasWater(nextLoc)) {
