@@ -22,11 +22,8 @@ public class Explorer extends MyUnit {
         sustainTorch();
         identifyBase();
         readSmokeSignals();
-        uc.println("update chunks");
         exploration.updateChunks();
-        uc.println("update enemy units");
         pathfinding.updateEnemyUnits();
-        uc.println("other stuff");
 
         ResourceInfo[] resources = uc.senseResources();
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());

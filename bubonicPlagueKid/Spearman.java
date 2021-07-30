@@ -47,25 +47,20 @@ public class Spearman extends MyUnit {
     }
 
     boolean willAttack(Direction dir, Location loc) {
-        /*if(uc.canAttack()) {
-            if (uc.canAttack(loc.add(dir.opposite()))){
-                uc.drawLineDebug(uc.getLocation(), loc.add(dir.opposite()), 255, 0, 0);
-            }
-            else{
-                uc.drawLineDebug(uc.getLocation(), loc.add(dir.opposite()), 0, 0, 255);
-            }
-            return uc.canAttack(loc.add(dir.opposite()));
-        }
-        else {*/
-            boolean ans = isObstructedNice(uc.getLocation().add(dir), loc);
-            if (ans){
-                uc.drawLineDebug(uc.getLocation().add(dir), loc, 0,0,0);
-            }
-            else{
-                uc.drawLineDebug(uc.getLocation().add(dir), loc, 255,255,255);
-            }
-            return !ans;
-        //}
+        boolean obstructed;
+        if(uc.canSenseLocation(uc.getLocation().add(dir)))
+            obstructed = !uc.isObstructed(uc.getLocation().add(dir), loc);
+        else if(uc.canSenseLocation(uc.getLocation()))
+            obstructed = !uc.isObstructed(uc.getLocation().add(dir), loc);
+        else
+            obstructed = isObstructedNice(uc.getLocation().add(dir), loc);
+
+        if (obstructed)
+            uc.drawPointDebug(loc, 0,0,0);
+        else
+            uc.drawPointDebug(loc, 255,255,255);
+
+        return !obstructed;
     }
 
     void idleMicro() {
@@ -177,7 +172,7 @@ public class Spearman extends MyUnit {
                 Direction dir = baseLocation.directionTo(uc.getLocation());
                 int k = 4;
                 while (uc.canMove() && k-- > 0){
-                    if (pathfinding.canMove(dir) && uc.getLocation().add(dir).distanceSquared(baseLocation) <= 2){
+                    if (pathfinding.canMove(dir) && uc.getLocation().add(dir).distanceSquared(baseLocation) <= 2) {
                         uc.move(dir);
                     }
                     else{
