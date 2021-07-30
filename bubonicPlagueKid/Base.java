@@ -42,6 +42,9 @@ public class Base extends MyUnit {
     boolean[] canSpawn = {true, true, true, true, true, true, true, true, true};
     UnitInfo[] enemies;
 
+    Technology[] tier1Techs = {Technology.SHARPENERS, Technology.COOKING, Technology.EUGENICS, Technology.NAVIGATION, Technology.OIL, Technology.VOCABULARY, Technology.HUTS, Technology.TACTICS};
+    Technology[] tier2Techs = {Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.EXPERTISE, Technology.FLINT, Technology.HOUSES};
+
     void playRound() {
         generalAttack();
         readSmokeSignals();
@@ -79,16 +82,12 @@ public class Base extends MyUnit {
                 workerCount++;
 
         if(trapperCount < 2) {
-            if (trySpawnUnit(UnitType.TRAPPER))
+            if (canBuildUnitWithMargin(UnitType.TRAPPER, 0, 75, 75) && trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
         }
 
-        if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600) && wolfCount < 10){
-            if (trySpawnUnit(UnitType.WOLF))
-                wolfCount++;
-        }
-        if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && uc.getResource(Resource.FOOD) > 900 && wolfCount < 5){
-            if (trySpawnUnit(UnitType.WOLF))
+        if (wolfCount < 5 || (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600) && wolfCount < 10)) {
+            if (canBuildUnitWithMargin(UnitType.WOLF, 800, 75, 75) && trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
     }
@@ -144,16 +143,14 @@ public class Base extends MyUnit {
 
     void research(){
         uc.println("rafts requested: " + raftsRequested);
-        if ((uc.getResource(Resource.WOOD) > 1000 && uc.getResource(Resource.STONE) > 200) || raftsRequested){
+        if (canResearchWithMargin (Technology.RAFTS, 0, 500, 150) || raftsRequested){
             tryResearch(Technology.RAFTS);
         }
-        /*if (uc.getResource(Resource.FOOD) > 900){
-            tryResearch(Technology.DOMESTICATION);
-        }*/
+
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
-            if (!raftsRequested || hasTech(Technology.RAFTS))
+            if ((!raftsRequested || hasTech(Technology.RAFTS)) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125))
                 tryResearch(Technology.MILITARY_TRAINING);
 
             if (raftsRequested)
@@ -162,58 +159,152 @@ public class Base extends MyUnit {
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs
-            int jobsWood = Technology.JOBS.getWoodCost();
-            int jobsStone = Technology.JOBS.getStoneCost();
-            int jobsFood = Technology.JOBS.getFoodCost();
+//            int jobsWood = Technology.JOBS.getWoodCost();
+//            int jobsStone = Technology.JOBS.getStoneCost();
+//            int jobsFood = Technology.JOBS.getFoodCost();
+//
+//            int bestMissingMax = 1000000000;
+//            int bestMissingFood = 1000000000;
+//            int bestMissingWood = 1000000000;
+//            int bestMissingStone = 1000000000;
+//
+//            for(Technology tech : preJobTechs) {
+//                int missingFood = jobsFood + tech.getFoodCost() - uc.getResource(Resource.FOOD);
+//                int missingWood = jobsWood + tech.getWoodCost() - uc.getResource(Resource.WOOD);
+//                int missingStone = jobsStone + tech.getStoneCost() - uc.getResource(Resource.STONE);
+//                int missingMax = Math.max(missingFood, Math.max(missingWood, missingStone));
+//
+//                if(missingMax <= 0 && tryResearch(tech)) {
+//                    techPhase++;
+//                    if(tryResearch(Technology.JOBS))
+//                        techPhase++;
+//                }
+//                else if(missingMax < bestMissingMax) {
+//                    bestMissingMax = missingMax;
+//                    bestMissingFood = missingFood;
+//                    bestMissingWood = missingWood;
+//                    bestMissingStone = missingStone;
+//                }
+//            }
+//
+//            if(bestMissingFood < 100 && buildFoodState)
+//                buildSettlementsForFood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD);
+//            else if(bestMissingWood < 100 && buildWoodState)
+//                buildSettlementsForWood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD);
+//            else if(bestMissingStone < 100 && buildStoneState)
+//                buildSettlementsForStone = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE);
 
-            int bestMissingMax = 1000000000;
-            int bestMissingFood = 1000000000;
-            int bestMissingWood = 1000000000;
-            int bestMissingStone = 1000000000;
-
-            for(Technology tech : preJobTechs) {
-                int missingFood = jobsFood + tech.getFoodCost() - uc.getResource(Resource.FOOD);
-                int missingWood = jobsWood + tech.getWoodCost() - uc.getResource(Resource.WOOD);
-                int missingStone = jobsStone + tech.getStoneCost() - uc.getResource(Resource.STONE);
-                int missingMax = Math.max(missingFood, Math.max(missingWood, missingStone));
-
-                if(missingMax <= 0 && tryResearch(tech)) {
-                    techPhase++;
-                    if(tryResearch(Technology.JOBS))
-                        techPhase++;
-                }
-                else if(missingMax < bestMissingMax) {
-                    bestMissingMax = missingMax;
-                    bestMissingFood = missingFood;
-                    bestMissingWood = missingWood;
-                    bestMissingStone = missingStone;
-                }
-            }
-
-            if(bestMissingFood < 100 && buildFoodState)
-                buildSettlementsForFood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD);
-            else if(bestMissingWood < 100 && buildWoodState)
-                buildSettlementsForWood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD);
-            else if(bestMissingStone < 100 && buildStoneState)
-                buildSettlementsForStone = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE);
-        }
-        else if(techPhase == 2) { // jobs 2: electric boogaloo
             if(tryResearch(Technology.JOBS)) {
                 techPhase++;
             }
         }
+        else if(techPhase == 2) {
+//            if(uc.getResource(Resource.FOOD) > 4500 && tryResearch(Technology.SCHOOLS))
+//                endgameTechIdx = endgameTechs.length - 1;
+//
+            if(farmCount >= 2 && quarryCount >= 5 && sawmillCount >= 5 && canResearchWithMargin(Technology.DOMESTICATION, 0, 75, 75))
+                tryResearch(Technology.DOMESTICATION);
+//            while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
+//                endgameTechIdx++;
+
+            int food = uc.getResource(Resource.FOOD), wood = uc.getResource(Resource.WOOD), stone = uc.getResource(Resource.STONE);
+            int foodCost = 1500, woodCost = 1500, stoneCost = 1500;
+            if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                // SHOOLS
+                foodCost += Technology.SCHOOLS.getFoodCost();
+                if(food >= foodCost){
+                    if(researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
+                        endgameTechs = new Technology[] {tier1Techs[0], tier1Techs[1], Technology.SCHOOLS, Technology.WHEEL};
+                        techPhase++;
+                        return;
+                    }
+                }
+                foodCost -= Technology.SCHOOLS.getFoodCost();
+
+                // NO SCHOOLS
+                for(Technology tech2a : tier2Techs) { // 1st T2 tech
+                    foodCost += tech2a.getFoodCost();
+                    woodCost += tech2a.getWoodCost();
+                    stoneCost += tech2a.getStoneCost();
+
+                    if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                        for(Technology tech2b : tier2Techs) { // 2nd T2 tech
+                            if(tech2a.ordinal() <= tech2b.ordinal())
+                                continue;
+
+                            foodCost += tech2b.getFoodCost();
+                            woodCost += tech2b.getWoodCost();
+                            stoneCost += tech2b.getStoneCost();
+
+                            if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                for(Technology tech2c : tier2Techs) { // third T3 tech
+                                    if(tech2b.ordinal() <= tech2c.ordinal())
+                                        continue;
+
+                                    foodCost += tech2c.getFoodCost();
+                                    woodCost += tech2c.getWoodCost();
+                                    stoneCost += tech2c.getStoneCost();
+                                    if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                        if(researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
+                                            endgameTechs = new Technology[]{tier1Techs[0], tier1Techs[1], tech2a, tech2b, tech2c, Technology.WHEEL};
+                                            techPhase++;
+                                            return;
+                                        }
+                                    }
+
+                                    foodCost -= tech2c.getFoodCost();
+                                    woodCost -= tech2c.getWoodCost();
+                                    stoneCost -= tech2c.getStoneCost();
+                                }
+                            }
+                            foodCost -= tech2b.getFoodCost();
+                            woodCost -= tech2b.getWoodCost();
+                            stoneCost -= tech2b.getStoneCost();
+                        }
+                    }
+                    foodCost -= tech2a.getFoodCost();
+                    woodCost -= tech2a.getWoodCost();
+                    stoneCost -= tech2a.getStoneCost();
+                }
+            }
+        }
         else {
-
-            techPhase++;
-
-            if(uc.getResource(Resource.FOOD) > 4500 && tryResearch(Technology.SCHOOLS))
-                endgameTechIdx = endgameTechs.length - 1;
-
-            if(farmCount >= 2 && quarryCount >= 5 && sawmillCount >= 5 && tryResearch(Technology.DOMESTICATION))
-                techPhase++;
             while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                 endgameTechIdx++;
         }
+        uc.println("techphase: " + techPhase);
+    }
+
+    boolean researchTechInner(int food, int wood, int stone, int foodCost, int woodCost, int stoneCost) {
+        for(Technology tech1a : tier1Techs) {
+            foodCost += tech1a.getFoodCost();
+            woodCost += tech1a.getWoodCost();
+            stoneCost += tech1a.getStoneCost();
+
+            if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                for(Technology tech1b : tier1Techs) {
+                    if(tech1a.ordinal() <= tech1b.ordinal())
+                        continue;
+
+                    foodCost += tech1b.getFoodCost();
+                    woodCost += tech1b.getWoodCost();
+                    stoneCost += tech1b.getStoneCost();
+
+                    if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                        tier1Techs = new Technology[]{tech1a, tech1b};
+                        return true;
+                    }
+                    foodCost -= tech1b.getFoodCost();
+                    woodCost -= tech1b.getWoodCost();
+                    stoneCost -= tech1b.getStoneCost();
+                }
+            }
+            foodCost -= tech1a.getFoodCost();
+            woodCost -= tech1a.getWoodCost();
+            stoneCost -= tech1a.getStoneCost();
+        }
+
+        return false;
     }
 
     void checkForEnemyAttack(){
@@ -223,9 +314,8 @@ public class Base extends MyUnit {
             if (ui.getType() == UnitType.AXEMAN)
                 axemanCount++;
         }
-        if (axemanCount >= 4){
+        if (axemanCount >= 4)
             reinforceRequested = comms.sendMiscMessage(comms.MSG_REINFORCE_BASE);
-        }
     }
 
     boolean tryResearch(Technology tech) {

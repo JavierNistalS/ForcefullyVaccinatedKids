@@ -206,4 +206,16 @@ public abstract class MyUnit {
         }
         return false;
     }
+
+    public boolean canBuildUnitWithMargin(UnitType unitType, int foodMargin, int woodMargin, int stoneMargin) {
+        return uc.getResource(Resource.FOOD) >= foodMargin + unitType.foodCost
+            && uc.getResource(Resource.WOOD) >= woodMargin + unitType.woodCost
+            && uc.getResource(Resource.STONE) >= stoneMargin + unitType.stoneCost;
+    }
+
+    public boolean canResearchWithMargin(Technology tech, int foodMargin, int woodMargin, int stoneMargin) {
+        return uc.getResource(Resource.FOOD) >= foodMargin + tech.getFoodCost()
+            && uc.getResource(Resource.WOOD) >= woodMargin + tech.getWoodCost()
+            && uc.getResource(Resource.STONE) >= stoneMargin + tech.getStoneCost();
+    }
 }
