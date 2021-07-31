@@ -16,6 +16,8 @@ public class Worker extends MyUnit {
     int SETTLEMENT_DISTANCE = 64;
     int SETTLEMENT_BUILD_SCORE = 850;
 
+    int STONE_SPAM = 69;
+
     // refs
     Pathfinding pathfinding;
     Exploration exploration;
@@ -56,6 +58,7 @@ public class Worker extends MyUnit {
     boolean[] isUpdatedBuildingDirection;
     Direction bannedBuildingDirection = Direction.ZERO;
     boolean enemyUnitsPresent = false;
+    boolean seenChosenStone = false;
 
     void playRound() {
         timeAlive++;
@@ -72,19 +75,51 @@ public class Worker extends MyUnit {
             uc.println("requesting rafts");
         }
 
-        if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation != null && baseLocation.distanceSquared(uc.getLocation()) <= 2) {
+        if(uc.hasResearched(Technology.MILITARY_TRAINING, uc.getTeam()) && buildBarracks && baseLocation != null && baseLocation.distanceSquared(uc.getLocation()) <= 4) {
             UnitInfo[] nextToBase = uc.senseUnits(4);
             boolean iAmTheChosen = true;
-            for (UnitInfo ui : nextToBase){
-                if (ui.getType() == UnitType.WORKER && ui.getLocation().distanceSquared(baseLocation) <= 2){
+            for (UnitInfo ui : nextToBase) {
+                if (ui.getType() == UnitType.WORKER && ui.getLocation().distanceSquared(baseLocation) <= 4){
                     if (ui.getID() < uc.getInfo().getID())
                         iAmTheChosen = false;
                 }
             }
             if (iAmTheChosen) {
-                trySpawnBarracks();
-                pathfinding.move3(uc.getLocation().directionTo(baseLocation));
-                pathfinding.tryMove(Direction.ZERO);
+                uc.println("I AM THE CHOSEN ONE");
+
+                if(uc.getLocation().distanceSquared(baseLocation) <= 2) {
+                    int buildingSpots = 0;
+                    for(Direction dir : dirs) {
+                        Location loc = baseLocation.add(dir);
+                        if(dir == Direction.ZERO)
+                            continue;
+                        if (uc.canSenseLocation(loc) && loc.distanceSquared(uc.getLocation()) <= 2 && (!uc.hasMountain(loc) && !uc.hasWater(loc))) {
+                            buildingSpots++;
+                            uc.drawLineDebug(uc.getLocation(), loc, 255, 0, 255);
+                        }
+                    }
+                    uc.println("buildingSpots: " + buildingSpots);
+                    if(buildingSpots == 1) { // i'm in the only spot
+                        uc.println("i'm in the only spot");
+                        if(uc.canMove()) {
+                            pathfinding.move3(baseLocation.directionTo(uc.getLocation()));
+                            for(Direction dir : dirs) {
+                                Location loc = uc.getLocation().add(dir);
+                                if(loc.distanceSquared(baseLocation) <= 2 && trySpawnUnit(UnitType.BARRACKS, dir))
+                                    break;
+                            }
+                        }
+                    }
+                    else {
+                        pathfinding.move3(uc.getLocation().directionTo(baseLocation));
+                        pathfinding.tryMove(Direction.ZERO);
+                        for(Direction dir : dirs) {
+                            Location loc = uc.getLocation().add(dir);
+                            if(loc.distanceSquared(baseLocation) <= 2 && isValidBuildingDirection(dir) && trySpawnUnit(UnitType.BARRACKS, dir))
+                                break;
+                        }
+                    }
+                }
             }
         }
 
@@ -95,7 +130,6 @@ public class Worker extends MyUnit {
                 bannedBuildingDirection = Direction.ZERO;
 
                 // TODO: use resourceGathering formula & SETTLEMENT_DISTANCE to determine settlement score
-
                 boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
                 boolean buildSettlementForWood = uc.getResource(Resource.WOOD) >= maxResourceCapacity && canBuildSettlementForWood;
                 boolean buildSettlementForStone = uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
@@ -283,14 +317,6 @@ public class Worker extends MyUnit {
             && (obstacle[6] || !((obstacle[4] || obstacle[5]) && (obstacle[7] || obstacle[0])));
     }
 
-    boolean isValidBuildingDirection(Direction dir) {
-        updateBuildingObstacles();
-        if(!isUpdatedBuildingDirection[dir.ordinal()])
-            updateIsValidBuildingDirection(dir);
-
-        return isValidBuildingDirection[dir.ordinal()];
-    }
-
     void explore() {
         uc.println("exploring...");
         Location exploreLoc = exploration.getLocation();
@@ -423,23 +449,34 @@ public class Worker extends MyUnit {
     Location trySpawnInValidAndReturnLocation(UnitType type) {
     mainLoop:
         for (Direction dir : dirs) {
-            if(!dir.isEqual(bannedBuildingDirection)) {
-                Location loc = uc.getLocation().add(dir);
-                if ((enemyBaseLocation == null || enemyBaseLocation.distanceSquared(loc) > 18 || (uc.canSenseLocation(enemyBaseLocation) && uc.isObstructed(enemyBaseLocation, loc))) && uc.canSpawn(type, dir) && uc.canSenseLocation(loc) && !uc.hasTrap(loc)) {
-                    ResourceInfo[] locResources = uc.senseResourceInfo(loc);
-                    for(ResourceInfo resource : locResources)
-                        if(resource != null && resource.amount > 9)
-                            continue mainLoop;
-                    if(isValidBuildingDirection(dir)) {
-                        uc.spawn(type, dir);
-                        lastValid = uc.getRound();
-                        return loc;
-                    }
-                }
+            if(uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
+                uc.spawn(type, dir);
+                lastValid = uc.getRound();
+                return uc.getLocation();
             }
         }
         return null;
     }
+
+    boolean isValidBuildingDirection(Direction dir) {
+        if (!dir.isEqual(bannedBuildingDirection)) {
+            Location loc = uc.getLocation().add(dir);
+            if ((enemyBaseLocation == null || enemyBaseLocation.distanceSquared(loc) > 18 || (uc.canSenseLocation(enemyBaseLocation) && uc.isObstructed(enemyBaseLocation, loc))) && uc.canSenseLocation(loc) && !uc.hasTrap(loc)) {
+                ResourceInfo[] locResources = uc.senseResourceInfo(loc);
+                for (ResourceInfo resource : locResources)
+                    if (resource != null && resource.amount > 9)
+                        return false;
+
+                updateBuildingObstacles();
+                if (!isUpdatedBuildingDirection[dir.ordinal()])
+                    updateIsValidBuildingDirection(dir);
+                return isValidBuildingDirection[dir.ordinal()];
+
+            }
+        }
+        return false;
+    }
+
 
     boolean tryDeposit() {
         if(uc.canDeposit()) {
