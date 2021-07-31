@@ -20,9 +20,12 @@ public class Settlement extends MyUnit {
     int wolfCount = 0;
     int totalWorkersSeen = 0;
     int lastWorkerSeenRound = 0;
+    boolean requestedRafts = false;
 
     void playRound() {
         readSmokeSignals();
+
+        boolean needsRafts = !(uc.hasResearched(Technology.RAFTS, uc.getTeam())) && requestedRafts;
 
         // spawning workers (& other units)
         totalResourcesSeen = 0;
@@ -38,14 +41,17 @@ public class Settlement extends MyUnit {
             }
         }
 
-        if(workerCount < (totalResourcesSeen / 350) && workerCount < 2)
+        if(!needsRafts && workerCount < (totalResourcesSeen / 350) && workerCount < 2)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if ((lastWorkerSeenRound < uc.getRound() - 30 && totalResourcesSeen >= 200) || lastWorkerSeenRound < uc.getRound() - 200){
+        if (!needsRafts && ((lastWorkerSeenRound < uc.getRound() - 30 && totalResourcesSeen >= 200) || lastWorkerSeenRound < uc.getRound() - 200)){
             if(canBuildUnitWithMargin(UnitType.WORKER, 0, 75, 75) && trySpawnUnit(UnitType.WORKER))
                 workerCount++;
         }
+
+        if(uc.canMakeSmokeSignal())
+            toldLocationCountdown--;
 
         // sending signals
         if(!genevaSuggestion || toldLocationCountdown <= 0) {
@@ -54,7 +60,6 @@ public class Settlement extends MyUnit {
         }
         else {
             kgb.disruptEveryone(enemyBaseLocation);
-            toldLocationCountdown--;
         }
 
         if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && wolfCount < 2 && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600)){
@@ -78,7 +83,15 @@ public class Settlement extends MyUnit {
                 int msgType = comms.getType(msg);
                 if (msgType == comms.MSG_TYPE_ENEMY_BASE)
                     enemyBaseLocation = comms.intToLocation(msg);
+                else if(msgType == comms.MSG_TYPE_MISC)
+                    readMiscMessages(comms.getInfo(msg));
             }
+        }
+    }
+
+    void readMiscMessages(int info) {
+        if(info == comms.MSG_REQUEST_RAFTS) {
+            requestedRafts = true;
         }
     }
 }

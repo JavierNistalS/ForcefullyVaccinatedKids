@@ -58,7 +58,6 @@ public class Worker extends MyUnit {
     boolean[] isUpdatedBuildingDirection;
     Direction bannedBuildingDirection = Direction.ZERO;
     boolean enemyUnitsPresent = false;
-    boolean seenChosenStone = false;
 
     void playRound() {
         timeAlive++;
@@ -129,13 +128,13 @@ public class Worker extends MyUnit {
                 updateSettlementTarget();
                 bannedBuildingDirection = Direction.ZERO;
 
-                // TODO: use resourceGathering formula & SETTLEMENT_DISTANCE to determine settlement score
-                boolean buildSettlementForFood = uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
+                boolean needsRafts = !uc.hasResearched(Technology.RAFTS, uc.getTeam()) && requestedRafts;
+                boolean buildSettlementForFood = !needsRafts && uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
                 boolean buildSettlementForWood = uc.getResource(Resource.WOOD) >= maxResourceCapacity && canBuildSettlementForWood;
-                boolean buildSettlementForStone = uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
+                boolean buildSettlementForStone = !needsRafts && uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
                 boolean buildSettlementForResources = roundsSinceJobs > 75 || buildSettlementForFood || buildSettlementForWood || buildSettlementForStone;
 
-                if (resourceGathering.valueForSettlementConstruction > SETTLEMENT_BUILD_SCORE && buildSettlementForResources && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
+                if (buildSettlementForResources && resourceGathering.valueForSettlementConstruction > SETTLEMENT_BUILD_SCORE && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
                     uc.println("no es relleno para no quitar el else");
                 else {
                     pathfinding.pathfindTo(settlements[settlementTargetIdx]);
@@ -380,6 +379,8 @@ public class Worker extends MyUnit {
             canBuildQuarry = false;
         if (info == comms.MSG_BARRACKS_START)
             buildBarracks = false;
+        if (info == comms.MSG_REQUEST_RAFTS)
+            requestedRafts = true;
     }
 
     boolean spawnNewSettlement() {

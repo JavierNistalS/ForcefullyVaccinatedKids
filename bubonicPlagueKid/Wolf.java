@@ -52,7 +52,9 @@ public class Wolf extends MyUnit {
             Location loc = uc.getLocation().add(dir);
             int light = uc.senseIllumination(loc);
 
-            if (light >= 8) { // visible
+            boolean visible = light >= 8;
+
+            if (visible) { // visible
                 score -= 50;
                 for (UnitInfo enemy : enemies) {
                     if (enemy.getAttack() > 0 && enemy.getLocation().distanceSquared(loc) <= enemy.getType().attackRange + 10) {
@@ -70,7 +72,7 @@ public class Wolf extends MyUnit {
                 int dist = loc.distanceSquared(enemy.getLocation());
                 double linDist10 = (int)(10*Math.sqrt(dist));
 
-                if(!isObstructedNice(loc, enemy.getLocation())) {
+                if(!visible || !isObstructedNice(loc, enemy.getLocation())) {
                     if(uc.getType() == UnitType.AXEMAN)
                         score += linDist10;
                     else if(uc.getType() == UnitType.SPEARMAN)

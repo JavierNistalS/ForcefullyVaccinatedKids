@@ -158,6 +158,13 @@ public abstract class MyUnit {
     }
 
     boolean isObstructedNice(Location p0, Location p1) {
+        if(p0.distanceSquared(p1) <= 2)
+            return false;
+
+        if(uc.canSenseLocation(p0) && uc.canSenseLocation(p1))
+            return uc.isObstructed(p0, p1);
+
+
         int dx = p1.x-p0.x, dy = p1.y-p0.y;
         int nx = Math.abs(dx), ny = Math.abs(dy);
         int sign_x = dx > 0 ? 1 : -1, sign_y = dy > 0 ? 1 : -1;
