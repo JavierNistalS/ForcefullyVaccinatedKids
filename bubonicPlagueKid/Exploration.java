@@ -84,34 +84,34 @@ public class Exploration
     }
 
     boolean setExploreTarget() {
-        if(exploredChunks[targetChunkX][targetChunkY]) {
-            Location loc = uc.getLocation();
-            int cx = (loc.x - spawnLocation.x + 50) / CHUNK_SIZE;
-            int cy = (loc.y - spawnLocation.y + 50) / CHUNK_SIZE;
-
-            // vv Cardinal directions are repeated so that they are twice as common
-            Direction[] randomDirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
-            for(int i = randomDirs.length - 1; i >= 1; i--) { // SHUFFLE DIRS
-                int j = (int)(uc.getRandomDouble() * i + 1);
-                Direction temp = randomDirs[i];
-                randomDirs[i] = randomDirs[j];
-                randomDirs[j] = temp;
-            }
-
-            for(Direction dir : randomDirs) {
-                int tx = cx + dir.dx;
-                int ty = cy + dir.dy;
-
-                if(!exploredChunks[tx][ty])
-                {
-                    targetChunkX = tx;
-                    targetChunkY = ty;
-                    targetRound = uc.getRound();
-                    uc.println("target (close): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY] + "{dir = " + dir.toString() + "}");
-                    return true;
-                }
-            }
-        }
+//        if(exploredChunks[targetChunkX][targetChunkY]) {
+//            Location loc = uc.getLocation();
+//            int cx = (loc.x - spawnLocation.x + 50) / CHUNK_SIZE;
+//            int cy = (loc.y - spawnLocation.y + 50) / CHUNK_SIZE;
+//
+//            // vv Cardinal directions are repeated so that they are twice as common
+//            Direction[] randomDirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
+//            for(int i = randomDirs.length - 1; i >= 1; i--) { // SHUFFLE DIRS
+//                int j = (int)(uc.getRandomDouble() * i + 1);
+//                Direction temp = randomDirs[i];
+//                randomDirs[i] = randomDirs[j];
+//                randomDirs[j] = temp;
+//            }
+//
+//            for(Direction dir : randomDirs) {
+//                int tx = cx + dir.dx;
+//                int ty = cy + dir.dy;
+//
+//                if(!exploredChunks[tx][ty])
+//                {
+//                    targetChunkX = tx;
+//                    targetChunkY = ty;
+//                    targetRound = uc.getRound();
+//                    uc.println("target (close): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY] + "{dir = " + dir.toString() + "}");
+//                    return true;
+//                }
+//            }
+//        }
 
         int SIZE = 100 / CHUNK_SIZE;
         int c = 0;
