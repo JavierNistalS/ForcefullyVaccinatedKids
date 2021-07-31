@@ -8,7 +8,7 @@ public class Base extends MyUnit {
     final int FARM_MAX = 7;
     final int SAWMILL_MAX = 8;
     final int QUARRY_MAX = 7;
-    final int WORKER_MAX = 8;
+    final int WORKER_MAX = 12;
 
     Base(UnitController uc) {
         super(uc);
@@ -20,7 +20,7 @@ public class Base extends MyUnit {
     Communications comms;
     TheKGB kgb;
 
-    int lastWorker = -100;
+    int lastWorkerSeenRound = 0;
     int workerCount = 0;
     int explorerCount = 0;
     int trapperCount = 0;
@@ -60,6 +60,12 @@ public class Base extends MyUnit {
                 totalResourcesSeen += resource.amount;
         }
 
+        UnitInfo[] allies = uc.senseUnits(uc.getTeam());
+        for (UnitInfo ui : allies){
+            if (ui.getType() == UnitType.WORKER)
+                lastWorkerSeenRound = uc.getRound();
+        }
+
         manageMaxBuildings();
 
         if(uc.getRound() > 9 && lastEnemyBaseTransmission < uc.getRound() - 40 && enemyBaseLocation != null) {
@@ -79,7 +85,7 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if(workerCount < 7 + totalResourcesSeen / 200 && workerCount < WORKER_MAX)
+        if((workerCount < 7 + totalResourcesSeen / 200 && workerCount < WORKER_MAX) || lastWorkerSeenRound < uc.getRound() - 150)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
@@ -325,7 +331,7 @@ public class Base extends MyUnit {
         for (UnitInfo ui : enemies){
             if (ui.getType() == UnitType.AXEMAN)
                 axemanCount++;
-            if (ui.getType() == UnitType.SPEARMAN){
+            if (ui.getType() == UnitType.SPEARMAN && uc.senseIllumination(ui.getLocation()) <= 10){
                 fuckingSpearmen = true;
             }
         }

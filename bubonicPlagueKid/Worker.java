@@ -13,7 +13,7 @@ public class Worker extends MyUnit {
     }
 
     // adjustable constants
-    int SETTLEMENT_DISTANCE = 100;
+    int SETTLEMENT_DISTANCE = 64;
     int SETTLEMENT_BUILD_SCORE = 850;
 
     // refs

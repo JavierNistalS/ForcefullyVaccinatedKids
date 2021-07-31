@@ -42,8 +42,8 @@ public class Settlement extends MyUnit {
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if (lastWorkerSeenRound < uc.getRound() - 30 && totalResourcesSeen >= 200){
-            if(trySpawnUnit(UnitType.WORKER))
+        if ((lastWorkerSeenRound < uc.getRound() - 30 && totalResourcesSeen >= 200) || lastWorkerSeenRound < uc.getRound() - 200){
+            if(canBuildUnitWithMargin(UnitType.WORKER, 0, 75, 75) && trySpawnUnit(UnitType.WORKER))
                 workerCount++;
         }
 
