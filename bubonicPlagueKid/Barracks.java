@@ -92,7 +92,7 @@ public class Barracks extends MyUnit {
         for (Direction dir : dirs){
             if (uc.canSpawn(UnitType.SPEARMAN, dir)){
                 Location loc = uc.getLocation().add(dir);
-                if (enemyBaseLocation != null && loc.distanceSquared(enemyBaseLocation) <= 18)
+                if (enemyBaseLocation != null && loc.distanceSquared(enemyBaseLocation) <= 18 && (!uc.canSenseLocation(enemyBaseLocation) || !uc.isObstructed(enemyBaseLocation, loc)))
                     continue;
                 if (baseLocation.distanceSquared(loc) > 2)
                     continue;
