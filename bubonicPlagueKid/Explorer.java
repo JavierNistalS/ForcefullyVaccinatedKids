@@ -30,7 +30,7 @@ public class Explorer extends MyUnit {
 
         for (UnitInfo ui : enemies){
             if (ui.getType() == UnitType.BASE){
-                if ((enemyBaseLocation != null || enemyBaseLocation.distanceSquared(ui.getLocation()) > 0) && comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, ui.getLocation())){
+                if ((enemyBaseLocation == null || enemyBaseLocation.distanceSquared(ui.getLocation()) > 0) && comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, ui.getLocation())){
                     enemyBaseLocation = ui.getLocation();
                 }
             }
