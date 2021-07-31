@@ -29,8 +29,8 @@ public class Explorer extends MyUnit {
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
 
         for (UnitInfo ui : enemies){
-            if (enemyBaseLocation == null && ui.getType() == UnitType.BASE){
-                if (comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, ui.getLocation())){
+            if (ui.getType() == UnitType.BASE){
+                if ((enemyBaseLocation != null || enemyBaseLocation.distanceSquared(ui.getLocation()) > 0) && comms.sendLocationMessage(comms.MSG_TYPE_ENEMY_BASE, ui.getLocation())){
                     enemyBaseLocation = ui.getLocation();
                 }
             }
