@@ -42,6 +42,8 @@ public class Base extends MyUnit {
     boolean[] canSpawn = {true, true, true, true, true, true, true, true, true};
     UnitInfo[] enemies;
 
+    boolean fuckingSpearmen = false;
+
     Technology[] tier1Techs = {Technology.SHARPENERS, Technology.COOKING, Technology.EUGENICS, Technology.NAVIGATION, Technology.OIL, Technology.VOCABULARY, Technology.HUTS, Technology.TACTICS};
     Technology[] tier2Techs = {Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.EXPERTISE, Technology.FLINT, Technology.HOUSES};
 
@@ -84,6 +86,12 @@ public class Base extends MyUnit {
         if(trapperCount < 0) {
             if (trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
+        }
+
+        if (wolfCount < 3 && fuckingSpearmen){
+            if (trySpawnUnit(UnitType.WOLF)){
+                wolfCount++;
+            }
         }
 
         if (wolfCount < 5 || (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600) && wolfCount < 10)) {
@@ -145,6 +153,9 @@ public class Base extends MyUnit {
         uc.println("rafts requested: " + raftsRequested);
         if (canResearchWithMargin (Technology.RAFTS, 0, 500, 150) || raftsRequested){
             tryResearch(Technology.RAFTS);
+        }
+        if (fuckingSpearmen){
+            tryResearch(Technology.DOMESTICATION);
         }
 
         if(techPhase == 0) { // pre-jobs
@@ -314,6 +325,9 @@ public class Base extends MyUnit {
         for (UnitInfo ui : enemies){
             if (ui.getType() == UnitType.AXEMAN)
                 axemanCount++;
+            if (ui.getType() == UnitType.SPEARMAN){
+                fuckingSpearmen = true;
+            }
         }
         if (axemanCount >= 4)
             reinforceRequested = comms.sendMiscMessage(comms.MSG_REINFORCE_BASE);
