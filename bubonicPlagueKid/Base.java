@@ -212,67 +212,68 @@ public class Base extends MyUnit {
             if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
                 // SHOOLS
                 foodCost += Technology.SCHOOLS.getFoodCost();
-                if(food >= foodCost){
-                    if(researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
-                        endgameTechs = new Technology[] {tier1Techs[0], tier1Techs[1], Technology.SCHOOLS, Technology.WHEEL};
-                        techPhase++;
-                        return;
-                    }
+                if(food >= foodCost && researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
+                    endgameTechs = new Technology[] {tier1Techs[0], tier1Techs[1], Technology.SCHOOLS, Technology.WHEEL};
+                    techPhase++;
                 }
-                foodCost -= Technology.SCHOOLS.getFoodCost();
+                else {
+                    foodCost -= Technology.SCHOOLS.getFoodCost();
 
-                // NO SCHOOLS
-                for(Technology tech2a : tier2Techs) { // 1st T2 tech
-                    foodCost += tech2a.getFoodCost();
-                    woodCost += tech2a.getWoodCost();
-                    stoneCost += tech2a.getStoneCost();
+                    // NO SCHOOLS
+                    mainLoop:
+                    for(Technology tech2a : tier2Techs) { // 1st T2 tech
+                        foodCost += tech2a.getFoodCost();
+                        woodCost += tech2a.getWoodCost();
+                        stoneCost += tech2a.getStoneCost();
 
-                    if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
-                        for(Technology tech2b : tier2Techs) { // 2nd T2 tech
-                            if(tech2a.ordinal() <= tech2b.ordinal())
-                                continue;
+                        if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                            for(Technology tech2b : tier2Techs) { // 2nd T2 tech
+                                if(tech2a.ordinal() <= tech2b.ordinal())
+                                    continue;
 
-                            foodCost += tech2b.getFoodCost();
-                            woodCost += tech2b.getWoodCost();
-                            stoneCost += tech2b.getStoneCost();
+                                foodCost += tech2b.getFoodCost();
+                                woodCost += tech2b.getWoodCost();
+                                stoneCost += tech2b.getStoneCost();
 
-                            if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
-                                for(Technology tech2c : tier2Techs) { // third T3 tech
-                                    if(tech2b.ordinal() <= tech2c.ordinal())
-                                        continue;
+                                if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                    for(Technology tech2c : tier2Techs) { // third T3 tech
+                                        if(tech2b.ordinal() <= tech2c.ordinal())
+                                            continue;
 
-                                    foodCost += tech2c.getFoodCost();
-                                    woodCost += tech2c.getWoodCost();
-                                    stoneCost += tech2c.getStoneCost();
-                                    if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
-                                        if(researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
-                                            endgameTechs = new Technology[]{tier1Techs[0], tier1Techs[1], tech2a, tech2b, tech2c, Technology.WHEEL};
-                                            techPhase++;
-                                            return;
+                                        foodCost += tech2c.getFoodCost();
+                                        woodCost += tech2c.getWoodCost();
+                                        stoneCost += tech2c.getStoneCost();
+                                        if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                            if(researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
+                                                endgameTechs = new Technology[]{tier1Techs[0], tier1Techs[1], tech2a, tech2b, tech2c, Technology.WHEEL};
+                                                techPhase++;
+                                                break mainLoop;
+                                            }
                                         }
-                                    }
 
-                                    foodCost -= tech2c.getFoodCost();
-                                    woodCost -= tech2c.getWoodCost();
-                                    stoneCost -= tech2c.getStoneCost();
+                                        foodCost -= tech2c.getFoodCost();
+                                        woodCost -= tech2c.getWoodCost();
+                                        stoneCost -= tech2c.getStoneCost();
+                                    }
                                 }
+                                foodCost -= tech2b.getFoodCost();
+                                woodCost -= tech2b.getWoodCost();
+                                stoneCost -= tech2b.getStoneCost();
                             }
-                            foodCost -= tech2b.getFoodCost();
-                            woodCost -= tech2b.getWoodCost();
-                            stoneCost -= tech2b.getStoneCost();
                         }
+                        foodCost -= tech2a.getFoodCost();
+                        woodCost -= tech2a.getWoodCost();
+                        stoneCost -= tech2a.getStoneCost();
                     }
-                    foodCost -= tech2a.getFoodCost();
-                    woodCost -= tech2a.getWoodCost();
-                    stoneCost -= tech2a.getStoneCost();
                 }
+
             }
         }
-        else {
+
+        if(techPhase >= 3) {
             while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                 endgameTechIdx++;
         }
-        uc.println("techphase: " + techPhase);
     }
 
     boolean researchTechInner(int food, int wood, int stone, int foodCost, int woodCost, int stoneCost) {
