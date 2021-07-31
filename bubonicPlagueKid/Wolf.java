@@ -39,6 +39,8 @@ public class Wolf extends MyUnit {
         if (enemies.length == 0)
             return false;
 
+        boolean inRangeOfAny = false;
+
         Direction bestDir = Direction.ZERO;
         int bestScore = -10000000;
 
@@ -68,16 +70,19 @@ public class Wolf extends MyUnit {
                 int dist = loc.distanceSquared(enemy.getLocation());
                 double linDist10 = (int)(10*Math.sqrt(dist));
 
-                if(uc.getType() == UnitType.AXEMAN)
-                    score += linDist10;
-                else if(uc.getType() == UnitType.SPEARMAN)
-                    score -= linDist10 * 10;
-                else
-                    score -= linDist10 * 6;
+                if(!isObstructedNice(loc, enemy.getLocation())) {
+                    if(uc.getType() == UnitType.AXEMAN)
+                        score += linDist10;
+                    else if(uc.getType() == UnitType.SPEARMAN)
+                        score -= linDist10 * 10;
+                    else
+                        score -= linDist10 * 6;
 
-                if(dist <= 2) {
-                    canHitCount++;
-                    canHitSpearman |= uc.getType() == UnitType.SPEARMAN;
+                    if(dist <= 2) {
+                        canHitCount++;
+                        canHitSpearman |= uc.getType() == UnitType.SPEARMAN;
+                    }
+                    inRangeOfAny = true;
                 }
 
                 if (enemy.getType() == UnitType.BASE) {
@@ -98,6 +103,9 @@ public class Wolf extends MyUnit {
                 bestDir = dir;
             }
         }
+
+        if(!inRangeOfAny)
+            return false;
 
         if (bestDir != Direction.ZERO)
             return pathfinding.tryMove(bestDir);
