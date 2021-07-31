@@ -81,7 +81,11 @@ public class Base extends MyUnit {
             barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
-        if(explorerCount < (enemyBaseLocation == null ? 2 : 1))
+        if(workerCount == 0) // TODO: check if we should spawn a worker or a explorer first (depends on the map)
+            if(trySpawnUnit(UnitType.WORKER)) // in the case that there is only one tile next to the base (& that tile has resources)
+                workerCount++;
+
+        if(explorerCount < (enemyBaseLocation == null ? 2 : 1)) // the 1 explorer is to check for rafts
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
@@ -101,7 +105,7 @@ public class Base extends MyUnit {
         }
 
         if (wolfCount < 5 || (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600) && wolfCount < 10)) {
-            if (canBuildUnitWithMargin(UnitType.WOLF, 800, 75, 75) && trySpawnUnit(UnitType.WOLF))
+            if (canBuildUnitWithMargin(UnitType.WOLF, 600, 75, 75) && trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
     }
@@ -176,58 +180,18 @@ public class Base extends MyUnit {
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs
-//            int jobsWood = Technology.JOBS.getWoodCost();
-//            int jobsStone = Technology.JOBS.getStoneCost();
-//            int jobsFood = Technology.JOBS.getFoodCost();
-//
-//            int bestMissingMax = 1000000000;
-//            int bestMissingFood = 1000000000;
-//            int bestMissingWood = 1000000000;
-//            int bestMissingStone = 1000000000;
-//
-//            for(Technology tech : preJobTechs) {
-//                int missingFood = jobsFood + tech.getFoodCost() - uc.getResource(Resource.FOOD);
-//                int missingWood = jobsWood + tech.getWoodCost() - uc.getResource(Resource.WOOD);
-//                int missingStone = jobsStone + tech.getStoneCost() - uc.getResource(Resource.STONE);
-//                int missingMax = Math.max(missingFood, Math.max(missingWood, missingStone));
-//
-//                if(missingMax <= 0 && tryResearch(tech)) {
-//                    techPhase++;
-//                    if(tryResearch(Technology.JOBS))
-//                        techPhase++;
-//                }
-//                else if(missingMax < bestMissingMax) {
-//                    bestMissingMax = missingMax;
-//                    bestMissingFood = missingFood;
-//                    bestMissingWood = missingWood;
-//                    bestMissingStone = missingStone;
-//                }
-//            }
-//
-//            if(bestMissingFood < 100 && buildFoodState)
-//                buildSettlementsForFood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_FOOD);
-//            else if(bestMissingWood < 100 && buildWoodState)
-//                buildSettlementsForWood = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_WOOD);
-//            else if(bestMissingStone < 100 && buildStoneState)
-//                buildSettlementsForStone = !comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SETTLEMENT_TO_COLLECT_STONE);
-
             if(tryResearch(Technology.JOBS)) {
                 techPhase++;
             }
         }
         else if(techPhase == 2) {
-//            if(uc.getResource(Resource.FOOD) > 4500 && tryResearch(Technology.SCHOOLS))
-//                endgameTechIdx = endgameTechs.length - 1;
-//
             if(farmCount >= 2 && quarryCount >= 5 && sawmillCount >= 5 && canResearchWithMargin(Technology.DOMESTICATION, 0, 75, 75))
                 tryResearch(Technology.DOMESTICATION);
-//            while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
-//                endgameTechIdx++;
 
             int food = uc.getResource(Resource.FOOD), wood = uc.getResource(Resource.WOOD), stone = uc.getResource(Resource.STONE);
             int foodCost = 1500, woodCost = 1500, stoneCost = 1500;
             if(food >= foodCost && wood >= woodCost && stone >= stoneCost) {
-                // SHOOLS
+                // SCHOOLS
                 foodCost += Technology.SCHOOLS.getFoodCost();
                 if(food >= foodCost && researchTechInner(food, wood, stone, foodCost, woodCost, stoneCost)) {
                     endgameTechs = new Technology[] {tier1Techs[0], tier1Techs[1], Technology.SCHOOLS, Technology.WHEEL};
