@@ -583,7 +583,7 @@ public class Worker extends MyUnit {
                     if (canHit)
                         score += 200;
                     if (canHitAggro)
-                        score += 1000;
+                        score += 500;
                     if (score > bestScore){
                         bestScore = score;
                         bestDir = dir;
