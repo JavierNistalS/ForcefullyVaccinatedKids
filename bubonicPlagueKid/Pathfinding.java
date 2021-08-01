@@ -81,12 +81,7 @@ public class Pathfinding {
 
     public boolean tryMoveSafe(Direction dir, Location danger, int radius) {
         int dist = location.distanceSquared(danger);
-        boolean result = location.add(dir).distanceSquared(danger) > Math.min(dist, radius);
-        boolean tryMoveResult = tryMove(dir);
-
-        uc.drawPointDebug(location.add(dir), result ? 255 : 0, tryMoveResult ? 255 : 0, 0);
-
-        return result && tryMoveResult;
+        return location.add(dir).distanceSquared(danger) > Math.min(dist, radius) && tryMove(dir);
     }
 
     public boolean move3Safe(Direction dir, Location danger, int radius){
@@ -107,10 +102,10 @@ public class Pathfinding {
         //uc.println("obj: " + obj);
         //uc.println("lastobj: " + lastObj);
         //uc.println("min dist to obj: "+minDistToObj);
-        if (!equals(lastObj, obj) || !equals(lastObj, location)){
+        if (!equals(lastObj,obj)){
             resetPathfinding(obj);
         }
-        if (!obstacle) {
+        if (!obstacle){
             //uc.println("no obstacle?");
             Direction dir = location.directionTo(obj);
             if (move3Safe(dir, obj, radius))
