@@ -1,6 +1,7 @@
 package bubonicPlagueKid;
 
 import aic2021.user.*;
+import com.sun.istack.internal.Nullable;
 
 
 public class TheKGB {
@@ -16,142 +17,45 @@ public class TheKGB {
 
     }
 
-    public boolean disruptRosa(Location loc){
-        //int message = 1050*loc.x + loc.y + 180500000;
-        //return trySmokeSignal(message);
-
-        if(loc == null) {
-            return trySmokeSignal(139518736); // -- ~= [-30,-30]
-        }
-        else {
-            Direction dir = uc.getLocation().directionTo(loc);
-
-            if(dir == Direction.NORTH || dir == Direction.NORTHEAST) // ++
-                return trySmokeSignal(139787668);
-            if(dir == Direction.EAST || dir == Direction.SOUTHEAST) // +-
-                return trySmokeSignal(139518736);
-            if(dir == Direction.SOUTH || dir == Direction.SOUTHWEST) // --
-                return trySmokeSignal(139518736);
-            //if(dir == Direction.WEST || dir == Direction.NORTHWEST) // -+
-                return trySmokeSignal(139518736);
-        }
-    }
-
     public boolean disruptViper(Location loc) {
-        Location loc1 = new Location(974, 456);
-        Location loc2 = new Location(642, 762);
-        Location loc3 = new Location(656, 106);
-
-        int dist1 = loc1.distanceSquared(uc.getLocation());
-        int dist2 = loc2.distanceSquared(uc.getLocation());
-        int dist3 = loc3.distanceSquared(uc.getLocation());
-
-        if(dist1 > dist2 && dist1 > dist3)
-            return trySmokeSignal(7543);
-        else if(dist2 > dist3)
-            return trySmokeSignal(11243);
-        else
-            return trySmokeSignal(11223);
+        int msg = 241*(1051*loc.x + loc.y);
+        return trySmokeSignal(msg);
     }
 
-    public void disruptRelativeCoords(Location enemyBaseLocation, P<Direction, Integer>[] relativeDataFromEnemyPerspective) {
-        if(enemyBaseLocation == null) {
-            if(relativeDataFromEnemyPerspective.length > 0)
-                trySmokeSignal(relativeDataFromEnemyPerspective[0].y); // assumes at least 1 element
-        }
-        else {
-            int bestDist = 100000000;
-            int best = 0;
+    public boolean disruptRosa(int dx, int dy) {
+        int inner = (100+dx) % 100 * 100 + (100+dy) % 100;
 
-            Direction dir = uc.getLocation().directionTo(enemyBaseLocation);
-
-            for(P<Direction, Integer> p : relativeDataFromEnemyPerspective) {
-                int dist = ((p.x.dx - dir.dx) * (p.x.dx - dir.dx)) + ((p.x.dy - dir.dy) * (p.x.dy - dir.dy));
-                if(dist < bestDist) {
-                    bestDist = dist;
-                    best = p.y;
-                }
-            }
-
-            if(bestDist != 100000000)
-                trySmokeSignal(best);
-        }
-
-    }
-    public void disruptAbsoluteCoords(Location enemyBaseLocation, P<Location, Integer>[] absoluteData) {
-        Location targetLoc = getTargetLoc(enemyBaseLocation);
-
-        if(targetLoc == null) {
-            int best = 0;
-            int bestDist = 0;
-            for(P<Location, Integer> p : absoluteData) {
-                int dist = uc.getLocation().distanceSquared(p.x);
-                if (dist > bestDist) {
-                    bestDist = dist;
-                    best = p.y;
-                }
-            }
-
-            if(bestDist != 0)
-                trySmokeSignal(best);
-        }
-        else {
-            int best = 0;
-            int bestDist = 100000000;
-
-            for(P<Location, Integer> p : absoluteData) {
-                int dist = targetLoc.distanceSquared(p.x);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    best = p.y;
-                }
-            }
-
-            if(bestDist != 100000000)
-                trySmokeSignal(best);
-        }
+        int msg = 137969968 + 219 * inner;
+        if(uc.getRandomDouble() > 0.5)
+            msg = 430350021 + 453 * inner;
+        return trySmokeSignal(msg);
     }
 
-    public Location getTargetLoc(Location enemyBaseLocation) {
-
-        int dx = 0, dy = 0;
-
-        if(enemyBaseLocation != null) {
-            Direction dir = uc.getLocation().directionTo(enemyBaseLocation);
-            dx = dir.dx;
-            dy = dir.dy;
-        }
-        else {
-            Location loc = uc.getLocation();
-
-            if(spotEndOfMapInDir(0, 1))
-                dy++;
-            if(spotEndOfMapInDir(0, -1))
-                dy--;
-            if(spotEndOfMapInDir(1, 1))
-                dx++;
-            if(spotEndOfMapInDir(-1, 1))
-                dx--;
-        }
-
-        if(dx == 0 && dy == 0)
-            return null;
-        else
-            return uc.getLocation().add(dx * 100, dy * 100);
+    public boolean disruptTastosis(Location loc) {
+        int msg = 2048*loc.x + loc.y + (uc.getRandomDouble() < 0.5 ? -578813952 : -1115684864);
+        return trySmokeSignal(msg);
     }
 
-    public boolean spotEndOfMapInDir(int dx, int dy){
-        Location loc;
-        UnitType type = uc.getType();
+    public Location readTastosis(int msg, Location alliedBase) {
+        Location loc = readTastosisConstant(msg, -1384120320, alliedBase);
+        if(loc == null)
+            loc = readTastosisConstant(msg, -847249408, alliedBase);
 
-        if(type == UnitType.BASE)
-            loc = uc.getLocation().add(dx * 6, dy * 6);
-        else if(type == UnitType.SETTLEMENT || type == UnitType.BARRACKS)
-            loc = uc.getLocation().add(dx * 5, dy * 5);
-        else
-            loc = uc.getLocation().add(dx * 4, dy * 4);
+        return loc;
+    }
+    private Location readTastosisConstant(int msg, int constant, Location alliedBase) {
+        msg -= constant;
+        int x = msg / 2048;
+        int y = msg % 2048;
 
-        return uc.isOutOfMap(loc);
+        Location myLoc = uc.getLocation();
+        if(Math.abs(x - myLoc.x) >= 50 || Math.abs(y - myLoc.y) >= 50)
+            return null; // location too far away, must've been another msg
+
+        if(alliedBase != null && (Math.abs(x - alliedBase.x) >= 50 || Math.abs(y - alliedBase.y) >= 50))
+            return null;  // location too far away from base, must've been another msg
+
+        return new Location(x, y);
     }
 
     public boolean disruptCarbassots(Location loc){
@@ -167,19 +71,25 @@ public class TheKGB {
     }
 
     public boolean disruptEveryone(Location enemyBaseLocation) {
-        Location loc;
-        if (enemyBaseLocation != null)
-            loc = new Location(2*enemyBaseLocation.x - uc.getLocation().x, 2*enemyBaseLocation.y - uc.getLocation().y);
-        else
-            loc = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
 
-        uc.drawLineDebug(uc.getLocation(), loc, 120,0,0);
         double random = uc.getRandomDouble();
+        if (random < 0.66) {
+            if (enemyBaseLocation == null)
+                enemyBaseLocation = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
 
-        if (random < 0.5)
-            return disruptRosa(loc);
-        else
-            return disruptViper(loc);
+            uc.drawLineDebug(uc.getLocation(), enemyBaseLocation, 120,0,0);
+            if(random < 0.33)
+                return disruptTastosis(enemyBaseLocation);
+            else
+                return disruptViper(enemyBaseLocation);
+        }
+        else {
+            Direction dir = Direction.ZERO;
+            if(enemyBaseLocation != null)
+                dir = uc.getLocation().directionTo(enemyBaseLocation);
+
+            return disruptRosa(dir.dx * 40, dir.dy * 40);
+        }
     }
 
     public boolean trySmokeSignal(int x){
