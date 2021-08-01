@@ -143,7 +143,7 @@ public class Spearman extends MyUnit {
                 else if(dir == Direction.NORTHEAST || dir == Direction.NORTHWEST || dir == Direction.SOUTHEAST || dir == Direction.SOUTHWEST)
                     score -= 8000;
                 if(enemyBaseLocation != null){
-                    if(enemyBaseLocation.distanceSquared(loc) <= 50)
+                    if(enemyBaseLocation.distanceSquared(loc) <= 18)
                         score -= 10e10;
                     score -= 0.01 * enemyBaseLocation.distanceSquared(loc);
                 }
@@ -181,7 +181,7 @@ public class Spearman extends MyUnit {
                 }
                 else {
                     uc.println("wandering around enemy base");
-                    pathfinding.wanderAround(enemyBaseLocation, 50);
+                    pathfinding.wanderAround(enemyBaseLocation, 18);
                 }
             }
             else if (best != Direction.ZERO)

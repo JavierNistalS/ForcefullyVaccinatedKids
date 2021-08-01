@@ -10,7 +10,7 @@ public abstract class MyUnit {
     public Location baseLocation, enemyBaseLocation;
     UnitController uc;
 
-    boolean genevaSuggestion = false;
+    boolean genevaSuggestion = true;
 
     MyUnit(UnitController uc){
         this.uc = uc;

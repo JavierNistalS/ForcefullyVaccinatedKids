@@ -15,10 +15,10 @@ public class TheKGB {
 
     }
 
-    public boolean disruptViper(Location loc) {
-        int msg = 241*(1051*loc.x + loc.y);
-        return trySmokeSignal(msg);
-    }
+//    public boolean disruptViper(Location loc) {
+//        int msg = 241*(1051*loc.x + loc.y);
+//        return trySmokeSignal(msg);
+//    }
 
     public boolean disruptRosa(int dx, int dy) {
         int inner = (100+dx) % 100 * 100 + (100+dy) % 100;
@@ -29,9 +29,10 @@ public class TheKGB {
         return trySmokeSignal(msg);
     }
 
+    int[] tastosisNumbers = {-1649760027, 1470683252, -1046765349};
     public boolean disruptTastosis(Location loc) {
-        int msg = 2048*loc.x + loc.y + (uc.getRandomDouble() < 0.5 ? -578813952 : -1115684864);
-        return trySmokeSignal(msg);
+        int num = (int)(uc.getRandomDouble() * tastosisNumbers.length);
+        return trySmokeSignal(tastosisNumbers[num]);
     }
 
     public Location readTastosis(int msg, Location alliedBase) {
@@ -76,10 +77,8 @@ public class TheKGB {
                 enemyBaseLocation = new Location((int)(1050*uc.getRandomDouble()), (int)(1050*uc.getRandomDouble()));
 
             uc.drawLineDebug(uc.getLocation(), enemyBaseLocation, 120,0,0);
-            if(random < 0.33)
-                return disruptTastosis(enemyBaseLocation);
-            else
-                return disruptViper(enemyBaseLocation);
+
+            return disruptTastosis(enemyBaseLocation);
         }
         else {
             Direction dir = Direction.ZERO;
