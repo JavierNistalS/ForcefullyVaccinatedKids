@@ -178,7 +178,7 @@ public class Pathfinding {
     public boolean canMove(Direction dir){
         if (uc.canMove(dir)){
             Location loc = uc.getLocation().add(dir);
-            if (unit.enemyBaseLocation != null && unit.enemyBaseLocation.distanceSquared(loc) <= 18 && (!uc.canSenseLocation(unit.enemyBaseLocation) || !uc.isObstructed(unit.enemyBaseLocation, loc)) && unit.enemyBaseLocation.distanceSquared(loc) <= uc.getLocation().distanceSquared(unit.enemyBaseLocation)){
+            if (unit.enemyBaseLocation != null && unit.enemyBaseLocation.distanceSquared(loc) <= 18 && (!uc.canSenseLocation(unit.enemyBaseLocation) || !uc.isObstructed(unit.enemyBaseLocation, loc))){
                 return false;
             }
             if (uc.canSenseLocation(loc)){

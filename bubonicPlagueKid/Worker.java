@@ -128,10 +128,15 @@ public class Worker extends MyUnit {
                 updateSettlementTarget();
                 bannedBuildingDirection = Direction.ZERO;
 
+                int[] resources = uc.getResourcesCarried();
+                int food = resources[Resource.FOOD.ordinal()];
+                int wood = resources[Resource.WOOD.ordinal()];
+                int stone = resources[Resource.STONE.ordinal()];
+
                 boolean needsRafts = !uc.hasResearched(Technology.RAFTS, uc.getTeam()) && requestedRafts;
-                boolean buildSettlementForFood = !needsRafts && uc.getResource(Resource.FOOD) >= maxResourceCapacity && canBuildSettlementForFood;
-                boolean buildSettlementForWood = uc.getResource(Resource.WOOD) >= maxResourceCapacity && canBuildSettlementForWood;
-                boolean buildSettlementForStone = !needsRafts && uc.getResource(Resource.STONE) >= maxResourceCapacity && canBuildSettlementForStone;
+                boolean buildSettlementForFood = !needsRafts && food >= maxResourceCapacity && canBuildSettlementForFood;
+                boolean buildSettlementForWood = wood >= maxResourceCapacity && canBuildSettlementForWood;
+                boolean buildSettlementForStone = !needsRafts && stone >= maxResourceCapacity && canBuildSettlementForStone;
                 boolean buildSettlementForResources = roundsSinceJobs > 75 || buildSettlementForFood || buildSettlementForWood || buildSettlementForStone;
 
                 if (buildSettlementForResources && resourceGathering.valueForSettlementConstruction > SETTLEMENT_BUILD_SCORE && uc.getLocation().distanceSquared(settlements[settlementTargetIdx]) > SETTLEMENT_DISTANCE && spawnNewSettlement())
