@@ -1,6 +1,7 @@
-package bubonicPlagueKid;
+package wolfGang;
 
-import aic2021.user.*;
+import aic2021.user.UnitController;
+import aic2021.user.UnitInfo;
 
 public class Farm extends MyUnit {
 

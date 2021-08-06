@@ -1,10 +1,10 @@
-package bubonicPlagueKid;
+package wolfGang;
 
 import aic2021.user.*;
 
-public class Farm extends MyUnit {
+public class Quarry extends MyUnit {
 
-    Farm(UnitController uc){
+    Quarry(UnitController uc){
         super(uc);
         comms = new Communications(uc);
         kgb = new TheKGB(uc);
@@ -29,15 +29,15 @@ public class Farm extends MyUnit {
             totalEnemyAttack += enemyUnit.getAttack();
 
         if(!toldExistence) {
-            if(comms.sendMiscMessage(comms.MSG_FARM_START))
+            if(comms.sendMiscMessage(comms.MSG_QUARRY_START))
                 toldExistence = true;
         }
         else if(totalEnemyAttack > 0 && !revokedExistence) {
-            if(totalEnemyAttack > uc.getInfo().getHealth() && comms.sendMiscMessage(comms.MSG_FARM_END))
+            if(totalEnemyAttack > uc.getInfo().getHealth() && comms.sendMiscMessage(comms.MSG_QUARRY_END))
                 revokedExistence = true;
         }
         else if (lastStatusUpdate < uc.getRound() - 100 && !beingBuilt){
-            comms.sendMiscMessage(comms.MSG_STOP_BUILDING_FARMS);
+            comms.sendMiscMessage(comms.MSG_STOP_BUILDING_QUARRYS);
         }
         else if(genevaSuggestion) {
             kgb.disruptEveryone(enemyBaseLocation);
@@ -61,12 +61,11 @@ public class Farm extends MyUnit {
     }
 
     void readMiscMessage(int info){
-        if(info == comms.MSG_START_BUILDING_FARMS) {
+        if(info == comms.MSG_START_BUILDING_QUARRYS) {
             beingBuilt = true;
             updateRound = uc.getRound();
         }
-        else if (updateRound < uc.getRound() && info == comms.MSG_STOP_BUILDING_FARMS)
+        else if (updateRound < uc.getRound() && info == comms.MSG_STOP_BUILDING_QUARRYS)
             beingBuilt = false;
     }
-
 }
