@@ -32,23 +32,40 @@ public class Trapper extends MyUnit {
 
         if(uc.canMove()) {
             // super-evasion micro
+            int bestScore = 0;
+            Direction bestDir = Direction.ZERO;
+            boolean any = false;
+
             for(Direction dir : dirs) {
                 if (pathfinding.canMove(dir)) {
+                    Location loc = uc.getLocation().add(dir);
                     int score = 0;
                     for(UnitInfo unit : enemyUnits) {
-                        score += unit.getType().attack;
+                        score += unit.getType().attack * unit.getLocation().distanceSquared(loc);
+                        any |= unit.getType().attack > 0;
+                    }
+
+                    if(score > bestScore) {
+                        bestDir = dir;
+                        bestScore = score;
                     }
                 }
+            }
+
+            if(any)
+                pathfinding.tryMove(bestDir);
+            else {
+                Location target = exploration.getLocation();
+                if (target == null) {
+                    exploration = new Exploration(uc, 3, 75);
+                    target = exploration.getLocation();
+                }
+                pathfinding.pathfindTo(target);
             }
         }
 
         if (enemyBaseLocation == null) {
-            Location target = exploration.getLocation();
-            if (target == null) {
-                exploration = new Exploration(uc, 3, 75);
-                target = exploration.getLocation();
-            }
-            pathfinding.pathfindTo(target);
+
         }
         else {
             pathfinding.wanderAround(enemyBaseLocation, 18);
