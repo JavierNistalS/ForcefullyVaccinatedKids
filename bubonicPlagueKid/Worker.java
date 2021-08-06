@@ -575,8 +575,12 @@ public class Worker extends MyUnit {
                         else{
                             score -= Math.sqrt(distSqr)*10;
                         }
-                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange)
-                            score -= ui.getAttack()*100;
+                        if (!obstructed) {
+                            if (loc.distanceSquared(ui.getLocation()) <= type.attackRange)
+                                score -= ui.getAttack() * 100;
+                            if (loc.distanceSquared(ui.getLocation()) <= type.attackRange + 8)
+                                score -= ui.getAttack() * 50;
+                        }
                         if (distSqr <= 5 && !obstructed && uc.canAttack()) {
                             canHit = true;
                             if (ui.getAttack() > 0)
