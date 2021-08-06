@@ -10,7 +10,7 @@ public abstract class MyUnit {
     public Location baseLocation, enemyBaseLocation;
     UnitController uc;
 
-    boolean genevaSuggestion = true;
+    boolean genevaSuggestion = false;
 
     MyUnit(UnitController uc){
         this.uc = uc;
@@ -123,8 +123,6 @@ public abstract class MyUnit {
     }
 
     boolean sustainTorch() {
-        uc.println("sustaining torch");
-
         int torchLife = uc.getInfo().getTorchRounds();
         if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
             tryLightTorch();

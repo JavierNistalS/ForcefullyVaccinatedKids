@@ -12,7 +12,6 @@ public class TheKGB {
     public TheKGB(UnitController uc){
         this.uc = uc;
         comms = new Communications(uc);
-
     }
 
 //    public boolean disruptViper(Location loc) {
