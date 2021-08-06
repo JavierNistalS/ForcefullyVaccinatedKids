@@ -36,7 +36,7 @@ public class Trapper extends MyUnit {
                 if (pathfinding.canMove(dir)) {
                     int score = 0;
                     for(UnitInfo unit : enemyUnits) {
-                        score += unit.getType().attack * unit.
+                        score += unit.getType().attack;
                     }
                 }
             }
