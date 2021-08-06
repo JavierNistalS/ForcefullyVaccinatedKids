@@ -22,6 +22,9 @@ public class Settlement extends MyUnit {
     int lastWorkerSeenRound = 0;
     boolean requestedRafts = false;
 
+    int enemyHostiles = 0;
+    int enemyWorkers = 0;
+
     void playRound() {
         readSmokeSignals();
 
@@ -39,6 +42,28 @@ public class Settlement extends MyUnit {
                 totalWorkersSeen++;
                 lastWorkerSeenRound = uc.getRound();
             }
+        }
+
+        enemyHostiles = 0;
+        enemyWorkers = 0;
+
+        UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+        for (UnitInfo ui : enemies){
+            if (ui.getType() == UnitType.WORKER)
+                enemyWorkers++;
+            else if (ui.getType() != UnitType.BASE && ui.getAttack() > 0){
+                enemyHostiles++;
+            }
+        }
+
+        if (!needsRafts && (enemyWorkers > 0 || enemyHostiles > 0) && enemyHostiles < 3 && wolfCount < 4){
+            if (trySpawnUnit(UnitType.WOLF))
+                wolfCount++;
+        }
+
+        if (!needsRafts && enemyWorkers > 0 && enemyWorkers < 5 && enemyHostiles == 0 && workerCount < 7){
+            if (trySpawnUnit(UnitType.WORKER))
+                workerCount++;
         }
 
         if(!needsRafts && workerCount < (totalResourcesSeen / 350) && workerCount < 2)

@@ -552,6 +552,39 @@ public class Worker extends MyUnit {
         }
     }
 
+    float unitCount(){
+        UnitInfo[] units = uc.senseUnits();
+        float score = 1;
+        for (UnitInfo ui : units){
+            if (uc.getTeam() == ui.getTeam()){
+                if (ui.getType() == UnitType.WORKER){
+                    score += 1;
+                }
+                else if (ui.getType() == UnitType.WOLF){
+                    score += 3;
+                }
+            }
+            else if (uc.getTeam() == ui.getTeam().getOpponent()){
+                if (ui.getType() == UnitType.WORKER){
+                    score -= 1;
+                }
+                else if (ui.getType() == UnitType.WOLF){
+                    score -= 4;
+                }
+                else if (ui.getAttack() > 0){
+                    score -= 1000;
+                }
+            }
+        }
+        return score;
+    }
+
+    void getReinforcements(){
+        if (settlements[settlementTargetIdx].distanceSquared(uc.getLocation()) > 25){
+            trySpawnUnit(UnitType.SETTLEMENT);
+        }
+    }
+
     void micro(){
         uc.println("doing micro");
         int bytecode = uc.getEnergyLeft();
@@ -559,6 +592,11 @@ public class Worker extends MyUnit {
             UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
             double bestScore = -1e9;
             Direction bestDir = Direction.ZERO;
+            double countUnitsScore = unitCount();
+            uc.println("countUnitsScore: " + countUnitsScore);
+            if (countUnitsScore < 0 && countUnitsScore >= -3){
+                getReinforcements();
+            }
             for (Direction dir : dirs){
                 if (pathfinding.canMove(dir)){
                     Location loc = uc.getLocation().add(dir);
@@ -573,10 +611,16 @@ public class Worker extends MyUnit {
                             score += Math.sqrt(distSqr)*100;
                         }
                         else{
-                            score -= Math.sqrt(distSqr)*10;
+                            score -= Math.sqrt(distSqr)*30*countUnitsScore;
+                        }
+                        if (type == UnitType.WORKER && countUnitsScore <= 0){
+                            score += Math.sqrt(distSqr)*100;
                         }
                         if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange)
                             score -= ui.getAttack()*100;
+                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange + 8){
+                            score -= ui.getAttack()*50;
+                        }
                         if (distSqr <= 5 && !obstructed && uc.canAttack()) {
                             canHit = true;
                             if (ui.getAttack() > 0)
@@ -587,8 +631,8 @@ public class Worker extends MyUnit {
                     uc.println("canHitAggro: " + canHitAggro);
                     if (canHit)
                         score += 200;
-                    if (canHitAggro)
-                        score += 500;
+                    if (canHitAggro && countUnitsScore > 0)
+                        score += 1000;
                     if (score > bestScore){
                         bestScore = score;
                         bestDir = dir;

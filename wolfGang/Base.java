@@ -85,7 +85,7 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if((workerCount < 7 + totalResourcesSeen / 200 && workerCount < WORKER_MAX) || lastWorkerSeenRound < uc.getRound() - 150)
+        if((workerCount < 10 + totalResourcesSeen / 200 && workerCount < WORKER_MAX) || lastWorkerSeenRound < uc.getRound() - 150)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
