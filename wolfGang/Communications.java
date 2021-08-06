@@ -5,8 +5,8 @@ import aic2021.user.*;
 public class Communications {
 
     final int[] SHUFFLE_NUMBER = {2, 12, 25, 7, 3, 8, 23, 9, 24, 1, 16, 17, 26, 28, 29, 30, 0, 27, 18, 31, 15, 6, 14, 19, 21, 22, 5, 13, 11, 10, 20, 4};
-    final int XOR_NUMBER = 2085430519;
-    final int ADD_NUMBER = -1729481724;
+    final int XOR_NUMBER = -2084139129;
+    final int ADD_NUMBER = 1734092567;
 
     final int ROUND_VALIDATION_BITS = 11; //Last round digits
     final int OFFSET_VALIDATION_BITS = 4;
