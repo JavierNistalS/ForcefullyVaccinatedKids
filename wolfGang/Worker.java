@@ -580,7 +580,13 @@ public class Worker extends MyUnit {
     }
 
     void getReinforcements(){
-        if (settlements[settlementTargetIdx].distanceSquared(uc.getLocation()) > 25){
+        UnitInfo[] allies = uc.senseUnits(uc.getTeam());
+        boolean settlement = false;
+        for (UnitInfo ui : allies){
+            if (ui.getType() == UnitType.SETTLEMENT)
+                settlement = true;
+        }
+        if (!settlement){
             trySpawnUnit(UnitType.SETTLEMENT);
         }
     }
