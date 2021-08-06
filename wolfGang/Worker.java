@@ -66,6 +66,7 @@ public class Worker extends MyUnit {
         tryGather();
         updateInfo();
         readSmokeSignals();
+        readRocks();
         generalAttack();
         resourceGathering.update();
 

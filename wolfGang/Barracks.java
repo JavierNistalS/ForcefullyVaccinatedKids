@@ -30,6 +30,7 @@ public class Barracks extends MyUnit {
     void playRound() {
         identifyBase();
         readSmokeSignals();
+        readRocks();
         if (lastUpdate < uc.getRound() - 60 && comms.sendMiscMessage(comms.MSG_BARRACKS_START))
             lastUpdate = uc.getRound();
 

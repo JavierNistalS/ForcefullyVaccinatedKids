@@ -25,6 +25,7 @@ public class Trapper extends MyUnit {
         identifyBase();
         setTraps();
         readSmokeSignals();
+        readRocks();
         pathfinding.updateEnemyUnits();
         exploration.updateChunks();
         enemyUnits = uc.senseUnits(uc.getOpponent());

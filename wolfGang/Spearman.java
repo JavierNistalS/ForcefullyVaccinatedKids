@@ -30,6 +30,7 @@ public class Spearman extends MyUnit {
         identifyBase();
         identifyEnemyBase();
         readSmokeSignals();
+        readRocks();
         generalAttack();
         updateMinSpearmanID();
         exploration.updateChunks();

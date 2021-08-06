@@ -44,6 +44,20 @@ public abstract class MyUnit {
         return false;
     }
 
+    void readRocks(){
+        if (baseLocation != null && enemyBaseLocation == null){
+            for (Direction dir : dirs){
+                Location loc = baseLocation.add(dir);
+                if (uc.canRead(loc)){
+                    int x = uc.read(loc);
+                    enemyBaseLocation = baseLocation.add(x/100-49, x%100-49);
+                    uc.println("read " + x);
+                    uc.println("location " + enemyBaseLocation);
+                }
+            }
+        }
+    }
+
     boolean trySpawnUnit(UnitType type) {
         for (Direction dir : dirs){
             if (trySpawnUnit(type, dir))

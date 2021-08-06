@@ -25,6 +25,10 @@ public class Explorer extends MyUnit {
         exploration.updateChunks();
         pathfinding.updateEnemyUnits();
 
+        if (baseLocation != null && uc.getLocation().distanceSquared(baseLocation) <= 2 && enemyBaseLocation != null){
+            uc.draw((enemyBaseLocation.x - baseLocation.x + 49)*100 + enemyBaseLocation.y - baseLocation.y + 49);
+        }
+
         ResourceInfo[] resources = uc.senseResources();
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
 
