@@ -62,15 +62,10 @@ public class Settlement extends MyUnit {
             kgb.disruptEveryone(enemyBaseLocation);
         }
 
-        if (uc.hasResearched(Technology.JOBS, uc.getTeam()) && wolfCount < 2 && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600)){
+        if (wolfCount == 0 || (wolfCount < 2 && (uc.getResource(Resource.FOOD) > 1600))){
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
-        if (!uc.hasResearched(Technology.JOBS, uc.getTeam()) && wolfCount < 2 && uc.getResource(Resource.FOOD) > 940 && uc.getResource(Resource.WOOD) > 240 && uc.getResource(Resource.STONE) > 240){
-            if (trySpawnUnit(UnitType.WOLF))
-                wolfCount++;
-        }
-
     }
 
     void readSmokeSignals() {
