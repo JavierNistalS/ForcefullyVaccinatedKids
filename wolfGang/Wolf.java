@@ -169,7 +169,7 @@ public class Wolf extends MyUnit {
                     Location loc = unit.getLocation();
                     int dist = uc.getLocation().distanceSquared(loc);
                     float value = unit.getAttack() / uc.getType().attackCooldown / unit.getHealth() / (float)Math.sqrt(dist);
-                    if(value > mostValuableTargetValue) {
+                    if(value > mostValuableTargetValue && (enemyBaseLocation == null || loc.distanceSquared(enemyBaseLocation) > 18)) {
                         mostValuableTargetValue = value;
                         mostValuableTarget = loc;
                     }

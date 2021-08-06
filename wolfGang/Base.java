@@ -8,7 +8,7 @@ public class Base extends MyUnit {
     final int FARM_MAX = 7;
     final int SAWMILL_MAX = 8;
     final int QUARRY_MAX = 7;
-    final int WORKER_MAX = 12;
+    final int WORKER_MAX = 15;
 
     Base(UnitController uc) {
         super(uc);
@@ -85,16 +85,16 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if((workerCount < 10 + totalResourcesSeen / 200 && workerCount < WORKER_MAX) || lastWorkerSeenRound < uc.getRound() - 150)
+        if((workerCount < 15 + totalResourcesSeen / 200 && workerCount < WORKER_MAX) || lastWorkerSeenRound < uc.getRound() - 150)
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if(trapperCount < 0) {
+        if(trapperCount < 5 + uc.getRound() / 300) {
             if (trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
         }
 
-        if (wolfCount < 6 + uc.getRound() / 200 || enemies.length > 2) {
+        if (wolfCount < 10 + uc.getRound() / 300 || enemies.length > 2) {
             if (trySpawnUnit(UnitType.WOLF)){
                 wolfCount++;
             }
@@ -156,7 +156,6 @@ public class Base extends MyUnit {
     }
 
     void research(){
-        tryResearch(Technology.DOMESTICATION);
 
         uc.println("rafts requested: " + raftsRequested);
         if (canResearchWithMargin (Technology.RAFTS, 0, 750, 150) || raftsRequested){
@@ -166,8 +165,11 @@ public class Base extends MyUnit {
         if(techPhase == 0) { // pre-jobs
             tryResearch(Technology.COIN);
             tryResearch(Technology.UTENSILS);
-            if ((!raftsRequested || hasTech(Technology.RAFTS)) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125))
+            tryResearch(Technology.DOMESTICATION);
+
+            if ((!raftsRequested || hasTech(Technology.RAFTS)) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
                 tryResearch(Technology.MILITARY_TRAINING);
+            }
 
             if (raftsRequested)
                 tryResearch(Technology.RAFTS);
@@ -175,6 +177,10 @@ public class Base extends MyUnit {
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs
+            tryResearch(Technology.COIN);
+            tryResearch(Technology.UTENSILS);
+            tryResearch(Technology.DOMESTICATION);
+
             if(tryResearch(Technology.JOBS)) {
                 techPhase++;
             }

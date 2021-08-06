@@ -11,11 +11,15 @@ public class Trapper extends MyUnit {
         exploration = new Exploration(uc, 3, 75);
         pathfinding = new EvasivePathfinding(uc, this);
         comms = new Communications(uc);
+        initialLocation = uc.getLocation();
     }
 
     Exploration exploration;
     EvasivePathfinding pathfinding;
     Communications comms;
+    UnitInfo[] enemyUnits;
+    Location initialLocation;
+    boolean[] hasTrap = new boolean[99*99];
 
     void playRound() {
         identifyBase();
@@ -23,6 +27,20 @@ public class Trapper extends MyUnit {
         readSmokeSignals();
         pathfinding.updateEnemyUnits();
         exploration.updateChunks();
+        enemyUnits = uc.senseUnits(uc.getOpponent());
+
+
+        if(uc.canMove()) {
+            // super-evasion micro
+            for(Direction dir : dirs) {
+                if (pathfinding.canMove(dir)) {
+                    int score = 0;
+                    for(UnitInfo unit : enemyUnits) {
+                        score += unit.getType().attack * unit.
+                    }
+                }
+            }
+        }
 
         if (enemyBaseLocation == null) {
             Location target = exploration.getLocation();
@@ -32,7 +50,7 @@ public class Trapper extends MyUnit {
             }
             pathfinding.pathfindTo(target);
         }
-        else{
+        else {
             pathfinding.wanderAround(enemyBaseLocation, 18);
         }
     }
@@ -55,9 +73,8 @@ public class Trapper extends MyUnit {
                             if (ri != null)
                                 resourcePresent = true;
                         }
-
                     }
-                    if (!resourcePresent && loc.x % 3 == 0 && loc.y % 3 == 0) {
+                    if (!resourcePresent && pathfinding.isTrapLocation(loc)) {
                         uc.attack(loc);
                     }
                 }
