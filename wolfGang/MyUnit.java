@@ -52,23 +52,15 @@ public abstract class MyUnit {
         return false;
     }
     boolean generalAttack(){
-        int lessHpAggro = 100000000;
-        int lessHpNonAggro = 100000000;
+        float bestScore = 0;
         Location best = null;
         UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
         for (UnitInfo u : units){
             int hp = u.getHealth();
-            if (u.getType().attack > 0){
-                if (lessHpAggro > hp && uc.canAttack(u.getLocation())){
-                    lessHpAggro = hp;
-                    best = u.getLocation();
-                }
-            }
-            else{
-                if (lessHpAggro == 100000000 && hp < lessHpNonAggro && uc.canAttack(u.getLocation())){
-                    lessHpNonAggro = hp;
-                    best = u.getLocation();
-                }
+            float score = u.getAttack() / u.getType().getAttackCooldown() / ((u.getHealth()+ uc.getType().getAttack() - 1 )/ uc.getType().getAttack());
+            if (score >= bestScore && uc.canAttack(u.getLocation())){
+                bestScore = score;
+                best = u.getLocation();
             }
         }
         if (best != null) {
