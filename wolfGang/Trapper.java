@@ -77,9 +77,9 @@ public class Trapper extends MyUnit {
             for (Direction dir : dirs) {
                 Location loc = uc.getLocation().add(dir);
                 if (uc.canAttack(loc)) {
-                    if (baseLocation != null && baseLocation.distanceSquared(loc) <= 2)
+                    if (baseLocation != null && baseLocation.distanceSquared(loc) <= 18)
                         continue;
-                    if (uc.canSenseLocation(loc) && uc.hasTrap(loc))
+                    if (uc.canSenseLocation(loc) && (uc.hasTrap(loc) || uc.hasMountain(loc)))
                         continue;
                     if (enemyBaseLocation != null && enemyBaseLocation.distanceSquared(loc) <= 18)
                         uc.attack(loc);
