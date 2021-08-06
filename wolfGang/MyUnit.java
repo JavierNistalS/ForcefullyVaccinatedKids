@@ -103,7 +103,7 @@ public abstract class MyUnit {
     }
 
     void identifyEnemyBase() {
-        if (enemyBaseLocation != null) {
+        if (enemyBaseLocation == null) {
             UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
             for (UnitInfo ui : units){
                 if (ui.getType() == UnitType.BASE){
