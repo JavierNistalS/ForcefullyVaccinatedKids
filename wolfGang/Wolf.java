@@ -168,7 +168,16 @@ public class Wolf extends MyUnit {
                 for(UnitInfo unit : enemyUnits) {
                     Location loc = unit.getLocation();
                     int dist = uc.getLocation().distanceSquared(loc);
-                    float value = unit.getAttack() / uc.getType().attackCooldown / unit.getHealth() / (float)Math.sqrt(dist);
+                    float value = unit.getAttack() / uc.getType().attackCooldown / unit.getHealth() / dist;
+                    int light = uc.senseIllumination(loc);
+
+                    if(light < 6)
+                        value *= 4f;
+                    else if(light < 8)
+                        value *= 2.5f;
+                    else if(light < 10)
+                        value *= 1.8f;
+
                     if(value > mostValuableTargetValue && (enemyBaseLocation == null || loc.distanceSquared(enemyBaseLocation) > 18)) {
                         mostValuableTargetValue = value;
                         mostValuableTarget = loc;
@@ -177,7 +186,6 @@ public class Wolf extends MyUnit {
 
                 float bestScore = -10e30f;
                 Direction bestDir = Direction.ZERO;
-
 
                 for (Direction dir : dirs) {
                     Location loc = uc.getLocation().add(dir);

@@ -85,28 +85,22 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if((workerCount < 15 + uc.getRound() / 100) || lastWorkerSeenRound < uc.getRound() - 150)
+        if((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (((workerCount < 10 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45))
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if(trapperCount < 0 + uc.getRound() / 300) {
+        if(trapperCount < 3 && uc.getTotalUnits() <= 50) {
             if (trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
         }
 
-        if (wolfCount < 10 + uc.getRound() / 300 || enemies.length > 2) {
-            if (trySpawnUnit(UnitType.WOLF)){
-                wolfCount++;
-            }
-        }
-
-        if (wolfCount < 5 || (uc.hasResearched(Technology.JOBS, uc.getTeam()) && (wolfCount == 0 || uc.getResource(Resource.FOOD) > 1600) && wolfCount < 10)) {
-            if (canBuildUnitWithMargin(UnitType.WOLF, 600, 75, 75) && trySpawnUnit(UnitType.WOLF))
+        if ((wolfCount < 6 + uc.getRound() / 300 || enemies.length > 2) && uc.getTotalUnits() <= 40) {
+            if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
     }
 
-    void manageMaxBuildings(){
+    void manageMaxBuildings() {
         uc.println("sawmillCount: " + sawmillCount);
         uc.println("farmCount: " + farmCount);
         uc.println("quarryCount: " + quarryCount);
@@ -155,7 +149,7 @@ public class Base extends MyUnit {
         }
     }
 
-    void research(){
+    void research() {
 
         uc.println("rafts requested: " + raftsRequested);
         if (canResearchWithMargin (Technology.RAFTS, 0, 750, 150) || raftsRequested){
@@ -173,21 +167,17 @@ public class Base extends MyUnit {
 
             if (raftsRequested)
                 tryResearch(Technology.RAFTS);
-            if(hasTech(Technology.COIN) && hasTech(Technology.UTENSILS) && hasTech(Technology.MILITARY_TRAINING) && (!raftsRequested || hasTech(Technology.RAFTS)))
+            if(hasTech(Technology.UTENSILS) && hasTech(Technology.MILITARY_TRAINING) && (!raftsRequested || hasTech(Technology.RAFTS)))
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs
-            tryResearch(Technology.COIN);
-            tryResearch(Technology.UTENSILS);
-            tryResearch(Technology.DOMESTICATION);
-
             if(tryResearch(Technology.JOBS)) {
                 techPhase++;
             }
         }
         else if(techPhase == 2) {
-            if(farmCount >= 2 && quarryCount >= 5 && sawmillCount >= 5 && canResearchWithMargin(Technology.DOMESTICATION, 0, 75, 75))
-                tryResearch(Technology.DOMESTICATION);
+            if(farmCount >= 2 && quarryCount >= 2 && sawmillCount >= 2 && canResearchWithMargin(Technology.MILITARY_TRAINING, 75, 75, 75))
+                tryResearch(Technology.MILITARY_TRAINING);
 
             int food = uc.getResource(Resource.FOOD), wood = uc.getResource(Resource.WOOD), stone = uc.getResource(Resource.STONE);
             int foodCost = 1500, woodCost = 1500, stoneCost = 1500;
@@ -251,12 +241,10 @@ public class Base extends MyUnit {
 
             }
         }
-        if(uc.getRound() > 1990)
-            techPhase = 3;
-        if(techPhase >= 3) {
+
+        if(uc.getRound() > 1990 || techPhase > 2)
             while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                 endgameTechIdx++;
-        }
     }
 
     boolean researchTechInner(int food, int wood, int stone, int foodCost, int woodCost, int stoneCost) {
