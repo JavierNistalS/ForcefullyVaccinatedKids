@@ -168,7 +168,7 @@ public class Wolf extends MyUnit {
                 for(UnitInfo unit : enemyUnits) {
                     Location loc = unit.getLocation();
                     int dist = uc.getLocation().distanceSquared(loc);
-                    float value = unit.getAttack() / uc.getType().attackCooldown / unit.getHealth() / dist;
+                    float value = unit.getAttack() / uc.getType().attackCooldown / unit.getHealth() / dist + 100;
                     int light = uc.senseIllumination(loc);
 
                     if(light < 6)
