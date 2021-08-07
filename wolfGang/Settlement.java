@@ -66,7 +66,7 @@ public class Settlement extends MyUnit {
                 workerCount++;
         }
 
-        if((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (!needsRafts && workerCount < (totalResourcesSeen / 350) && workerCount < 4 + uc.getRound() / 400 && uc.getTotalUnits() <= 50))
+        if((!needsRafts && uc.getTotalUnits() < 15 && uc.getRound() < 350) || (!needsRafts && workerCount < (totalResourcesSeen / 350) && workerCount < 4 + uc.getRound() / 400 && uc.getTotalUnits() <= 50))
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
@@ -87,7 +87,7 @@ public class Settlement extends MyUnit {
             kgb.disruptEveryone(enemyBaseLocation);
         }
 
-        if (wolfCount == 0 || (wolfCount < 2 && (uc.getResource(Resource.FOOD) > 1600))){
+        if (!needsRafts && (wolfCount == 0 || (wolfCount < 2 && (uc.getResource(Resource.FOOD) > 1600)))){
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
