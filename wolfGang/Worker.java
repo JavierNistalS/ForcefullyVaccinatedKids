@@ -25,7 +25,6 @@ public class Worker extends MyUnit {
     ResourceGathering resourceGathering;
 
     // data
-    Location baseLocation;
     Location[] settlements = new Location[256];
     int settlementsLength = 0, settlementTargetIdx = -1;
     int farmCount, quarryCount, sawmillCount;
@@ -66,7 +65,6 @@ public class Worker extends MyUnit {
         tryGather();
         updateInfo();
         readSmokeSignals();
-        readRocks();
         generalAttack();
         resourceGathering.update();
 
@@ -247,6 +245,8 @@ public class Worker extends MyUnit {
                 buildBarracks = false;
             }
         }
+
+        readRocks();
 
         // resourceInfosOccupied
         resourceInfos = uc.senseResources();

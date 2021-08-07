@@ -45,14 +45,18 @@ public abstract class MyUnit {
     }
 
     void readRocks(){
+        uc.println("readRocks: " + baseLocation + " " + enemyBaseLocation);
         if (baseLocation != null && enemyBaseLocation == null){
+            uc.println("going to read");
             for (Direction dir : dirs){
                 Location loc = baseLocation.add(dir);
                 if (uc.canRead(loc)){
                     int x = uc.read(loc);
-                    enemyBaseLocation = baseLocation.add(x/100-49, x%100-49);
-                    uc.println("read " + x);
-                    uc.println("location " + enemyBaseLocation);
+                    if (x > 0) {
+                        enemyBaseLocation = new Location(baseLocation.x + x / 100 - 49, baseLocation.y + x % 100 - 49);
+                        uc.println("read " + x);
+                        uc.println("location " + enemyBaseLocation);
+                    }
                 }
             }
         }
