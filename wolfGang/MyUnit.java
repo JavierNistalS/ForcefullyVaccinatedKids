@@ -130,12 +130,18 @@ public abstract class MyUnit {
 
     boolean sustainTorch() {
         int torchLife = uc.getInfo().getTorchRounds();
-        if (torchLife < 4 && uc.getResource(Resource.WOOD) > uc.getRound()*0.3) {
-            if (!tryLightTorch() && randomTorchThrow())
+        //uc.println("torch life: " + torchLife + ", margin: " + Math.max(uc.getRound()*0.3 - 50, 0));
+
+        if (torchLife < 4 && uc.getResource(Resource.WOOD) > Math.max(uc.getRound()*0.3 - 50, 0)) {
+            //uc.println("trying to light");
+            if (!tryLightTorch()) {
+                //uc.println("trying to throw torch & light");
+                randomTorchThrow();
                 tryLightTorch();
+            }
         }
 
-        return uc.getInfo().getTorchRounds() > 0;
+        return torchLife > 0 || (uc.getResource(Resource.WOOD) < Math.max(uc.getRound()*0.3 - 10, 0));
     }
 
     int totalResourcesAtLocation(Location loc) {

@@ -53,6 +53,9 @@ public class Base extends MyUnit {
         research();
         checkForEnemyAttack();
 
+        //if(uc.getRound() > 300)
+        //    uc.killSelf();
+
         totalResourcesSeen = 0;
         ResourceInfo[] resources = uc.senseResources();
         for(ResourceInfo resource : resources) {
@@ -81,22 +84,24 @@ public class Base extends MyUnit {
             barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
-        if(explorerCount < (enemyBaseLocation == null ? 2 : 1)) // the 1 explorer is to check for rafts
-            if(trySpawnUnit(UnitType.EXPLORER))
-                explorerCount++;
+        if(uc.getResource(Resource.WOOD) > 20) {
+            if (explorerCount < (enemyBaseLocation == null ? 2 : 1)) // the 1 explorer is to check for rafts
+                if (trySpawnUnit(UnitType.EXPLORER))
+                    explorerCount++;
 
-        if (((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (((workerCount < 10 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
-            if(trySpawnUnit(UnitType.WORKER))
-                workerCount++;
+            if (((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (((workerCount < 10 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
+                if (trySpawnUnit(UnitType.WORKER))
+                    workerCount++;
 
-        if(trapperCount < 3 && uc.getTotalUnits() <= 50 && (!raftsRequested || hasTech(Technology.RAFTS))) {
-            if (trySpawnUnit(UnitType.TRAPPER))
-                trapperCount++;
-        }
+            if (trapperCount < 3 && uc.getRound() > 100 && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+                if (trySpawnUnit(UnitType.TRAPPER))
+                    trapperCount++;
+            }
 
-        if ((wolfCount < 6 + uc.getRound() / 300 || enemies.length > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
-            if (trySpawnUnit(UnitType.WOLF))
-                wolfCount++;
+            if ((wolfCount < 6 + uc.getRound() / 300 || enemies.length > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+                if (trySpawnUnit(UnitType.WOLF))
+                    wolfCount++;
+            }
         }
     }
 
