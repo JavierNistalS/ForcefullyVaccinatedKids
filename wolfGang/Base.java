@@ -20,6 +20,8 @@ public class Base extends MyUnit {
     Communications comms;
     TheKGB kgb;
 
+    int actualEnemies = 0;
+
     int lastWorkerSeenRound = 0;
     int workerCount = 0;
     int explorerCount = 0;
@@ -98,7 +100,7 @@ public class Base extends MyUnit {
                     trapperCount++;
             }
 
-            if ((wolfCount < 6 + uc.getRound() / 300 || enemies.length > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+            if ((wolfCount < 6 + uc.getRound() / 300 || actualEnemies > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
                 if (trySpawnUnit(UnitType.WOLF))
                     wolfCount++;
             }
@@ -286,6 +288,7 @@ public class Base extends MyUnit {
 
     void checkForEnemyAttack(){
         int axemanCount = 0;
+        actualEnemies = 0;
         enemies = uc.senseUnits(uc.getTeam().getOpponent());
         for (UnitInfo ui : enemies){
             if (ui.getType() == UnitType.AXEMAN)
@@ -293,6 +296,8 @@ public class Base extends MyUnit {
             if (ui.getType() == UnitType.SPEARMAN && uc.senseIllumination(ui.getLocation()) <= 10){
                 fuckingSpearmen = true;
             }
+            if (enemyBaseLocation == null || ui.getLocation().distanceSquared(enemyBaseLocation) > 18)
+                actualEnemies++;
         }
         if (axemanCount >= 4)
             reinforceRequested = comms.sendMiscMessage(comms.MSG_REINFORCE_BASE);

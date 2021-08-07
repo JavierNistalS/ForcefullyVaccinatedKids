@@ -122,12 +122,18 @@ public class Spearman extends MyUnit {
                 for(UnitInfo unit : units) {
                     Location unitLoc = unit.getLocation();
                     int dist = unitLoc.distanceSquared(loc);
-                    if(unit.getType() == UnitType.AXEMAN && dist <= 13) {
+                    if((unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.WOLF) && dist <= 13) {
                         score -= 10e8f / dist;
                         anyTargetPresent = true;
                         uc.drawLineDebug(loc, unitLoc, 255, 0,0);
                     }
-                    else if(!canShootAnyAggro && dist <= 18 && dist >= 9 && willAttack(dir, unitLoc)){ //!uc.isObstructed(loc, unitLoc)) { WTF
+                    else if (unit.getType() == UnitType.SPEARMAN && !uc.isObstructed(unitLoc, loc)){
+                        if (dist <= 18)
+                            score -= 25000;
+                        if (dist <= 32)
+                            score -= 10000;
+                    }
+                    if(!canShootAnyAggro && dist <= 18 && dist >= 9 && willAttack(dir, unitLoc)){ //!uc.isObstructed(loc, unitLoc)) { WTF
                         canShootAny = true;
                         anyTargetPresent = true;
                         if(unit.getType() == UnitType.AXEMAN || unit.getType() == UnitType.SPEARMAN) {
@@ -193,19 +199,14 @@ public class Spearman extends MyUnit {
     void camperMicro(){
         uc.println("camperMicro");
         if (uc.canMove()){
-            if (uc.getLocation().distanceSquared(baseLocation) > 2){
+            UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
+            if (enemies.length > 0){
+                idleMicro();
+            }
+            else if (uc.getLocation().distanceSquared(baseLocation) > 2){
                 pathfinding.pathfindTo(baseLocation);
             }
             else{
-                boolean canAttack = false;
-                UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
-                for (UnitInfo ui : enemies){
-                    Location loc = ui.getLocation();
-                    if (loc.distanceSquared(uc.getLocation()) <= 18 && !uc.isObstructed(loc, uc.getLocation()))
-                        canAttack = true;
-                }
-                if (canAttack)
-                    return;
                 Direction dir = baseLocation.directionTo(uc.getLocation());
                 int k = 4;
                 while (uc.canMove() && k-- > 0){
