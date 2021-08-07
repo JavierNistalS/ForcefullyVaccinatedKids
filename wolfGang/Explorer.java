@@ -7,7 +7,7 @@ public class Explorer extends MyUnit {
     Explorer(UnitController uc){
         super(uc);
         pathfinding = new EvasivePathfinding(uc, this);
-        exploration = new Exploration(uc, 5, 50);
+        exploration = new Exploration(uc, 5, 2);
         comms = new Communications(uc);
     }
 
@@ -52,7 +52,7 @@ public class Explorer extends MyUnit {
         if(uc.canMove()){
             Location toExplore = exploration.getLocation();
             if (toExplore == null) {
-                exploration = new Exploration(uc, 5, 75);
+                exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.MOVEMENT_MULT);
                 toExplore = exploration.getLocation();
             }
             pathfinding.pathfindTo(toExplore);

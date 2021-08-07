@@ -8,7 +8,7 @@ public class Worker extends MyUnit {
         super(uc);
         pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
-        exploration = new Exploration(uc, 3, 75);
+        exploration = new Exploration(uc, 3, 4);
         resourceGathering = new ResourceGathering(uc, this);
     }
 
@@ -326,7 +326,7 @@ public class Worker extends MyUnit {
         uc.println("exploring...");
         Location exploreLoc = exploration.getLocation();
         if(exploreLoc == null) {
-            exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.RESET_TURNS);
+            exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.MOVEMENT_MULT);
             bannedBuildingDirection = Direction.ZERO;
         }
         else {

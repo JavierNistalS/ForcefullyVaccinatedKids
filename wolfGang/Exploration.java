@@ -6,12 +6,12 @@ public class Exploration
 {
     // TODO: try to make specialized worker exploration
 
-    Exploration(UnitController uc, int CHUNK_SIZE, int RESET_TURNS)
+    Exploration(UnitController uc, int CHUNK_SIZE, int MOVEMENT_MULT)
     {
         this.uc = uc;
         this.spawnLocation = uc.getLocation();
         this.CHUNK_SIZE = CHUNK_SIZE;
-        this.RESET_TURNS = RESET_TURNS;
+        this.MOVEMENT_MULT = MOVEMENT_MULT;
         SIZE = (99 + 2 * CHUNK_SIZE) / CHUNK_SIZE; // ceil(100 / CHUNK_SIZE) + 1
         exploredChunks = new boolean[SIZE][SIZE];
     }
@@ -19,7 +19,7 @@ public class Exploration
     Location spawnLocation;
     int CHUNK_SIZE;
     int SIZE;
-    int RESET_TURNS;
+    int MOVEMENT_MULT;
     boolean[][] exploredChunks;
     UnitInfo[] enemyUnits;
 
@@ -30,8 +30,7 @@ public class Exploration
 
     boolean outOfBoundsUp = true, outOfBoundsDown = true, outOfBoundsLeft = true, outOfBoundsRight = true;
 
-    void updateChunks()
-    {
+    void updateChunks() {
         // Discard current chunk
         Location loc = uc.getLocation();
         int cx = (loc.x - spawnLocation.x + 50) / CHUNK_SIZE;
@@ -73,74 +72,33 @@ public class Exploration
         }
     }
 
-    Location getLocation()
-    {
+    Location getLocation() {
         if (setExploreTarget())
-            return new Location(
-                spawnLocation.x - 50 + targetChunkX * CHUNK_SIZE,
-                spawnLocation.y - 50 + targetChunkY * CHUNK_SIZE);
+            return chunkToLocation(targetChunkX, targetChunkY);
         else
             return null;
     }
 
     boolean setExploreTarget() {
-//        if(exploredChunks[targetChunkX][targetChunkY]) {
-//            Location loc = uc.getLocation();
-//            int cx = (loc.x - spawnLocation.x + 50) / CHUNK_SIZE;
-//            int cy = (loc.y - spawnLocation.y + 50) / CHUNK_SIZE;
-//
-//            // vv Cardinal directions are repeated so that they are twice as common
-//            Direction[] randomDirs = {Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
-//            for(int i = randomDirs.length - 1; i >= 1; i--) { // SHUFFLE DIRS
-//                int j = (int)(uc.getRandomDouble() * i + 1);
-//                Direction temp = randomDirs[i];
-//                randomDirs[i] = randomDirs[j];
-//                randomDirs[j] = temp;
-//            }
-//
-//            for(Direction dir : randomDirs) {
-//                int tx = cx + dir.dx;
-//                int ty = cy + dir.dy;
-//
-//                if(!exploredChunks[tx][ty])
-//                {
-//                    targetChunkX = tx;
-//                    targetChunkY = ty;
-//                    targetRound = uc.getRound();
-//                    uc.println("target (close): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY] + "{dir = " + dir.toString() + "}");
-//                    return true;
-//                }
-//            }
-//        }
-
         int SIZE = 100 / CHUNK_SIZE;
         int c = 0;
-        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound + RESET_TURNS)
-        {
+        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound) {
             targetChunkX = (int)(SIZE * uc.getRandomDouble());
             targetChunkY = (int)(SIZE * uc.getRandomDouble());
-            targetRound = uc.getRound();
+            targetRound = uc.getRound() + MOVEMENT_MULT * uc.getLocation().distanceSquared(chunkToLocation(targetChunkX, targetChunkY));
             c++;
         }
         uc.println("target (random): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
         return !exploredChunks[targetChunkX][targetChunkY];
     }
 
-    void setRandomExploreTarget() {
-        int SIZE = 100 / CHUNK_SIZE;
-        int c = 0;
-        while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound + RESET_TURNS)
-        {
-            targetChunkX = (int)(SIZE * uc.getRandomDouble());
-            targetChunkY = (int)(SIZE * uc.getRandomDouble());
-            targetRound = uc.getRound();
-            c++;
-        }
-        uc.println("randomTarget: [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
-
+    Location chunkToLocation(int cx, int cy) {
+        return new Location(
+            spawnLocation.x - 50 + cx * CHUNK_SIZE,
+            spawnLocation.y - 50 + cy * CHUNK_SIZE);
     }
 
-    boolean willReset(){
-        return uc.getRound() >= targetRound + RESET_TURNS;
+    boolean willReset() {
+        return uc.getRound() >= targetRound;
     }
 }

@@ -7,7 +7,6 @@ public class UnitPlayer {
 
 	public void run(UnitController uc) {
 
-
 		try {
 			UnitType t = uc.getType();
 			MyUnit u;

@@ -8,7 +8,7 @@ public class Trapper extends MyUnit {
 
     Trapper(UnitController uc){
         super(uc);
-        exploration = new Exploration(uc, 3, 75);
+        exploration = new Exploration(uc, 3, 6);
         pathfinding = new EvasivePathfinding(uc, this);
         comms = new Communications(uc);
         initialLocation = uc.getLocation();
@@ -58,7 +58,7 @@ public class Trapper extends MyUnit {
             else {
                 Location target = exploration.getLocation();
                 if (target == null) {
-                    exploration = new Exploration(uc, 3, 75);
+                    exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.MOVEMENT_MULT);
                     target = exploration.getLocation();
                 }
                 pathfinding.pathfindTo(target);

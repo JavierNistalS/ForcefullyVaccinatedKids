@@ -8,7 +8,7 @@ public class Spearman extends MyUnit {
         super(uc);
         pathfinding = new Pathfinding(uc, this);
         comms = new Communications(uc);
-        exploration = new Exploration(uc, 6, 100);
+        exploration = new Exploration(uc, 6, 8);
         minSpearmanID = uc.getInfo().getID();
         UnitInfo[] enemies = uc.senseUnits(uc.getTeam().getOpponent());
         if (enemies.length >= 2) {
@@ -175,7 +175,7 @@ public class Spearman extends MyUnit {
                     uc.println("exploring enemy base");
                     Location obj = exploration.getLocation();
                     if (obj == null){
-                        exploration = new Exploration(uc, 5, 100);
+                        exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.MOVEMENT_MULT);
                         obj = exploration.getLocation();
                     }
                     pathfinding.pathfindTo(obj);

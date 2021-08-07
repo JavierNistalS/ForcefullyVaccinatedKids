@@ -10,7 +10,7 @@ public class Wolf extends MyUnit {
     Wolf(UnitController uc) {
         super(uc);
         pathfinding = new Pathfinding(uc, this);
-        exploration = new Exploration(uc, 4, 75);
+        exploration = new Exploration(uc, 4, 4);
     }
 
     Exploration exploration;
@@ -155,7 +155,7 @@ public class Wolf extends MyUnit {
 
                     Location loc = exploration.getLocation();
                     if (loc == null) {
-                        exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.RESET_TURNS);
+                        exploration = new Exploration(uc, exploration.CHUNK_SIZE, exploration.MOVEMENT_MULT);
                         loc = exploration.getLocation();
                     }
                     pathfinding.pathfindTo(loc);
