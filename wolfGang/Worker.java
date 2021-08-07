@@ -620,12 +620,12 @@ public class Worker extends MyUnit {
                         else{
                             score -= Math.sqrt(distSqr)*30*countUnitsScore;
                         }
-                        if (type == UnitType.WORKER && countUnitsScore < 0){
+                        if (type == UnitType.WORKER && !ui.isBeingConstructed() && countUnitsScore < 0){
                             score += Math.sqrt(distSqr)*100;
                         }
-                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange)
+                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange && !ui.isBeingConstructed())
                             score -= ui.getAttack()*100;
-                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange + 8 && countUnitsScore < 3){
+                        if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange + 8 && countUnitsScore < 3 && !ui.isBeingConstructed()){
                             score -= ui.getAttack()*50;
                         }
                         if (distSqr <= 5 && !obstructed && uc.canAttack()) {
