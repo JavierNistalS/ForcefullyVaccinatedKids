@@ -25,6 +25,7 @@ public class Wolf extends MyUnit {
         enemyUnits = uc.senseUnits(uc.getOpponent());
         identifyEnemyBase();
         identifyBase();
+        exploration.updateChunks();
         generalAttack();
 
         if(uc.canMove()) {
@@ -258,8 +259,7 @@ public class Wolf extends MyUnit {
                     pathfinding.tryMove(bestDir);
             }
         }
-
-        identifyBase();
+        
         generalAttack();
     }
 

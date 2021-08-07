@@ -85,16 +85,16 @@ public class Base extends MyUnit {
             if(trySpawnUnit(UnitType.EXPLORER))
                 explorerCount++;
 
-        if((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (((workerCount < 10 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45))
+        if (((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (((workerCount < 10 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
             if(trySpawnUnit(UnitType.WORKER))
                 workerCount++;
 
-        if(trapperCount < 3 && uc.getTotalUnits() <= 50) {
+        if(trapperCount < 3 && uc.getTotalUnits() <= 50 && (!raftsRequested || hasTech(Technology.RAFTS))) {
             if (trySpawnUnit(UnitType.TRAPPER))
                 trapperCount++;
         }
 
-        if ((wolfCount < 6 + uc.getRound() / 300 || enemies.length > 2) && uc.getTotalUnits() <= 40) {
+        if ((wolfCount < 6 + uc.getRound() / 300 || enemies.length > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
             if (trySpawnUnit(UnitType.WOLF))
                 wolfCount++;
         }
