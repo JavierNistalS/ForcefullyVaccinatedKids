@@ -130,8 +130,10 @@ public abstract class MyUnit {
 
     boolean sustainTorch() {
         int torchLife = uc.getInfo().getTorchRounds();
-        if ((torchLife < 4 && randomTorchThrow()) || torchLife < 10)
-            tryLightTorch();
+        if (torchLife < 4 && uc.getResource(Resource.WOOD) > uc.getRound()*0.3) {
+            if (!tryLightTorch() && randomTorchThrow())
+                tryLightTorch();
+        }
 
         return uc.getInfo().getTorchRounds() > 0;
     }
