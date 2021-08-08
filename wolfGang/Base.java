@@ -211,14 +211,13 @@ public class Base extends MyUnit {
                     int foodCost = tech1a.getFoodCost();
                     int woodCost = tech1a.getWoodCost();
                     int stoneCost = tech1a.getStoneCost();
-                    uc.println(tech1a);
 
                     if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
-                        for (Technology tech1b : tier1Techs) {
-                            if (tech1a.ordinal() < tech1b.ordinal())
-                                continue;
+                        uc.println(tech1a);
 
-                            uc.println(tech1a + " " + tech1b);
+                        for (Technology tech1b : tier1Techs) {
+                            if (tech1a.ordinal() <= tech1b.ordinal())
+                                continue;
 
                             foodCost += tech1b.getFoodCost();
                             woodCost += tech1b.getWoodCost();
@@ -226,6 +225,8 @@ public class Base extends MyUnit {
 
                             // 2 Tier-1 Techs check
                             if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                uc.println(tech1a + " " + tech1b);
+
                                 int totalCost = foodCost + woodCost + stoneCost;
                                 if (bestTechLevel == 1 || (bestTechLevel == 2 && minimumCost <= totalCost)) {
                                     bestTechLevel = 2;
@@ -251,28 +252,29 @@ public class Base extends MyUnit {
 
                                 // 3 Tier-2 Techs
                                 for (Technology tech2a : tier2Techs) {
-                                    if (tech1b.ordinal() < tech2a.ordinal())
+                                    if (tech1b.ordinal() <= tech2a.ordinal())
                                         continue;
-                                    uc.println(tech1a + " " + tech1b + " " + tech2a);
 
                                     foodCost += tech2a.getFoodCost();
                                     woodCost += tech2a.getWoodCost();
                                     stoneCost += tech2a.getStoneCost();
 
                                     if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
-                                        for (Technology tech2b : tier2Techs) {
-                                            if (tech2a.ordinal() < tech2b.ordinal())
-                                                continue;
+                                        uc.println(tech1a + " " + tech1b + " " + tech2a);
 
-                                            uc.println(tech1a + " " + tech1b + " " + tech2a + " " + tech2b);
+                                        for (Technology tech2b : tier2Techs) {
+                                            if (tech2a.ordinal() <= tech2b.ordinal())
+                                                continue;
 
                                             foodCost += tech2b.getFoodCost();
                                             woodCost += tech2b.getWoodCost();
                                             stoneCost += tech2b.getStoneCost();
 
                                             if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                                uc.println(tech1a + " " + tech1b + " " + tech2a + " " + tech2b);
+
                                                 for (Technology tech2c : tier2Techs) {
-                                                    if (tech2b.ordinal() < tech2c.ordinal())
+                                                    if (tech2b.ordinal() <= tech2c.ordinal())
                                                         continue;
                                                     foodCost += tech2c.getFoodCost();
                                                     woodCost += tech2c.getWoodCost();
@@ -280,6 +282,8 @@ public class Base extends MyUnit {
 
                                                     // 3 Tier-2 Techs check
                                                     if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
+                                                        uc.println(tech1a + " " + tech1b + " " + tech2a + " " + tech2b + " " + tech2c);
+
                                                         totalCost = foodCost + woodCost + stoneCost;
                                                         if (bestTechLevel < 3 || totalCost <= minimumCost) {
                                                             bestTechLevel = 3;
@@ -373,9 +377,10 @@ public class Base extends MyUnit {
                 for(Technology tech : emergencyTechs)
                     tryResearch(tech);
             }
-            else
+            else {
                 while (endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                     endgameTechIdx++;
+            }
         }
     }
 
