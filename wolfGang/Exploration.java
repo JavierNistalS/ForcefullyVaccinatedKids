@@ -103,6 +103,6 @@ public class Exploration
     }
 
     boolean willReset() {
-        return uc.getRound() >= targetRound;
+        return uc.getRound() + Math.sqrt(getLocation().distanceSquared(uc.getLocation()))*uc.getType().movementCooldown >= targetRound;
     }
 }
