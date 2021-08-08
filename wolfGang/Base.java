@@ -5,9 +5,9 @@ import aic2021.user.*;
 
 public class Base extends MyUnit {
 
-    final int FARM_MAX = 7;
-    final int SAWMILL_MAX = 8;
-    final int QUARRY_MAX = 7;
+    final int FARM_MAX = 14;
+    final int SAWMILL_MAX = 12;
+    final int QUARRY_MAX = 9;
     final int WORKER_MAX = 15;
 
     Base(UnitController uc) {
