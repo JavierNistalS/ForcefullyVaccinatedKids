@@ -191,20 +191,30 @@ public class Base extends MyUnit {
             if (farmCount >= 2 && quarryCount >= 2 && sawmillCount >= 2 && canResearchWithMargin(Technology.MILITARY_TRAINING, 75, 75, 75))
                 tryResearch(Technology.MILITARY_TRAINING);
 
-            int food = uc.getResource(Resource.FOOD) + 8, wood = uc.getResource(Resource.WOOD) + 8, stone = uc.getResource(Resource.STONE) + 8;
+            int food = uc.getResource(Resource.FOOD), wood = uc.getResource(Resource.WOOD), stone = uc.getResource(Resource.STONE);
 
             if (uc.getRound() > 1990) {
+
+                // a bit of margin to correct for the 10 rounds
+                food += 8;
+                wood += 8;
+                stone += 8;
+
                 int bestTechLevel = 1;
                 int minimumCost = 0;
                 for (Technology tech1a : tier1Techs) {
                     int foodCost = tech1a.getFoodCost();
                     int woodCost = tech1a.getWoodCost();
                     int stoneCost = tech1a.getStoneCost();
+                    uc.println(tech1a);
 
                     if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
                         for (Technology tech1b : tier1Techs) {
                             if (tech1a.ordinal() < tech1b.ordinal())
                                 continue;
+
+                            uc.println(tech1a + " " + tech1b);
+
                             foodCost += tech1b.getFoodCost();
                             woodCost += tech1b.getWoodCost();
                             stoneCost += tech1b.getStoneCost();
@@ -216,16 +226,20 @@ public class Base extends MyUnit {
                                     bestTechLevel = 2;
                                     minimumCost = totalCost;
                                     endgameTechs = new Technology[]{tech1a, tech1b};
+                                    uc.println("new best");
                                 }
 
                                 // SCHOOLS
                                 foodCost += 3500;
                                 if (food >= foodCost) {
+                                    uc.println(tech1a + " " + tech1b + " SCHOOLS");
+
                                     totalCost = foodCost + woodCost + stoneCost;
                                     if (bestTechLevel < 3 || totalCost <= minimumCost) {
                                         bestTechLevel = 3;
                                         minimumCost = totalCost;
                                         endgameTechs = new Technology[]{tech1a, tech1b, Technology.SCHOOLS};
+                                        uc.println("new best");
                                     }
                                 }
                                 foodCost -= 3500;
@@ -234,25 +248,30 @@ public class Base extends MyUnit {
                                 for (Technology tech2a : tier2Techs) {
                                     if (tech1b.ordinal() < tech2a.ordinal())
                                         continue;
-                                    foodCost += tech1b.getFoodCost();
-                                    woodCost += tech1b.getWoodCost();
-                                    stoneCost += tech1b.getStoneCost();
+                                    uc.println(tech1a + " " + tech1b + " " + tech2a);
+
+                                    foodCost += tech2a.getFoodCost();
+                                    woodCost += tech2a.getWoodCost();
+                                    stoneCost += tech2a.getStoneCost();
 
                                     if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
                                         for (Technology tech2b : tier2Techs) {
                                             if (tech2a.ordinal() < tech2b.ordinal())
                                                 continue;
-                                            foodCost += tech1b.getFoodCost();
-                                            woodCost += tech1b.getWoodCost();
-                                            stoneCost += tech1b.getStoneCost();
+
+                                            uc.println(tech1a + " " + tech1b + " " + tech2a + " " + tech2b);
+
+                                            foodCost += tech2b.getFoodCost();
+                                            woodCost += tech2b.getWoodCost();
+                                            stoneCost += tech2b.getStoneCost();
 
                                             if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
                                                 for (Technology tech2c : tier2Techs) {
                                                     if (tech2b.ordinal() < tech2c.ordinal())
                                                         continue;
-                                                    foodCost += tech1b.getFoodCost();
-                                                    woodCost += tech1b.getWoodCost();
-                                                    stoneCost += tech1b.getStoneCost();
+                                                    foodCost += tech2c.getFoodCost();
+                                                    woodCost += tech2c.getWoodCost();
+                                                    stoneCost += tech2c.getStoneCost();
 
                                                     // 3 Tier-2 Techs check
                                                     if (food >= foodCost && wood >= woodCost && stone >= stoneCost) {
@@ -261,21 +280,22 @@ public class Base extends MyUnit {
                                                             bestTechLevel = 3;
                                                             minimumCost = totalCost;
                                                             endgameTechs = new Technology[]{tech1a, tech1b, tech2a, tech2b, tech2c};
+                                                            uc.println("new best");
                                                         }
                                                     }
-                                                    foodCost -= tech1b.getFoodCost();
-                                                    woodCost -= tech1b.getWoodCost();
-                                                    stoneCost -= tech1b.getStoneCost();
+                                                    foodCost -= tech2c.getFoodCost();
+                                                    woodCost -= tech2c.getWoodCost();
+                                                    stoneCost -= tech2c.getStoneCost();
                                                 }
                                             }
-                                            foodCost -= tech1b.getFoodCost();
-                                            woodCost -= tech1b.getWoodCost();
-                                            stoneCost -= tech1b.getStoneCost();
+                                            foodCost -= tech2b.getFoodCost();
+                                            woodCost -= tech2b.getWoodCost();
+                                            stoneCost -= tech2b.getStoneCost();
                                         }
                                     }
-                                    foodCost -= tech1b.getFoodCost();
-                                    woodCost -= tech1b.getWoodCost();
-                                    stoneCost -= tech1b.getStoneCost();
+                                    foodCost -= tech2a.getFoodCost();
+                                    woodCost -= tech2a.getWoodCost();
+                                    stoneCost -= tech2a.getStoneCost();
                                 }
                             }
                             foodCost -= tech1b.getFoodCost();
@@ -344,12 +364,13 @@ public class Base extends MyUnit {
         }
 
         if (techPhase > 2) {
-            while (endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
-                endgameTechIdx++;
             if(endgameTechIdx == endgameTechs.length) { // just research whatever
                 for(Technology tech : emergencyTechs)
                     tryResearch(tech);
             }
+            else
+                while (endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
+                    endgameTechIdx++;
         }
     }
 
