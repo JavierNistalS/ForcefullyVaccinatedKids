@@ -103,7 +103,7 @@ public class Base extends MyUnit {
                     workerCount++;
             }
 
-            if (((uc.getTotalUnits() < 7 && uc.getRound() < 150) || (((workerCount < 15 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)))
+            if (((uc.getTotalUnits() < 7 && uc.getRound() < 150) || (((workerCount < 20 + uc.getRound() / 300) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)))
                 if (trySpawnWithMargin(UnitType.WORKER))
                     workerCount++;
 
