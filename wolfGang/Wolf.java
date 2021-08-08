@@ -20,6 +20,7 @@ public class Wolf extends MyUnit {
     boolean pushing = false;
 
 
+
     void playRound() {
         alliedUnits = uc.senseUnits(uc.getTeam());
         enemyUnits = uc.senseUnits(uc.getOpponent());
@@ -28,7 +29,12 @@ public class Wolf extends MyUnit {
         exploration.updateChunks();
         generalAttack();
 
-        if(uc.canMove()) {
+
+        if (uc.canMove() && uc.getRound() > DIVE_ROUND && enemyBaseLocation != null){
+            if (enemyBaseLocation.distanceSquared(enemyBaseLocation) > 2)
+                pathfinding.pathfindTo(enemyBaseLocation);
+        }
+        else if(uc.canMove()) {
             float totalWolfPower = uc.getInfo().getHealth() + 80;
             for (UnitInfo unit : alliedUnits) {
                 if (unit.getType() == UnitType.WOLF && unit.getLocation().distanceSquared(uc.getLocation()) <= 10)
@@ -150,7 +156,7 @@ public class Wolf extends MyUnit {
                     if (bestDir != Direction.ZERO)
                         pathfinding.tryMove(bestDir);
 
-                } else {
+                } else if (uc.getRound() < SURROUND_ROUND || enemyBaseLocation == null) {
                     uc.println("exploring");
 
                     Location loc = exploration.getLocation();
@@ -159,6 +165,8 @@ public class Wolf extends MyUnit {
                         loc = exploration.getLocation();
                     }
                     pathfinding.pathfindTo(loc);
+                } else{
+                    pathfinding.pathfindTo(enemyBaseLocation);
                 }
             } else {
                 uc.println("aggro micro");

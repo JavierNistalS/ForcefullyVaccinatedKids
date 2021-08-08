@@ -4,6 +4,9 @@ import aic2021.user.*;
 
 public abstract class MyUnit {
 
+    final int DIVE_ROUND = 1930;
+    final int SURROUND_ROUND = 1860;
+
     Direction[] dirs = Direction.values();
     Direction[] diagDirs = {Direction.NORTHWEST, Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST};
 
@@ -91,9 +94,13 @@ public abstract class MyUnit {
         UnitInfo[] units = uc.senseUnits(uc.getTeam().getOpponent());
         for (UnitInfo u : units){
             int hp = u.getHealth();
-            float score = u.getAttack() / u.getType().getAttackCooldown() / ((u.getHealth()+ uc.getType().getAttack() - 1 )/ uc.getType().getAttack());
+            float score = u.getAttack() / u.getType().getAttackCooldown() / ((hp+ uc.getType().getAttack() - 1 )/ uc.getType().getAttack());
             if (score >= bestScore && uc.canAttack(u.getLocation())){
                 bestScore = score;
+                best = u.getLocation();
+            }
+            if (u.getType() == UnitType.BASE && uc.canAttack(u.getLocation())) {
+                bestScore = 1e9f;
                 best = u.getLocation();
             }
         }
