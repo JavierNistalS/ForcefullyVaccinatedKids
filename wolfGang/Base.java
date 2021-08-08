@@ -180,7 +180,7 @@ public class Base extends MyUnit {
                 }
             }
 
-            if (hasTech(Technology.UTENSILS) && tryResearch(Technology.MILITARY_TRAINING) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS))) // && hasTech(Technology.MILITARY_TRAINING)
+            if (hasTech(Technology.UTENSILS) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS)) && tryResearch(Technology.MILITARY_TRAINING)) // && hasTech(Technology.MILITARY_TRAINING)
                 techPhase++;
         } else if (techPhase == 1) { // jobs
             tryResearch(Technology.COIN);

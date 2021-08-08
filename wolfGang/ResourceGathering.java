@@ -4,7 +4,7 @@ import aic2021.user.*;
 
 public class ResourceGathering {
 
-    final int MAX_TURNS_CHASING_MULT = 10;
+    final int MAX_TURNS_CHASING_MULT = 4;
     final int BLACK_LIST_DURATION = 250;
     final double MIN_TARGET_VALUE = 18.5f;
 
@@ -55,6 +55,7 @@ public class ResourceGathering {
                 targetResource = null;
                 turnsChasing = 0;
                 fuckingWater = false;
+                uc.println("not valuable enough");
                 resetTurnCount();
             }
         }
@@ -75,11 +76,18 @@ public class ResourceGathering {
                 valueForSettlementConstruction += effectiveValueForSettlement(ri);
 
                 if (value > targetResourceValue) {
-                    targetResourceValue = value;
-                    targetResource = loc;
-                    turnsChasing = 0;
-                    resetTurnCount();
-                    fuckingWater = false;
+                    if (targetResource == null || targetResource.distanceSquared(loc) > 2) {
+                        targetResourceValue = value;
+                        targetResource = loc;
+                        turnsChasing = 0;
+                        uc.println("change objective");
+                        resetTurnCount();
+                        fuckingWater = false;
+                    }
+                    else{
+                        targetResource = loc;
+                        targetResourceValue = value;
+                    }
                 }
             }
         }
