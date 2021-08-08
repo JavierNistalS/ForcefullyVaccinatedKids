@@ -255,6 +255,10 @@ public class Base extends MyUnit {
             }
         }
 
+        if(uc.getRound() > 1990 && techPhase == 2) {
+
+        }
+
         if(uc.getRound() > 1990 || techPhase > 2)
             while(endgameTechIdx < endgameTechs.length && tryResearch(endgameTechs[endgameTechIdx]))
                 endgameTechIdx++;
