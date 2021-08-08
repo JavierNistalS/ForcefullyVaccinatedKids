@@ -57,6 +57,7 @@ public class Worker extends MyUnit {
     boolean[] isUpdatedBuildingDirection;
     Direction bannedBuildingDirection = Direction.ZERO;
     boolean enemyUnitsPresent = false;
+    int totalResources = 0;
 
     void playRound() {
         timeAlive++;
@@ -122,7 +123,7 @@ public class Worker extends MyUnit {
         }
 
         if(uc.canMove()) {
-            if (fullOfResources || !torchLighted) {
+            if (fullOfResources || !torchLighted || (totalResources > 50 && resourceGathering.targetResourceValue == 0)) {
                 resourceGathering.resetTurnCount();
                 updateSettlementTarget();
                 bannedBuildingDirection = Direction.ZERO;
@@ -203,6 +204,7 @@ public class Worker extends MyUnit {
         // carried resources & max resource capacity
         getResourcesCarried = uc.getResourcesCarried();
         maxResourceCapacity = (uc.hasResearched(Technology.BOXES, uc.getTeam()) ? GameConstants.MAX_RESOURCE_CAPACITY_BOXES : GameConstants.MAX_RESOURCE_CAPACITY) - 4;
+        totalResources = getResourcesCarried[0] + getResourcesCarried[1] + getResourcesCarried[2];
         fullOfResources =  getResourcesCarried[0] >= maxResourceCapacity
                         || getResourcesCarried[1] >= maxResourceCapacity
                         || getResourcesCarried[2] >= maxResourceCapacity;
@@ -454,7 +456,7 @@ public class Worker extends MyUnit {
         return trySpawnInValidAndReturnLocation(type) != null;
     }
     Location trySpawnInValidAndReturnLocation(UnitType type) {
-        int distMargin = (int)(baseLocation == null ? 50d : Math.sqrt(uc.getLocation().distanceSquared(baseLocation)));
+        int distMargin = (int)(baseLocation == null ? 50d : Math.sqrt(uc.getLocation().distanceSquared(baseLocation))) * 2;
         if(canBuildUnitWithMargin(type, distMargin, distMargin, distMargin)) {
             for (Direction dir : dirs) {
                 if(uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
