@@ -259,7 +259,7 @@ public abstract class MyUnit {
     }
 
     public int woodResourceMargin() {
-        if(uc.getRound() > 1800)
+        if(uc.getRound() > 1600)
             return 100000;
 
         boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
@@ -269,7 +269,7 @@ public abstract class MyUnit {
         return woodResourceMargin();
     }
     public int foodResourceMargin() {
-        if(uc.getRound() > 1800)
+        if(uc.getRound() > 1600)
             return 100000;
 
         boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
