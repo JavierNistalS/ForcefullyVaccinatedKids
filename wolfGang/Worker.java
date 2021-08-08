@@ -545,6 +545,8 @@ public class Worker extends MyUnit {
     void buildEconBuildings() {
         if (timeAlive < 10)
             return;
+        if (uc.getRound() > 1650)
+            return;
         uc.println("canBuildSawmill: " + canBuildSawmill);
         uc.println("canBuildFarm: " + canBuildFarm);
         uc.println("canBuildQuarry: " + canBuildQuarry);
