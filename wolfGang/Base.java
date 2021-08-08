@@ -97,7 +97,7 @@ public class Base extends MyUnit {
                 if (trySpawnWithMargin(UnitType.EXPLORER))
                     explorerCount++;
 
-            if (((uc.getTotalUnits() < 3 && uc.getRound() < 150) || (((workerCount < 7 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
+            if (((uc.getTotalUnits() < 7 && uc.getRound() < 150) || (((workerCount < 15 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
                 if (trySpawnWithMargin(UnitType.WORKER))
                     workerCount++;
 

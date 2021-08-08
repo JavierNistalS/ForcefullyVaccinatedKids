@@ -129,7 +129,7 @@ public class ResourceGathering {
     }
 
     public double effectiveValue(int amount, Resource resource, int sqrDist) {
-        return Math.max(amount, 20)*values[resource.ordinal()]/(Math.sqrt(sqrDist) + 1);
+        return Math.max(amount, 20)*values[resource.ordinal()]/(Math.sqrt(sqrDist) + 1) * (resource == Resource.FOOD ? 1.5f : 1);
     }
 
     private double effectiveValueForSettlement(ResourceInfo ri) {
