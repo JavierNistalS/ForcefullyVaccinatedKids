@@ -85,11 +85,15 @@ public class Exploration
         while((exploredChunks[targetChunkX][targetChunkY] && c < 100) || uc.getRound() >= targetRound) {
             targetChunkX = (int)(SIZE * uc.getRandomDouble());
             targetChunkY = (int)(SIZE * uc.getRandomDouble());
-            targetRound = uc.getRound() + MOVEMENT_MULT * uc.getLocation().distanceSquared(chunkToLocation(targetChunkX, targetChunkY));
+            setTargetRound();
             c++;
         }
         uc.println("target (random): [" + targetChunkX + ", " + targetChunkY + "] = " + exploredChunks[targetChunkX][targetChunkY]);
         return !exploredChunks[targetChunkX][targetChunkY];
+    }
+
+    void setTargetRound(){
+        targetRound = uc.getRound() + MOVEMENT_MULT * (int)(Math.sqrt(uc.getLocation().distanceSquared(chunkToLocation(targetChunkX, targetChunkY))) + 1f);
     }
 
     Location chunkToLocation(int cx, int cy) {

@@ -25,6 +25,8 @@ public class Explorer extends MyUnit {
         exploration.updateChunks();
         pathfinding.updateEnemyUnits();
 
+        uc.println("exploration targetRound: " + exploration.targetRound);
+
         if (baseLocation != null && uc.getLocation().distanceSquared(baseLocation) <= 2 && enemyBaseLocation != null){
             uc.draw((enemyBaseLocation.x - baseLocation.x + 49)*100 + enemyBaseLocation.y - baseLocation.y + 49);
         }
@@ -59,7 +61,7 @@ public class Explorer extends MyUnit {
             uc.drawLineDebug(uc.getLocation(), toExplore, 0, 0, 255);
 
             if(pathfinding.dodgedAnyEnemies)
-                exploration.targetRound = uc.getRound();
+                exploration.setTargetRound();
 
             Location nextLoc = uc.getLocation().add(uc.getLocation().directionTo(toExplore));
             if(uc.canSenseLocation(nextLoc) && uc.hasWater(nextLoc)) {

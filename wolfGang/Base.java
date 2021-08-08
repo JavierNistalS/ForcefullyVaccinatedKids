@@ -92,21 +92,21 @@ public class Base extends MyUnit {
             barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
-        if(uc.getResource(Resource.WOOD) > 15) {
+        if(uc.getResource(Resource.WOOD) > 15 && (!raftsRequested || hasTech(Technology.RAFTS))) {
             if (explorerCount < 1) // the 1 explorer is to check for rafts
                 if (trySpawnWithMargin(UnitType.EXPLORER))
                     explorerCount++;
 
-            if (((uc.getTotalUnits() < 7 && uc.getRound() < 150) || (((workerCount < 15 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
+            if (((uc.getTotalUnits() < 7 && uc.getRound() < 150) || (((workerCount < 15 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)))
                 if (trySpawnWithMargin(UnitType.WORKER))
                     workerCount++;
 
-            if (trapperCount < 0 && uc.getRound() > 100 && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+            if (trapperCount < 0 && uc.getRound() > 100 && uc.getTotalUnits() <= 40) {
                 if (trySpawnWithMargin(UnitType.TRAPPER))
                     trapperCount++;
             }
 
-            if ((wolfCount < 2 + uc.getRound() / 300 || actualEnemies > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+            if ((wolfCount < 2 + uc.getRound() / 300 || actualEnemies > 2) && uc.getTotalUnits() <= 40) {
                 if (trySpawnWithMargin(UnitType.WOLF))
                     wolfCount++;
             }
@@ -171,7 +171,6 @@ public class Base extends MyUnit {
 
         if(techPhase == 0) { // pre-jobs
             if(!raftsRequested || hasTech(Technology.RAFTS)) {
-                tryResearch(Technology.COIN);
                 tryResearch(Technology.UTENSILS);
                 tryResearch(Technology.DOMESTICATION);
 
@@ -180,10 +179,11 @@ public class Base extends MyUnit {
                 }
             }
 
-            if(hasTech(Technology.UTENSILS) && hasTech(Technology.COIN) && tryResearch(Technology.MILITARY_TRAINING) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS))) // && hasTech(Technology.MILITARY_TRAINING)
+            if(hasTech(Technology.UTENSILS) && tryResearch(Technology.MILITARY_TRAINING) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS))) // && hasTech(Technology.MILITARY_TRAINING)
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs
+            tryResearch(Technology.COIN);
             if(tryResearch(Technology.JOBS)) {
                 techPhase++;
             }
