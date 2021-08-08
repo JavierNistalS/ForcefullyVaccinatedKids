@@ -580,7 +580,7 @@ public class Worker extends MyUnit {
                     score += 1;
                 }
                 else if (ui.getType() == UnitType.WOLF){
-                    score += 3;
+                    score += 5;
                 }
             }
             else if (uc.getTeam() == ui.getTeam().getOpponent()){
@@ -642,9 +642,9 @@ public class Worker extends MyUnit {
                             score += Math.sqrt(distSqr)*100;
                         }
                         if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange && !ui.isBeingConstructed())
-                            score -= ui.getAttack()*100;
+                            score -= ui.getAttack()*200;
                         if (!obstructed && loc.distanceSquared(ui.getLocation()) <= type.attackRange + 8 && countUnitsScore < 3 && !ui.isBeingConstructed()){
-                            score -= ui.getAttack()*50;
+                            score -= ui.getAttack()*100;
                         }
                         if (distSqr <= 5 && !obstructed && uc.canAttack()) {
                             canHit = true;
@@ -655,7 +655,7 @@ public class Worker extends MyUnit {
                     uc.println("canHit: " + canHit);
                     uc.println("canHitAggro: " + canHitAggro);
                     if (canHit)
-                        score += 200;
+                        score += 150;
                     if (canHitAggro && countUnitsScore > 0)
                         score += 1000;
                     if (score > bestScore){
