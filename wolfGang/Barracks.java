@@ -89,27 +89,29 @@ public class Barracks extends MyUnit {
             raftsRequested = true;
     }
 
-    boolean trySpawnSpearman(){
-        for (Direction dir : dirs){
-            if (uc.canSpawn(UnitType.SPEARMAN, dir)){
-                Location loc = uc.getLocation().add(dir);
-                if (enemyBaseLocation != null && loc.distanceSquared(enemyBaseLocation) <= 18 && (!uc.canSenseLocation(enemyBaseLocation) || !uc.isObstructed(enemyBaseLocation, loc)))
-                    continue;
-                if (baseLocation.distanceSquared(loc) > 2)
-                    continue;
-                if (trySpawnWithMargin(UnitType.SPEARMAN, dir)){
-                    return true;
+    boolean trySpawnSpearman() {
+        if(canBuildUnitWithMargin(UnitType.SPEARMAN, 140, 30, 30)) {
+            for (Direction dir : dirs) {
+                if (uc.canSpawn(UnitType.SPEARMAN, dir)) {
+                    Location loc = uc.getLocation().add(dir);
+                    if (enemyBaseLocation != null && loc.distanceSquared(enemyBaseLocation) <= 18 && (!uc.canSenseLocation(enemyBaseLocation) || !uc.isObstructed(enemyBaseLocation, loc)))
+                        continue;
+                    if (baseLocation.distanceSquared(loc) > 2)
+                        continue;
+                    if (trySpawnWithMargin(UnitType.SPEARMAN, dir)) {
+                        return true;
+                    }
                 }
             }
-        }
 
-        for (Direction dir : dirs){
-            if (uc.canSpawn(UnitType.SPEARMAN, dir)){
-                Location loc = uc.getLocation().add(dir);
-                if (enemyBaseLocation != null && loc.distanceSquared(enemyBaseLocation) <= 18 && (!uc.canSenseLocation(enemyBaseLocation) || !uc.isObstructed(enemyBaseLocation, loc)))
-                    continue;
-                if (trySpawnUnit(UnitType.SPEARMAN, dir)){
-                    return true;
+            for (Direction dir : dirs) {
+                if (uc.canSpawn(UnitType.SPEARMAN, dir)) {
+                    Location loc = uc.getLocation().add(dir);
+                    if (enemyBaseLocation != null && loc.distanceSquared(enemyBaseLocation) <= 18 && (!uc.canSenseLocation(enemyBaseLocation) || !uc.isObstructed(enemyBaseLocation, loc)))
+                        continue;
+                    if (trySpawnWithMargin(UnitType.SPEARMAN, dir)) {
+                        return true;
+                    }
                 }
             }
         }
