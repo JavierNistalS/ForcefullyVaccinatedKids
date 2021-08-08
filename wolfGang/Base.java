@@ -45,6 +45,7 @@ public class Base extends MyUnit {
     UnitInfo[] enemies;
 
     boolean fuckingSpearmen = false;
+    boolean jobsWorker = false;
 
     Technology[] tier1Techs = {Technology.SHARPENERS, Technology.COOKING, Technology.EUGENICS, Technology.NAVIGATION, Technology.OIL, Technology.VOCABULARY, Technology.HUTS, Technology.TACTICS};
     Technology[] tier2Techs = {Technology.CRYSTALS, Technology.COMBUSTION, Technology.POISON, Technology.EXPERTISE, Technology.FLINT, Technology.HOUSES};
@@ -54,6 +55,11 @@ public class Base extends MyUnit {
         readSmokeSignals();
         research();
         checkForEnemyAttack();
+
+        if(!jobsWorker && hasTech(Technology.JOBS)) {
+            jobsWorker = trySpawnUnit(UnitType.WORKER);
+            workerCount++;
+        }
 
         //if(uc.getRound() > 300)
         //    uc.killSelf();
@@ -169,12 +175,12 @@ public class Base extends MyUnit {
                 tryResearch(Technology.UTENSILS);
                 tryResearch(Technology.DOMESTICATION);
 
-                if (hasTech(Technology.DOMESTICATION) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
-                    tryResearch(Technology.MILITARY_TRAINING);
-                }
+                //if (hasTech(Technology.DOMESTICATION) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
+                //    tryResearch(Technology.MILITARY_TRAINING);
+                //}
             }
 
-            if(hasTech(Technology.UTENSILS) && hasTech(Technology.COIN) && hasTech(Technology.DOMESTICATION) && hasTech(Technology.MILITARY_TRAINING) && (!raftsRequested || hasTech(Technology.RAFTS)))
+            if(hasTech(Technology.UTENSILS) && hasTech(Technology.COIN) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS))) // && hasTech(Technology.MILITARY_TRAINING)
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs

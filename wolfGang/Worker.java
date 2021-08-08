@@ -454,12 +454,14 @@ public class Worker extends MyUnit {
         return trySpawnInValidAndReturnLocation(type) != null;
     }
     Location trySpawnInValidAndReturnLocation(UnitType type) {
-    mainLoop:
-        for (Direction dir : dirs) {
-            if(uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
-                uc.spawn(type, dir);
-                lastValid = uc.getRound();
-                return uc.getLocation();
+        int distMargin = (int)(baseLocation == null ? 50d : Math.sqrt(uc.getLocation().distanceSquared(baseLocation)));
+        if(canBuildUnitWithMargin(type, distMargin, distMargin, distMargin)) {
+            for (Direction dir : dirs) {
+                if(uc.canSpawn(type, dir) && isValidBuildingDirection(dir)) {
+                    uc.spawn(type, dir);
+                    lastValid = uc.getRound();
+                    return uc.getLocation();
+                }
             }
         }
         return null;
@@ -469,7 +471,6 @@ public class Worker extends MyUnit {
         return trySpawnInValidAndReturnLocation(type) != null;
     }
     Location trySpawnInValidWithMarginAndReturnLocation(UnitType type) {
-        mainLoop:
         for (Direction dir : dirs) {
             if(uc.canSpawn(type, dir) && isValidBuildingDirection(dir) && trySpawnWithMargin(type, dir)) {
                 lastValid = uc.getRound();
