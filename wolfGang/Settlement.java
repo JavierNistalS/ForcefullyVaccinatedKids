@@ -61,7 +61,7 @@ public class Settlement extends MyUnit {
                 wolfCount++;
         }
 
-        if (uc.getTotalUnits() < 45 && !needsRafts && enemyWorkers > 0 && enemyWorkers < 4 && enemyHostiles == 0 && workerCount < 6 + uc.getRound() / 300){
+        if (uc.getTotalUnits() < 45 && !needsRafts && enemyWorkers > 0 && enemyWorkers < 4 && enemyHostiles == 0){ //&& workerCount < 6 + uc.getRound() / 300){
             if (trySpawnWithMargin(UnitType.WORKER))
                 workerCount++;
         }
