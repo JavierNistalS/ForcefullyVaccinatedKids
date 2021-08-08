@@ -56,12 +56,12 @@ public class Settlement extends MyUnit {
             }
         }
 
-        if ((!needsRafts && ((enemyWorkers > 0 || enemyHostiles > 0) && enemyHostiles < 3) || wolfCount < 2)){
+        if (uc.getTotalUnits() < 40 && (!needsRafts && ((enemyWorkers > 0 || enemyHostiles > 0) && enemyHostiles < 3) || wolfCount < 2)){
             if (trySpawnWithMargin(UnitType.WOLF))
                 wolfCount++;
         }
 
-        if (!needsRafts && enemyWorkers > 0 && enemyWorkers < 4 && enemyHostiles == 0 && workerCount < 6 + uc.getRound() / 300){
+        if (uc.getTotalUnits() < 45 && !needsRafts && enemyWorkers > 0 && enemyWorkers < 4 && enemyHostiles == 0 && workerCount < 6 + uc.getRound() / 300){
             if (trySpawnWithMargin(UnitType.WORKER))
                 workerCount++;
         }

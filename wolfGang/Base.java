@@ -101,7 +101,7 @@ public class Base extends MyUnit {
                 if (trySpawnWithMargin(UnitType.WORKER))
                     workerCount++;
 
-            if (trapperCount < 0 && uc.getRound() > 100 && uc.getTotalUnits() <= 40) {
+            if (trapperCount < 2 && uc.getRound() > 250 && uc.getTotalUnits() <= 40 && wolfCount > 1) {
                 if (trySpawnWithMargin(UnitType.TRAPPER))
                     trapperCount++;
             }

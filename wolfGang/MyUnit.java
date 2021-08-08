@@ -259,14 +259,19 @@ public abstract class MyUnit {
     }
 
     public int woodResourceMargin() {
+        if(uc.getRound() > 1800)
+            return 100000;
+
         boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
         return Math.max(Math.min((uc.getRound() - 300) / 4, hasJobs ? 160 : 200), 0);
     }
     public int stoneResourceMargin() {
-        boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
-        return Math.max(Math.min((uc.getRound() - 300) / 4, hasJobs ? 160 : 200), 0);
+        return woodResourceMargin();
     }
     public int foodResourceMargin() {
+        if(uc.getRound() > 1800)
+            return 100000;
+
         boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
         return Math.max(Math.min((uc.getRound() - 300), hasJobs ? 160 : 800), 0);
     }
