@@ -175,12 +175,12 @@ public class Base extends MyUnit {
                 tryResearch(Technology.UTENSILS);
                 tryResearch(Technology.DOMESTICATION);
 
-                //if (hasTech(Technology.DOMESTICATION) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
-                //    tryResearch(Technology.MILITARY_TRAINING);
-                //}
+                if (canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
+                    tryResearch(Technology.MILITARY_TRAINING);
+                }
             }
 
-            if(hasTech(Technology.UTENSILS) && hasTech(Technology.COIN) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS))) // && hasTech(Technology.MILITARY_TRAINING)
+            if(hasTech(Technology.UTENSILS) && hasTech(Technology.COIN) && tryResearch(Technology.MILITARY_TRAINING) && hasTech(Technology.DOMESTICATION) && (!raftsRequested || hasTech(Technology.RAFTS))) // && hasTech(Technology.MILITARY_TRAINING)
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs
