@@ -56,22 +56,22 @@ public class Settlement extends MyUnit {
             }
         }
 
-        if (!needsRafts && (enemyWorkers > 0 || enemyHostiles > 0) && enemyHostiles < 3 && wolfCount < 3){
-            if (trySpawnUnit(UnitType.WOLF))
+        if ((!needsRafts && ((enemyWorkers > 0 || enemyHostiles > 0) && enemyHostiles < 3) || wolfCount < 2)){
+            if (trySpawnWithMargin(UnitType.WOLF))
                 wolfCount++;
         }
 
-        if (!needsRafts && enemyWorkers > 0 && enemyWorkers < 5 && enemyHostiles == 0 && workerCount < 10 + uc.getRound() / 300){
-            if (trySpawnUnit(UnitType.WORKER))
+        if (!needsRafts && enemyWorkers > 0 && enemyWorkers < 4 && enemyHostiles == 0 && workerCount < 6 + uc.getRound() / 300){
+            if (trySpawnWithMargin(UnitType.WORKER))
                 workerCount++;
         }
 
-        if((!needsRafts && uc.getTotalUnits() < 15 && uc.getRound() < 350) || (!needsRafts && workerCount < (totalResourcesSeen / 350) && workerCount < 4 + uc.getRound() / 400 && uc.getTotalUnits() <= 50))
-            if(trySpawnUnit(UnitType.WORKER))
+        if((!needsRafts && uc.getTotalUnits() < 7 && uc.getRound() < 350) || (!needsRafts && workerCount < (totalResourcesSeen / 350) && workerCount < 3 + uc.getRound() / 400 && uc.getTotalUnits() <= 50))
+            if(trySpawnWithMargin(UnitType.WORKER))
                 workerCount++;
 
         if (!needsRafts && ((lastWorkerSeenRound < uc.getRound() - 30 && totalResourcesSeen >= 200) || lastWorkerSeenRound < uc.getRound() - 200)){
-            if(canBuildUnitWithMargin(UnitType.WORKER, 0, 75, 75) && trySpawnUnit(UnitType.WORKER))
+            if(canBuildUnitWithMargin(UnitType.WORKER, 0, 75, 75) && trySpawnWithMargin(UnitType.WORKER))
                 workerCount++;
         }
 

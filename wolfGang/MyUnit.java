@@ -69,6 +69,22 @@ public abstract class MyUnit {
         }
         return false;
     }
+    boolean trySpawnWithMargin(UnitType type) {
+        if(canBuildUnitWithMargin(type, foodResourceMargin(), woodResourceMargin(), stoneResourceMargin())) {
+            for (Direction dir : dirs) {
+                if (trySpawnUnit(type, dir))
+                    return true;
+            }
+        }
+        return false;
+    }
+    boolean trySpawnWithMargin(UnitType type, Direction dir) {
+        if(canBuildUnitWithMargin(type, foodResourceMargin(), woodResourceMargin(), stoneResourceMargin())) {
+            if (trySpawnUnit(type, dir))
+                return true;
+        }
+        return false;
+    }
     boolean generalAttack(){
         float bestScore = 0;
         Location best = null;
@@ -240,5 +256,18 @@ public abstract class MyUnit {
         return uc.getResource(Resource.FOOD) >= foodMargin + tech.getFoodCost()
             && uc.getResource(Resource.WOOD) >= woodMargin + tech.getWoodCost()
             && uc.getResource(Resource.STONE) >= stoneMargin + tech.getStoneCost();
+    }
+
+    public int woodResourceMargin() {
+        boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
+        return Math.max(Math.min((uc.getRound() - 300) / 4, hasJobs ? 160 : 200), 0);
+    }
+    public int stoneResourceMargin() {
+        boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
+        return Math.max(Math.min((uc.getRound() - 300) / 4, hasJobs ? 160 : 200), 0);
+    }
+    public int foodResourceMargin() {
+        boolean hasJobs = uc.hasResearched(Technology.JOBS, uc.getTeam());
+        return Math.max(Math.min((uc.getRound() - 300), hasJobs ? 160 : 800), 0);
     }
 }

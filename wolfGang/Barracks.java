@@ -35,7 +35,7 @@ public class Barracks extends MyUnit {
             lastUpdate = uc.getRound();
 
         if (!raftsRequested || uc.hasResearched(Technology.RAFTS, uc.getTeam())) {
-            if (uc.getTotalUnits() <= 45 && ((spawnedUnits < 5 || (reinforceRequested && spawnedUnits < 10)) && trySpawnSpearman()))
+            if (uc.getTotalUnits() <= 45 && (((spawnedUnits < 3 + uc.getRound() / 250) || (reinforceRequested && spawnedUnits < 8 + uc.getRound() / 250)) && trySpawnSpearman()))
                 spawnedUnits++;
             if (spawnedUnits < 10 && !canBuildFarm && !canBuildQuarry && !canBuildSawmill && trySpawnSpearman()) {
                 spawnedUnits++;
@@ -97,7 +97,7 @@ public class Barracks extends MyUnit {
                     continue;
                 if (baseLocation.distanceSquared(loc) > 2)
                     continue;
-                if (trySpawnUnit(UnitType.SPEARMAN, dir)){
+                if (trySpawnWithMargin(UnitType.SPEARMAN, dir)){
                     return true;
                 }
             }

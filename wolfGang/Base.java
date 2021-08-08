@@ -86,22 +86,22 @@ public class Base extends MyUnit {
             barracksWorker = trySpawnUnit(UnitType.WORKER);
         }
 
-        if(uc.getResource(Resource.WOOD) > 20) {
-            if (explorerCount < (enemyBaseLocation == null ? 2 : 1)) // the 1 explorer is to check for rafts
-                if (trySpawnUnit(UnitType.EXPLORER))
+        if(uc.getResource(Resource.WOOD) > 15) {
+            if (explorerCount < 1) // the 1 explorer is to check for rafts
+                if (trySpawnWithMargin(UnitType.EXPLORER))
                     explorerCount++;
 
-            if (((uc.getTotalUnits() < 15 && uc.getRound() < 350) || (((workerCount < 10 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
-                if (trySpawnUnit(UnitType.WORKER))
+            if (((uc.getTotalUnits() < 3 && uc.getRound() < 150) || (((workerCount < 7 + uc.getRound() / 250) || lastWorkerSeenRound < uc.getRound() - 150) && uc.getTotalUnits() <= 45)) && (!raftsRequested || hasTech(Technology.RAFTS)))
+                if (trySpawnWithMargin(UnitType.WORKER))
                     workerCount++;
 
-            if (trapperCount < 3 && uc.getRound() > 100 && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
-                if (trySpawnUnit(UnitType.TRAPPER))
+            if (trapperCount < 0 && uc.getRound() > 100 && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+                if (trySpawnWithMargin(UnitType.TRAPPER))
                     trapperCount++;
             }
 
-            if ((wolfCount < 6 + uc.getRound() / 300 || actualEnemies > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
-                if (trySpawnUnit(UnitType.WOLF))
+            if ((wolfCount < 2 + uc.getRound() / 300 || actualEnemies > 2) && uc.getTotalUnits() <= 40 && (!raftsRequested || hasTech(Technology.RAFTS))) {
+                if (trySpawnWithMargin(UnitType.WOLF))
                     wolfCount++;
             }
         }
@@ -159,22 +159,22 @@ public class Base extends MyUnit {
     void research() {
 
         uc.println("rafts requested: " + raftsRequested);
-        if (canResearchWithMargin (Technology.RAFTS, 0, 750, 150) || raftsRequested){
+        if (canResearchWithMargin(Technology.RAFTS, 0, 1500, 150) || raftsRequested){
             tryResearch(Technology.RAFTS);
         }
 
         if(techPhase == 0) { // pre-jobs
-            tryResearch(Technology.COIN);
-            tryResearch(Technology.UTENSILS);
-            tryResearch(Technology.DOMESTICATION);
+            if(!raftsRequested || hasTech(Technology.RAFTS)) {
+                tryResearch(Technology.COIN);
+                tryResearch(Technology.UTENSILS);
+                tryResearch(Technology.DOMESTICATION);
 
-            if ((!raftsRequested || hasTech(Technology.RAFTS)) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
-                tryResearch(Technology.MILITARY_TRAINING);
+                if (hasTech(Technology.DOMESTICATION) && canResearchWithMargin(Technology.MILITARY_TRAINING, 0, 125, 125)) {
+                    tryResearch(Technology.MILITARY_TRAINING);
+                }
             }
 
-            if (raftsRequested)
-                tryResearch(Technology.RAFTS);
-            if(hasTech(Technology.UTENSILS) && hasTech(Technology.MILITARY_TRAINING) && (!raftsRequested || hasTech(Technology.RAFTS)))
+            if(hasTech(Technology.UTENSILS) && hasTech(Technology.COIN) && hasTech(Technology.DOMESTICATION) && hasTech(Technology.MILITARY_TRAINING) && (!raftsRequested || hasTech(Technology.RAFTS)))
                 techPhase++;
         }
         else if(techPhase == 1) { // jobs

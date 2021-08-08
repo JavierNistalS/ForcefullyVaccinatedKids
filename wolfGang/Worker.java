@@ -391,7 +391,7 @@ public class Worker extends MyUnit {
 
     boolean spawnNewSettlement() {
         uc.println("spawning new settlement");
-        Location newSettlementLoc = trySpawnInValidAndReturnLocation(UnitType.SETTLEMENT);
+        Location newSettlementLoc = trySpawnInValidWithMarginAndReturnLocation(UnitType.SETTLEMENT);
         if(newSettlementLoc != null) {
             uc.drawLineDebug(uc.getLocation(), newSettlementLoc, 0, 255, 255);
             addSettlementUnchecked(newSettlementLoc);
@@ -465,6 +465,20 @@ public class Worker extends MyUnit {
         return null;
     }
 
+    boolean trySpawnInValidWithMargin(UnitType type) {
+        return trySpawnInValidAndReturnLocation(type) != null;
+    }
+    Location trySpawnInValidWithMarginAndReturnLocation(UnitType type) {
+        mainLoop:
+        for (Direction dir : dirs) {
+            if(uc.canSpawn(type, dir) && isValidBuildingDirection(dir) && trySpawnWithMargin(type, dir)) {
+                lastValid = uc.getRound();
+                return uc.getLocation();
+            }
+        }
+        return null;
+    }
+
     boolean isValidBuildingDirection(Direction dir) {
         if (!dir.isEqual(bannedBuildingDirection)) {
             Location loc = uc.getLocation().add(dir);
@@ -478,7 +492,6 @@ public class Worker extends MyUnit {
                 if (!isUpdatedBuildingDirection[dir.ordinal()])
                     updateIsValidBuildingDirection(dir);
                 return isValidBuildingDirection[dir.ordinal()];
-
             }
         }
         return false;
@@ -527,7 +540,7 @@ public class Worker extends MyUnit {
     }
 
     void buildEconBuildings() {
-        if (timeAlive < 100 || uc.getRandomDouble() > 0.1)
+        if (timeAlive < 10)
             return;
         uc.println("canBuildSawmill: " + canBuildSawmill);
         uc.println("canBuildFarm: " + canBuildFarm);
