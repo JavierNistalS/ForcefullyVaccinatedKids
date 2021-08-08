@@ -4,8 +4,8 @@ import aic2021.user.*;
 
 public class Communications {
 
-    final int XOR_NUMBER = -1251833774;
-    final int ADD_NUMBER = -19568032;
+    final int XOR_NUMBER = 2108587054;
+    final int ADD_NUMBER = -1775906532;
 
     final int ROUND_VALIDATION_BITS = 11; //Last round digits
     final int OFFSET_VALIDATION_BITS = 4;
