@@ -1,4 +1,4 @@
-package wolfGang;
+package finalBot;
 
 public class P<X, Y> {
     public X x;

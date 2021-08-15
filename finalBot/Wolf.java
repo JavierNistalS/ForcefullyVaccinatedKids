@@ -1,4 +1,4 @@
-package wolfGang;
+package finalBot;
 
 import aic2021.user.*;
 

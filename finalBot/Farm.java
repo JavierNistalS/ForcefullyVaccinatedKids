@@ -1,11 +1,11 @@
-package wolfGang;
+package finalBot;
 
 import aic2021.user.UnitController;
 import aic2021.user.UnitInfo;
 
-public class Sawmill extends MyUnit {
+public class Farm extends MyUnit {
 
-    Sawmill(UnitController uc){
+    Farm(UnitController uc){
         super(uc);
         comms = new Communications(uc);
         kgb = new TheKGB(uc);
@@ -30,15 +30,15 @@ public class Sawmill extends MyUnit {
             totalEnemyAttack += enemyUnit.getAttack();
 
         if(!toldExistence) {
-            if(comms.sendMiscMessage(comms.MSG_SAWMILL_START))
+            if(comms.sendMiscMessage(comms.MSG_FARM_START))
                 toldExistence = true;
         }
         else if(totalEnemyAttack > 0 && !revokedExistence) {
-            if(totalEnemyAttack > uc.getInfo().getHealth() && comms.sendMiscMessage(comms.MSG_SAWMILL_END))
+            if(totalEnemyAttack > uc.getInfo().getHealth() && comms.sendMiscMessage(comms.MSG_FARM_END))
                 revokedExistence = true;
         }
         else if (lastStatusUpdate < uc.getRound() - 100 && !beingBuilt){
-            comms.sendMiscMessage(comms.MSG_STOP_BUILDING_SAWMILLS);
+            comms.sendMiscMessage(comms.MSG_STOP_BUILDING_FARMS);
         }
         else if(genevaSuggestion) {
             kgb.disruptEveryone(enemyBaseLocation);
@@ -62,11 +62,11 @@ public class Sawmill extends MyUnit {
     }
 
     void readMiscMessage(int info){
-        if(info == comms.MSG_START_BUILDING_SAWMILLS) {
+        if(info == comms.MSG_START_BUILDING_FARMS) {
             beingBuilt = true;
             updateRound = uc.getRound();
         }
-        else if (updateRound < uc.getRound() && info == comms.MSG_STOP_BUILDING_SAWMILLS)
+        else if (updateRound < uc.getRound() && info == comms.MSG_STOP_BUILDING_FARMS)
             beingBuilt = false;
     }
 
