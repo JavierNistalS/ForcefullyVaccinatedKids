@@ -1,4 +1,4 @@
-#AIC2021 ForcefullyVaxxedKids
+# AIC2021 ForcefullyVaxxedKids
 ## By Javier Nistal (JavierN) & Vicent Baeza (Visi)
 
 This is the repository our team used during AIC2021, a 3-week competition about programming bots to play a certain game against other teams' bots. More info [here](https://coliseum.ai/home?lang=en&tournament=aic2021 "AIC2021's Homepage"). Since we didn't intend to publish the bot, so we apologize in advance for the lack of 'cleanliness' of some parts of the code.
